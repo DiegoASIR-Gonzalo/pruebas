@@ -7,28 +7,28 @@
 <style>
 :root{color-scheme:dark;--bg:#070b14;--panel:#101827;--panel2:#0c1321;--line:#24324a;--text:#eef4ff;--muted:#98a7bf;--accent:#f4c75a;--accent2:#74b9ff;--ok:#35d49a;--bad:#ff7185;--shadow:0 16px 45px rgba(0,0,0,.28)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 420px at 10% -5%,rgba(244,199,90,.11),transparent 58%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{width:min(1450px,94vw);margin:auto;padding:25px 0 60px}
-.hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.brand h1{margin:0;font-size:clamp(27px,4vw,40px);letter-spacing:-.035em}.brand p{margin:6px 0 0;color:var(--muted)}
+main{width:min(1350px,96vw);margin:auto;padding:16px 0 35px}
+.hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.brand h1{margin:0;font-size:clamp(24px,3vw,34px);letter-spacing:-.035em}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}
 .badge{border:1px solid rgba(244,199,90,.35);background:rgba(244,199,90,.08);color:#ffe9a3;border-radius:999px;padding:7px 11px;font-size:12px;white-space:nowrap}
-.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin:20px 0 14px}
-input,button,select{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;outline:none}
+.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin:13px 0 10px}
+input,button,select{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;outline:none}
 input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(116,185,255,.10)}
 button{cursor:pointer}.primary{background:var(--accent);border-color:var(--accent);color:#17130a;font-weight:800}.ghost{background:#151f31}
-.notice{border:1px solid #314460;background:linear-gradient(180deg,rgba(116,185,255,.09),rgba(116,185,255,.03));padding:13px 15px;border-radius:14px;color:#cbd7ea;margin:14px 0 22px}
+.notice{border:1px solid #314460;background:linear-gradient(180deg,rgba(116,185,255,.09),rgba(116,185,255,.03));padding:9px 12px;border-radius:11px;color:#cbd7ea;margin:10px 0 14px;font-size:12px}
 .notice strong{color:#f2f6ff}.notice code,.route code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .card{background:linear-gradient(180deg,rgba(16,24,39,.98),rgba(12,19,33,.98));border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-.card-head{padding:16px;border-bottom:1px solid var(--line)}.title-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.name{font-size:18px;font-weight:850}.desc{font-size:13px;color:var(--muted);margin-top:3px}.method{font-size:11px;color:#b5f3d9;border:1px solid rgba(53,212,154,.25);background:rgba(53,212,154,.07);padding:4px 8px;border-radius:999px}
-.route{display:flex;gap:8px;margin-top:10px}.route code{flex:1;overflow:auto;background:#08101d;border:1px solid #1b283d;border-radius:9px;padding:8px;color:#c4d0e2}
-.body{padding:15px}.params{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:170px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
-.status{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#67748a;display:inline-block;margin-right:7px}.ok .dot{background:var(--ok)}.bad .dot{background:var(--bad)}.loading .dot{background:#f2b94b;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.35}}
-.result{margin-top:13px}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}.tabs button{font-size:12px;padding:7px 10px}.tabs button.active{background:#26344d;border-color:#51627e}
-.panel{border:1px solid #1d2a3e;border-radius:12px;overflow:hidden;background:#080d16}.overview{padding:12px}.kv{display:grid;grid-template-columns:minmax(150px,.6fr) minmax(0,1.4fr);gap:1px;background:#1d2a3e}.kv>div{background:#0d1524;padding:8px 10px;word-break:break-word}.k{color:#a9cbff;font-weight:650}.v{color:#e4ebf7}
-pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;padding:13px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
-.tree{max-height:560px;overflow:auto;padding:10px}.node{padding-left:9px}.node summary{cursor:pointer;padding:4px 0;list-style:none}.node summary::-webkit-details-marker{display:none}
-.media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px}.media{border:1px solid #233149;background:#0b1322;border-radius:11px;overflow:hidden}.media img{display:block;width:100%;aspect-ratio:1.6;object-fit:contain;background:#070b13}.media figcaption{padding:7px 9px;font-size:11px;color:#b7c4d8;word-break:break-word}.media a{color:#8fc4ff}
-table{width:100%;border-collapse:collapse;font-size:12px}.tablewrap{max-height:560px;overflow:auto}.tablewrap th,.tablewrap td{padding:8px 9px;border-bottom:1px solid #1d2a3e;text-align:left;vertical-align:top;word-break:break-word}.tablewrap th{position:sticky;top:0;background:#121d30;color:#dce7f6}.tablewrap tr:hover td{background:#0e1728}
+.card-head{padding:11px 12px;border-bottom:1px solid var(--line)}.title-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.name{font-size:16px;font-weight:850}.desc{font-size:12px;color:var(--muted);margin-top:2px}.method{font-size:11px;color:#b5f3d9;border:1px solid rgba(53,212,154,.25);background:rgba(53,212,154,.07);padding:4px 8px;border-radius:999px}
+.route{display:flex;gap:6px;margin-top:7px}.route code{flex:1;overflow:auto;background:#08101d;border:1px solid #1b283d;border-radius:8px;padding:6px 8px;color:#c4d0e2}
+.body{padding:10px 12px}.params{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:170px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.status{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:8px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#67748a;display:inline-block;margin-right:7px}.ok .dot{background:var(--ok)}.bad .dot{background:var(--bad)}.loading .dot{background:#f2b94b;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.35}}
+.result{margin-top:9px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}.tabs button{font-size:11px;padding:5px 8px}.tabs button.active{background:#26344d;border-color:#51627e}
+.panel{border:1px solid #1d2a3e;border-radius:12px;overflow:hidden;background:#080d16}.overview{padding:8px}.kv{display:grid;grid-template-columns:minmax(150px,.6fr) minmax(0,1.4fr);gap:1px;background:#1d2a3e}.kv>div{background:#0d1524;padding:6px 8px;word-break:break-word}.k{color:#a9cbff;font-weight:650}.v{color:#e4ebf7}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;padding:13px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tree{max-height:320px;overflow:auto;padding:10px}.node{padding-left:9px}.node summary{cursor:pointer;padding:4px 0;list-style:none}.node summary::-webkit-details-marker{display:none}
+.media-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:7px}.media{border:1px solid #233149;background:#0b1322;border-radius:9px;overflow:hidden}.media img{display:block;width:100%;height:72px;object-fit:contain;background:#070b13}.media figcaption{padding:7px 9px;font-size:11px;color:#b7c4d8;word-break:break-word}.media a{color:#8fc4ff}
+table{width:100%;border-collapse:collapse;font-size:12px}.tablewrap{max-height:320px;overflow:auto}.tablewrap th,.tablewrap td{padding:5px 7px;border-bottom:1px solid #1d2a3e;text-align:left;vertical-align:top;word-break:break-word}.tablewrap th{position:sticky;top:0;background:#121d30;color:#dce7f6}.tablewrap tr:hover td{background:#0e1728}
 code.small{font-size:11px}.subtle{color:var(--muted);font-size:12px}
 details.tech{margin-top:10px;border-top:1px dashed #27364e;padding-top:9px}.tech summary{cursor:pointer;color:#b6c2d4;font-size:12px}
 .hidden{display:none!important}
@@ -82,7 +82,7 @@ const EPS=[
 ];
 
 const TRANSLATIONS={
- id:"ID",playerId:"ID de jugador",player_id:"ID de jugador",teamId:"ID de equipo",team_id:"ID de equipo",
+ id:"ID",playerId:"ID de jugador",player_id:"ID de jugador",teamId:"ID de equipo",team_id:"ID de equipo",nickname:"Nombre",lastSeasonPoints:"Últimos puntos",last_season_points:"Últimos puntos",averagePoints:"Media de puntos",average_points:"Media de puntos",
  name:"Nombre",fullName:"Nombre completo",firstName:"Nombre",lastName:"Apellidos",shortName:"Nombre corto",
  position:"Posición",positions:"Posiciones",role:"Rol",status:"Estado",active:"Activo",enabled:"Habilitado",
  team:"Equipo",teamName:"Equipo",club:"Club",clubName:"Nombre del club",league:"Liga",
@@ -96,7 +96,7 @@ const TRANSLATIONS={
  previousValue:"Valor anterior",previousMarketValue:"Valor de mercado anterior",initialValue:"Valor inicial",
  change:"Cambio",changeValue:"Cambio de valor",changePercent:"Cambio porcentual",trend:"Tendencia",
  min:"Mínimo",max:"Máximo",average:"Media",avg:"Media",median:"Mediana",total:"Total",
- points:"Puntos",fantasyPoints:"Puntos Fantasy",score:"Puntuación",rating:"Valoración",form:"Forma",
+ points:"Puntos",fantasyPoints:"Puntos Fantasy",score:"Puntuación",rating:"Valoración",form:"Forma",seasonPoints:"Puntos de la temporada",totalSeasonPoints:"Puntos totales de la temporada",currentSeasonPoints:"Puntos de la temporada actual",lastSeason:"Última temporada",lastSeasonRank:"Posición de la última temporada",averageScore:"Puntuación media",averagePointsPerGame:"Media de puntos por partido",gamesPlayed:"Partidos jugados",fantasyValue:"Valor Fantasy",credits:"Créditos",formPoints:"Puntos de forma",formValue:"Valor de forma",
  goals:"Goles",assists:"Asistencias",shots:"Tiros",shotsOnTarget:"Tiros a puerta",minutes:"Minutos",
  matches:"Partidos",appearances:"Apariciones",starts:"Titularidades",bench:"Banquillo",
  goalsConceded:"Goles encajados",cleanSheets:"Porterías a cero",saves:"Paradas",penaltiesSaved:"Penaltis parados",
@@ -204,7 +204,7 @@ function render(){const q=$("filter").value.toLowerCase().trim();$("grid").repla
 function renderResult(data,result){
   const images=collectImages(data);
   const table=flatTable(data);
-  result.innerHTML='<div class="tabs"><button class="active" data-tab="overview">Resumen</button>'+(table?'<button data-tab="table">Tabla</button>':"")+'<button data-tab="tree">Campos traducidos</button>'+(images.length?'<button data-tab="media">Imágenes ('+images.length+')</button>':"")+'<button data-tab="json">JSON original</button></div><div class="panel" data-view="overview">'+prettyOverview(data)+'</div>'+(table?'<div class="panel hidden" data-view="table">'+table+'</div>':"")+'<div class="panel hidden" data-view="tree"><div class="tree">'+translatedTree(data)+'</div></div>'+(images.length?'<div class="panel hidden" data-view="media"><div class="media-grid">'+images.slice(0,80).map(([k,v])=>imageMarkup(k,v)).join("")+'</div><div class="subtle" style="padding:0 10px 10px">Mostrando hasta 80 imágenes detectadas.</div></div>':"")+'<div class="panel hidden" data-view="json"><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div>';
+  result.innerHTML='<div class="tabs"><button class="active" data-tab="overview">Resumen</button>'+(table?'<button data-tab="table">Tabla</button>':"")+'<button data-tab="tree">Campos traducidos</button>'+(images.length?'<button data-tab="media">Imágenes ('+images.length+')</button>':"")+'<button data-tab="json">JSON original</button></div><div class="panel" data-view="overview">'+prettyOverview(data)+'</div>'+(table?'<div class="panel hidden" data-view="table">'+table+'</div>':"")+'<div class="panel hidden" data-view="tree"><div class="tree">'+translatedTree(data)+'</div></div>'+(images.length?'<div class="panel hidden" data-view="media"><div class="media-grid">'+images.slice(0,60).map(([k,v])=>imageMarkup(k,v)).join("")+'</div><div class="subtle" style="padding:0 10px 10px">Mostrando hasta 60 imágenes detectadas.</div></div>':"")+'<div class="panel hidden" data-view="json"><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div>';
   result.querySelectorAll("[data-tab]").forEach(tab=>tab.onclick=()=>{result.querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("active"));tab.classList.add("active");result.querySelectorAll("[data-view]").forEach(x=>x.classList.add("hidden"));result.querySelector('[data-view="'+tab.dataset.tab+'"]').classList.remove("hidden")});
 }
 async function fetchEndpoint(ep,c){
