@@ -3,54 +3,233 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LALIGA Fantasy · API Explorer</title>
+<title>LALIGA Fantasy · Explorador público</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--card:#131b2e;--line:#2b3854;--txt:#eef2ff;--muted:#9aa7bf;--accent:#f5c451;--ok:#37d39a;--bad:#ff6b7d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif}
-main{max-width:1350px;margin:auto;padding:24px}.top{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.top h1{margin:0;font-size:30px}.hint{color:var(--muted)}
-.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin:18px 0}
-input,button,select{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#0f1729;color:var(--txt)}
-button{cursor:pointer}.primary{background:var(--accent);color:#17130b;border-color:var(--accent);font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.head{padding:15px;border-bottom:1px solid var(--line)}.name{font-weight:800;font-size:17px}.desc{color:var(--muted);font-size:13px;margin-top:3px}
-.url{margin-top:10px;display:flex;gap:7px}.url code{flex:1;overflow:auto;background:#0a1120;padding:8px;border-radius:8px;font-size:12px}
-.body{padding:14px}.params{display:flex;gap:8px;flex-wrap:wrap}.field{flex:1;min-width:150px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
-.status{margin-top:10px;display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--muted);font-size:12px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#667085;margin-right:6px}.ok .dot{background:var(--ok)}.bad .dot{background:var(--bad)}
-.result{margin-top:12px}.tabs{display:flex;gap:6px;margin-bottom:8px}.tabs button{font-size:12px;padding:7px 9px}.tabs .active{background:#26334d}
-pre{white-space:pre-wrap;word-break:break-word;max-height:480px;overflow:auto;background:#080d18;border:1px solid #1e2a41;border-radius:10px;padding:12px;font:12px/1.45 ui-monospace,monospace}
-.tablewrap{max-height:480px;overflow:auto;border:1px solid #1e2a41;border-radius:10px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:7px 9px;border-bottom:1px solid #1e2a41;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e31}
-details{font:12px/1.45 ui-monospace,monospace}.tree{background:#080d18;border:1px solid #1e2a41;border-radius:10px;padding:9px;max-height:480px;overflow:auto}.k{color:#8fc4ff}.s{color:#83e6ad}.n{color:#f8d86d}.b{color:#ff9fb0}.null{color:#c8b5ff}
-.notice{padding:12px 14px;background:#151f34;border:1px solid #314461;border-radius:12px;color:#cbd5e1;margin:16px 0}.notice strong{color:#fff}
-footer{margin-top:22px;color:var(--muted);font-size:12px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}@media(max-width:600px){.toolbar{grid-template-columns:1fr}}
+:root{color-scheme:dark;--bg:#070b14;--panel:#101827;--panel2:#0c1321;--line:#24324a;--text:#eef4ff;--muted:#98a7bf;--accent:#f4c75a;--accent2:#74b9ff;--ok:#35d49a;--bad:#ff7185;--shadow:0 16px 45px rgba(0,0,0,.28)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 420px at 10% -5%,rgba(244,199,90,.11),transparent 58%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(1450px,94vw);margin:auto;padding:25px 0 60px}
+.hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.brand h1{margin:0;font-size:clamp(27px,4vw,40px);letter-spacing:-.035em}.brand p{margin:6px 0 0;color:var(--muted)}
+.badge{border:1px solid rgba(244,199,90,.35);background:rgba(244,199,90,.08);color:#ffe9a3;border-radius:999px;padding:7px 11px;font-size:12px;white-space:nowrap}
+.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin:20px 0 14px}
+input,button,select{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;outline:none}
+input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(116,185,255,.10)}
+button{cursor:pointer}.primary{background:var(--accent);border-color:var(--accent);color:#17130a;font-weight:800}.ghost{background:#151f31}
+.notice{border:1px solid #314460;background:linear-gradient(180deg,rgba(116,185,255,.09),rgba(116,185,255,.03));padding:13px 15px;border-radius:14px;color:#cbd7ea;margin:14px 0 22px}
+.notice strong{color:#f2f6ff}.notice code,.route code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.card{background:linear-gradient(180deg,rgba(16,24,39,.98),rgba(12,19,33,.98));border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:16px;border-bottom:1px solid var(--line)}.title-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.name{font-size:18px;font-weight:850}.desc{font-size:13px;color:var(--muted);margin-top:3px}.method{font-size:11px;color:#b5f3d9;border:1px solid rgba(53,212,154,.25);background:rgba(53,212,154,.07);padding:4px 8px;border-radius:999px}
+.route{display:flex;gap:8px;margin-top:10px}.route code{flex:1;overflow:auto;background:#08101d;border:1px solid #1b283d;border-radius:9px;padding:8px;color:#c4d0e2}
+.body{padding:15px}.params{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:170px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.status{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#67748a;display:inline-block;margin-right:7px}.ok .dot{background:var(--ok)}.bad .dot{background:var(--bad)}.loading .dot{background:#f2b94b;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.35}}
+.result{margin-top:13px}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}.tabs button{font-size:12px;padding:7px 10px}.tabs button.active{background:#26344d;border-color:#51627e}
+.panel{border:1px solid #1d2a3e;border-radius:12px;overflow:hidden;background:#080d16}.overview{padding:12px}.kv{display:grid;grid-template-columns:minmax(150px,.6fr) minmax(0,1.4fr);gap:1px;background:#1d2a3e}.kv>div{background:#0d1524;padding:8px 10px;word-break:break-word}.k{color:#a9cbff;font-weight:650}.v{color:#e4ebf7}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;padding:13px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tree{max-height:560px;overflow:auto;padding:10px}.node{padding-left:9px}.node summary{cursor:pointer;padding:4px 0;list-style:none}.node summary::-webkit-details-marker{display:none}
+.media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px}.media{border:1px solid #233149;background:#0b1322;border-radius:11px;overflow:hidden}.media img{display:block;width:100%;aspect-ratio:1.6;object-fit:contain;background:#070b13}.media figcaption{padding:7px 9px;font-size:11px;color:#b7c4d8;word-break:break-word}.media a{color:#8fc4ff}
+table{width:100%;border-collapse:collapse;font-size:12px}.tablewrap{max-height:560px;overflow:auto}.tablewrap th,.tablewrap td{padding:8px 9px;border-bottom:1px solid #1d2a3e;text-align:left;vertical-align:top;word-break:break-word}.tablewrap th{position:sticky;top:0;background:#121d30;color:#dce7f6}.tablewrap tr:hover td{background:#0e1728}
+code.small{font-size:11px}.subtle{color:var(--muted);font-size:12px}
+details.tech{margin-top:10px;border-top:1px dashed #27364e;padding-top:9px}.tech summary{cursor:pointer;color:#b6c2d4;font-size:12px}
+.hidden{display:none!important}
+@media(max-width:950px){.grid{grid-template-columns:1fr}.media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.hero{display:block}.badge{display:inline-block;margin-top:12px}.toolbar{grid-template-columns:1fr}.media-grid{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
 </style>
 </head>
-<body><main>
-<div class="top"><h1>LALIGA Fantasy · API Explorer</h1><span class="hint">Solo endpoints GET públicos</span></div>
-<div class="toolbar"><input id="filter" placeholder="Filtrar endpoints…"><select id="lang"><option value="">Idioma por defecto</option><option value="es">x-lang=es</option></select><button id="all" class="primary">Cargar públicos</button></div>
-<div class="notice"><strong>Sin servidor propio:</strong> GitHub guarda la página y Vercel ejecuta la función serverless. El navegador llama a <code>/api/laliga/...</code> y la función obtiene el JSON del API de LALIGA Fantasy server-to-server. No intenta desactivar CORS.</div>
-<div id="grid" class="grid"></div>
-<footer>El proxy está bloqueado a los endpoints públicos listados abajo. No acepta URLs arbitrarias, cookies ni cabeceras Authorization.</footer>
+<body>
+<main>
+  <section class="hero">
+    <div class="brand">
+      <h1>⚽ LALIGA Fantasy</h1>
+      <p>Explorador de datos públicos · jugadores · equipos · mercado · estadísticas</p>
+    </div>
+    <span class="badge">Solo lectura · GET</span>
+  </section>
+
+  <div class="toolbar">
+    <input id="filter" type="search" placeholder="Buscar una sección…">
+    <select id="lang" aria-label="Idioma de los datos">
+      <option value="">Idioma predeterminado</option>
+      <option value="es">Pedir datos en español (x-lang=es)</option>
+    </select>
+    <button id="all" class="primary">Cargar datos públicos</button>
+  </div>
+
+  <div class="notice">
+    <strong>¿Qué estás viendo?</strong> La página traduce automáticamente los nombres de los campos del JSON a etiquetas comprensibles.
+    Las respuestas originales siguen disponibles en <strong>JSON original</strong>. Las direcciones que parezcan fotos,
+    escudos, logos, avatares o imágenes se muestran visualmente cuando el navegador puede cargarlas.
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <p class="subtle" style="margin-top:22px">
+    El backend serverless está limitado a endpoints públicos GET concretos. No acepta URLs arbitrarias, cookies ni credenciales.
+  </p>
 </main>
+
 <script>
+"use strict";
 const API="/api/laliga";
+
 const EPS=[
-{id:"teams",name:"Teams master",desc:"Datos maestros de equipos",path:"/v3/teams-master",params:[]},
-{id:"players",name:"Players",desc:"Catálogo de jugadores",path:"/v1/competition/1/players",params:[]},
-{id:"mv",name:"Market value",desc:"Histórico de valor de mercado de un jugador",path:"/v1/competition/1/player/{playerId}/market-value",params:[["playerId","ID de jugador","Ej. 12345"]]},
-{id:"current",name:"Current week",desc:"Semana Fantasy actual",path:"/v1/competition/1/week/current",params:[]},
-{id:"calendar",name:"Calendar",desc:"Calendario de una semana",path:"/v1/competition/1/calendar?weekNumber={week}",params:[["week","Semana","Ej. 8"]]},
-{id:"stats",name:"Weekly stats",desc:"Estadísticas semanales",path:"/stats/v1/competition/1/stats/week/{week}",params:[["week","Semana","Ej. 8"]]}
+  {id:"teams",name:"Equipos",desc:"Lista y datos maestros de los equipos",path:"/v3/teams-master",params:[]},
+  {id:"players",name:"Jugadores",desc:"Catálogo completo de jugadores disponible para Fantasy",path:"/v1/competition/1/players",params:[]},
+  {id:"player",name:"Estadísticas del jugador",desc:"Ficha completa de un jugador concreto",path:"/v1/competition/1/player/{id}",params:[["id","ID del jugador","Ej. 12345"]]},
+  {id:"market",name:"Valor de mercado",desc:"Histórico del valor de mercado de un jugador",path:"/v1/competition/1/player/{id}/market-value",params:[["id","ID del jugador","Ej. 12345"]]},
+  {id:"current",name:"Semana actual",desc:"Información de la jornada Fantasy actual",path:"/v1/competition/1/week/current",params:[]},
+  {id:"calendar",name:"Calendario",desc:"Calendario y encuentros de una jornada Fantasy",path:"/v1/competition/1/calendar?weekNumber={week}",params:[["week","Número de jornada","Ej. 8"]]},
+  {id:"stats",name:"Estadísticas semanales",desc:"Estadísticas generales de una jornada Fantasy",path:"/stats/v1/competition/1/stats/week/{week}",params:[["week","Número de jornada","Ej. 8"]]}
 ];
+
+const TRANSLATIONS={
+ id:"ID",playerId:"ID de jugador",player_id:"ID de jugador",teamId:"ID de equipo",team_id:"ID de equipo",
+ name:"Nombre",fullName:"Nombre completo",firstName:"Nombre",lastName:"Apellidos",shortName:"Nombre corto",
+ position:"Posición",positions:"Posiciones",role:"Rol",status:"Estado",active:"Activo",enabled:"Habilitado",
+ team:"Equipo",teamName:"Equipo",club:"Club",clubName:"Nombre del club",league:"Liga",
+ number:"Dorsal",shirtNumber:"Dorsal",jerseyNumber:"Dorsal",nationality:"Nacionalidad",country:"País",
+ birthDate:"Fecha de nacimiento",dateOfBirth:"Fecha de nacimiento",age:"Edad",
+ image:"Imagen",imageUrl:"Imagen",photo:"Foto",photoUrl:"Foto",avatar:"Avatar",avatarUrl:"Avatar",
+ logo:"Escudo / logo",logoUrl:"Escudo / logo",badge:"Escudo",badgeUrl:"Escudo",crest:"Escudo",crestUrl:"Escudo",
+ teamLogo:"Escudo del equipo",teamLogoUrl:"Escudo del equipo",playerImage:"Foto del jugador",playerImageUrl:"Foto del jugador",
+ url:"URL",href:"Enlace",description:"Descripción",shortDescription:"Descripción breve",
+ marketValue:"Valor de mercado",market_value:"Valor de mercado",value:"Valor",price:"Precio",
+ previousValue:"Valor anterior",previousMarketValue:"Valor de mercado anterior",initialValue:"Valor inicial",
+ change:"Cambio",changeValue:"Cambio de valor",changePercent:"Cambio porcentual",trend:"Tendencia",
+ min:"Mínimo",max:"Máximo",average:"Media",avg:"Media",median:"Mediana",total:"Total",
+ points:"Puntos",fantasyPoints:"Puntos Fantasy",score:"Puntuación",rating:"Valoración",form:"Forma",
+ goals:"Goles",assists:"Asistencias",shots:"Tiros",shotsOnTarget:"Tiros a puerta",minutes:"Minutos",
+ matches:"Partidos",appearances:"Apariciones",starts:"Titularidades",bench:"Banquillo",
+ goalsConceded:"Goles encajados",cleanSheets:"Porterías a cero",saves:"Paradas",penaltiesSaved:"Penaltis parados",
+ yellowCards:"Tarjetas amarillas",redCards:"Tarjetas rojas",fouls:"Faltas",offsides:"Fueras de juego",
+ passes:"Pases",successfulPasses:"Pases completados",keyPasses:"Pases clave",crosses:"Centros",
+ duels:"Duelos",duelsWon:"Duelos ganados",interceptions:"Intercepciones",tackles:"Entradas",
+ possession:"Posesión",distance:"Distancia",events:"Eventos",statistics:"Estadísticas",stats:"Estadísticas",
+ season:"Temporada",competition:"Competición",week:"Jornada",weekNumber:"Número de jornada",matchday:"Jornada",
+ fixture:"Partido",fixtures:"Partidos",calendar:"Calendario",date:"Fecha",time:"Hora",kickoff:"Inicio",
+ home:"Local",away:"Visitante",homeTeam:"Equipo local",awayTeam:"Equipo visitante",
+ totalPoints:"Puntos totales",lastUpdate:"Última actualización",updatedAt:"Actualizado",createdAt:"Creado",
+ timestamp:"Marca de tiempo",type:"Tipo",category:"Categoría",rank:"Posición en ranking",ranking:"Clasificación",
+ data:"Datos",items:"Elementos",results:"Resultados",content:"Contenido",meta:"Metadatos",metadata:"Metadatos",
+ page:"Página",pageSize:"Tamaño de página",count:"Cantidad",totalCount:"Cantidad total",
+ uuid:"Identificador",code:"Código",key:"Clave",valueId:"ID del valor",currency:"Moneda",
+ injury:"Lesión",injured:"Lesionado",availability:"Disponibilidad",suspension:"Sanción",statusText:"Estado",
+ start:"Inicio",end:"Fin",from:"Desde",to:"Hasta",seasonId:"ID de temporada",competitionId:"ID de competición"
+};
+
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-function val(v){if(v===null)return '<span class="null">null</span>';if(typeof v==="string")return '<span class="s">"'+esc(v)+'"</span>';if(typeof v==="number")return '<span class="n">'+v+'</span>';if(typeof v==="boolean")return '<span class="b">'+v+'</span>';return esc(v)}
-function tree(v){if(v&&typeof v==="object"){const a=Array.isArray(v),en=Object.entries(v);return '<details open><summary class="k">'+(a?'Array ['+v.length+']':'Object {'+en.length+'}')+'</summary>'+en.map(([k,x])=>'<div style="padding-left:12px"><span class="k">'+esc(k)+'</span>: '+tree(x)+'</div>').join('')+'</details>'}return val(v)}
-function table(v){if(!Array.isArray(v)||!v.length||v.some(x=>!x||typeof x!=="object"||Array.isArray(x)))return null;const ks=[...new Set(v.flatMap(x=>Object.keys(x)))].slice(0,30);return '<div class="tablewrap"><table><thead><tr>'+ks.map(k=>'<th>'+esc(k)+'</th>').join('')+'</tr></thead><tbody>'+v.slice(0,500).map(r=>'<tr>'+ks.map(k=>'<td>'+val(r[k])+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'}
-function urlFor(ep,card){let p=ep.path;for(const [k,,] of ep.params){const el=card.querySelector('[data-p="'+k+'"]');if(!el.value.trim())throw Error("Falta "+k);p=p.replace('{'+k+'}',encodeURIComponent(el.value.trim()))}const [pathname,qs]=p.split("?");let u=API+"?path="+encodeURIComponent(pathname);if(qs){const params=new URLSearchParams(qs);for(const [k,v] of params)u+="&"+encodeURIComponent(k)+"="+encodeURIComponent(v)}const l=$("lang").value;if(l)u+="&x-lang="+encodeURIComponent(l);return u}
-function card(ep){const c=document.createElement("section");c.className="card";c.innerHTML='<div class="head"><div class="name">'+esc(ep.name)+'</div><div class="desc">'+esc(ep.desc)+'</div><div class="url"><code>'+esc(ep.path)+'</code><button data-copy>Copiar</button></div></div><div class="body">'+(ep.params.length?'<div class="params">'+ep.params.map(([k,l,p])=>'<div class="field"><label>'+esc(l)+'</label><input data-p="'+esc(k)+'" placeholder="'+esc(p)+'"></div>').join('')+'</div>':'<span class="hint">Sin parámetros</span>')+'<div class="status"><span data-status><span class="dot"></span>Sin cargar</span><button class="primary" data-fetch>Fetch JSON</button></div><div class="result" data-result></div></div>';c.querySelector("[data-copy]").onclick=()=>navigator.clipboard.writeText(urlFor(ep,c)).catch(()=>{});c.querySelector("[data-fetch]").onclick=()=>go(ep,c);return c}
-function render(){const q=$("filter").value.toLowerCase();$("grid").replaceChildren(...EPS.filter(e=>(e.name+" "+e.desc+" "+e.path).toLowerCase().includes(q)).map(card))}
-async function go(ep,c){const s=c.querySelector("[data-status]"),b=c.querySelector("[data-fetch]"),r=c.querySelector("[data-result]");b.disabled=true;s.textContent="Cargando…";r.innerHTML="";try{const u=urlFor(ep,c),t0=performance.now(),resp=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"}),txt=await resp.text();let data;try{data=JSON.parse(txt)}catch{data=txt}if(!resp.ok)throw Error("HTTP "+resp.status+" "+resp.statusText+" · "+txt.slice(0,500));s.innerHTML='<span class="dot" style="background:var(--ok)"></span>HTTP '+resp.status+' · '+Math.round(performance.now()-t0)+' ms';const tv=table(data);r.innerHTML='<div class="tabs"><button class="active" data-tab="a">'+(tv?"Tabla":"Vista")+'</button><button data-tab="b">Árbol</button><button data-tab="c">JSON</button></div><div data-v="a">'+(tv||"<span class='hint'>Respuesta no tabular; usa Árbol o JSON.</span>")+'</div><div data-v="b" hidden><div class="tree">'+tree(data)+'</div></div><div data-v="c" hidden><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div>';r.querySelectorAll("[data-tab]").forEach(x=>x.onclick=()=>{r.querySelectorAll("[data-tab]").forEach(y=>y.classList.remove("active"));x.classList.add("active");r.querySelectorAll("[data-v]").forEach(y=>y.hidden=true);r.querySelector('[data-v="'+x.dataset.tab+'"]').hidden=false})}catch(e){s.innerHTML='<span class="dot" style="background:var(--bad)"></span>'+esc(e.message);r.innerHTML='<pre>'+esc(/Failed to fetch|NetworkError|CORS/i.test(e.message)?"El navegador no está viendo el API directamente; revisa que la función de Vercel esté desplegada y accesible.\n\n":"")+esc(e.stack||e.message)+'</pre>'}finally{b.disabled=false}}
-$("filter").oninput=render;$("all").onclick=async()=>{for(const e of EPS.filter(x=>!x.params.length))await go(e,[...$("grid").querySelectorAll(".card")].find(c=>c.querySelector(".name").textContent===e.name))};render();
+const humanWord=w=>w.replace(/[_-]+/g," ").replace(/([a-z0-9])([A-Z])/g,"$1 $2").replace(/\s+/g," ").trim();
+const translateKey=k=>{
+  if(TRANSLATIONS[k])return TRANSLATIONS[k];
+  const h=humanWord(k), low=h.toLowerCase();
+  const direct={"id":"Identificador","name":"Nombre","status":"Estado","team":"Equipo","player":"Jugador","date":"Fecha","time":"Hora","value":"Valor","points":"Puntos","total":"Total","current":"Actual","previous":"Anterior","next":"Siguiente","average":"Media","minimum":"Mínimo","maximum":"Máximo","statistics":"Estadísticas","calendar":"Calendario","week":"Jornada","home":"Local","away":"Visitante","image":"Imagen","photo":"Foto","logo":"Logo","url":"URL","country":"País","position":"Posición","number":"Número"};
+  return direct[low]||h.replace(/\bId\b/i,"ID").replace(/\bUrl\b/i,"URL").replace(/\bPct\b/i,"%").replace(/\bPts\b/i,"Puntos");
+};
+const isObject=v=>v&&typeof v==="object";
+const isImageKey=k=>/(image|photo|avatar|logo|badge|crest|icon|picture|cover|thumbnail|url)/i.test(k);
+const isImageUrl=v=>typeof v==="string" && /^(https?:|data:image\/|\/)/i.test(v) && (/\.(png|jpe?g|gif|webp|svg)(\?|#|$)/i.test(v)||/image|photo|avatar|logo|badge|crest|icon|picture|thumbnail/i.test(v));
+function scalar(v){
+  if(v===null)return '<span style="color:#c8b7ff">No disponible</span>';
+  if(typeof v==="boolean")return v?"Sí":"No";
+  if(typeof v==="number")return v.toLocaleString("es-ES");
+  return esc(v);
+}
+function imageMarkup(key,value){
+  if(!isImageUrl(value))return "";
+  return '<figure class="media"><img src="'+esc(value)+'" alt="'+esc(translateKey(key))+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML=\'<div style="padding:14px;color:#ff9dac;font-size:12px">No se ha podido cargar la imagen.<br><a href="'+esc(value)+'" target="_blank" rel="noopener">Abrir imagen</a></div>\'"><figcaption>'+esc(translateKey(key))+' · <a href="'+esc(value)+'" target="_blank" rel="noopener">abrir</a></figcaption></figure>';
+}
+function collectImages(v,key="Datos",out=[]){
+  if(Array.isArray(v)){v.slice(0,500).forEach(x=>collectImages(x,key,out));return out}
+  if(isObject(v)){for(const [k,x] of Object.entries(v)){if(typeof x==="string"&&isImageKey(k)&&isImageUrl(x))out.push([k,x]);else if(isObject(x)||Array.isArray(x))collectImages(x,k,out)}}
+  return out;
+}
+function prettyOverview(data){
+  if(Array.isArray(data)){
+    return '<div class="overview"><div style="font-weight:800;margin-bottom:8px">Lista de '+data.length.toLocaleString("es-ES")+' elementos</div><div class="subtle">Usa “Tabla”, “Árbol” o “JSON original” para explorar todos los campos.</div></div>';
+  }
+  if(!isObject(data))return '<div class="overview">'+scalar(data)+'</div>';
+  const entries=Object.entries(data).slice(0,80);
+  return '<div class="kv">'+entries.map(([k,v])=>{
+    const img=imageMarkup(k,v);
+    if(img)return '<div class="k">'+esc(translateKey(k))+'</div><div class="v">'+img+'</div>';
+    return '<div class="k">'+esc(translateKey(k))+'</div><div class="v">'+(isObject(v)?'<span class="subtle">'+(Array.isArray(v)?"Lista":"Objeto")+'</span>':scalar(v))+'</div>';
+  }).join("")+'</div>';
+}
+function translatedTree(v,level=0){
+  if(Array.isArray(v)){
+    const body=v.slice(0,500).map((x,i)=>'<details class="node" '+(level<1?"open":"")+'><summary><span class="k">Elemento '+(i+1)+'</span></summary><div style="padding-left:12px">'+translatedTree(x,level+1)+'</div></details>').join("");
+    return '<div>'+body+(v.length>500?'<div class="subtle">Se muestran 500 elementos en esta vista. El JSON original conserva todos.</div>':'')+'</div>';
+  }
+  if(isObject(v)){
+    return Object.entries(v).map(([k,x])=>{
+      const img=imageMarkup(k,x);
+      if(img)return '<div>'+img+'</div>';
+      if(isObject(x))return '<details class="node" '+(level<1?"open":"")+'><summary><span class="k">'+esc(translateKey(k))+'</span></summary><div style="padding-left:12px">'+translatedTree(x,level+1)+'</div></details>';
+      return '<div style="padding:3px 0"><span class="k">'+esc(translateKey(k))+'</span>: <span class="v">'+scalar(x)+'</span></div>';
+    }).join("");
+  }
+  return scalar(v);
+}
+function flatTable(v){
+  if(!Array.isArray(v)||!v.length||v.some(x=>!isObject(x)||Array.isArray(x)))return null;
+  const keys=[...new Set(v.flatMap(x=>Object.keys(x)))].slice(0,30);
+  const head=keys.map(k=>'<th>'+esc(translateKey(k))+'</th>').join("");
+  const body=v.slice(0,500).map(row=>'<tr>'+keys.map(k=>{
+    const x=row[k], img=isImageUrl(x)&&isImageKey(k);
+    return '<td>'+(img?'<a href="'+esc(x)+'" target="_blank" rel="noopener">Ver imagen</a>':isObject(x)?'<code class="small">'+esc(JSON.stringify(x))+'</code>':scalar(x))+'</td>';
+  }).join("")+'</tr>').join("");
+  return '<div class="tablewrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div><div class="subtle" style="margin-top:6px">Tabla limitada a 500 filas y 30 columnas; el resto está en “JSON original”.</div>';
+}
+function buildUrl(ep,card){
+  let p=ep.path;
+  for(const [k] of ep.params){
+    const el=card.querySelector('[data-p="'+k+'"]');
+    if(!el.value.trim())throw Error("Introduce el "+k);
+    p=p.replace("{"+k+"}",encodeURIComponent(el.value.trim()));
+  }
+  const [pathname,query]=p.split("?");
+  let u=API+"?path="+encodeURIComponent(pathname);
+  if(query){for(const [k,v] of new URLSearchParams(query))u+="&"+encodeURIComponent(k)+"="+encodeURIComponent(v)}
+  const lang=$("lang").value;if(lang)u+="&x-lang="+encodeURIComponent(lang);
+  return u;
+}
+function makeCard(ep){
+  const c=document.createElement("section");c.className="card";
+  c.innerHTML='<div class="card-head"><div class="title-row"><div><div class="name">'+esc(ep.name)+'</div><div class="desc">'+esc(ep.desc)+'</div></div><span class="method">GET · PÚBLICO</span></div><div class="route"><code>'+esc(ep.path)+'</code><button class="ghost" data-copy>Copiar</button></div></div><div class="body">'+(ep.params.length?'<div class="params">'+ep.params.map(([k,l,p])=>'<div class="field"><label>'+esc(l)+'</label><input data-p="'+esc(k)+'" inputmode="numeric" placeholder="'+esc(p)+'"></div>').join("")+'</div>':'<span class="subtle">No necesita parámetros.</span>')+'<div class="status"><span data-status><span class="dot"></span>Listo para consultar</span><button class="primary" data-fetch>Consultar</button></div><div class="result" data-result></div></div>';
+  c.querySelector("[data-copy]").onclick=async()=>{try{await navigator.clipboard.writeText(buildUrl(ep,c));c.querySelector("[data-copy]").textContent="Copiado"}catch{}setTimeout(()=>c.querySelector("[data-copy]").textContent="Copiar",1200)};
+  c.querySelector("[data-fetch]").onclick=()=>fetchEndpoint(ep,c);
+  return c;
+}
+function render(){const q=$("filter").value.toLowerCase().trim();$("grid").replaceChildren(...EPS.filter(e=>(e.name+" "+e.desc+" "+e.path).toLowerCase().includes(q)).map(makeCard))}
+function renderResult(data,result){
+  const images=collectImages(data);
+  const table=flatTable(data);
+  result.innerHTML='<div class="tabs"><button class="active" data-tab="overview">Resumen</button>'+(table?'<button data-tab="table">Tabla</button>':"")+'<button data-tab="tree">Campos traducidos</button>'+(images.length?'<button data-tab="media">Imágenes ('+images.length+')</button>':"")+'<button data-tab="json">JSON original</button></div><div class="panel" data-view="overview">'+prettyOverview(data)+'</div>'+(table?'<div class="panel hidden" data-view="table">'+table+'</div>':"")+'<div class="panel hidden" data-view="tree"><div class="tree">'+translatedTree(data)+'</div></div>'+(images.length?'<div class="panel hidden" data-view="media"><div class="media-grid">'+images.slice(0,80).map(([k,v])=>imageMarkup(k,v)).join("")+'</div><div class="subtle" style="padding:0 10px 10px">Mostrando hasta 80 imágenes detectadas.</div></div>':"")+'<div class="panel hidden" data-view="json"><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div>';
+  result.querySelectorAll("[data-tab]").forEach(tab=>tab.onclick=()=>{result.querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("active"));tab.classList.add("active");result.querySelectorAll("[data-view]").forEach(x=>x.classList.add("hidden"));result.querySelector('[data-view="'+tab.dataset.tab+'"]').classList.remove("hidden")});
+}
+async function fetchEndpoint(ep,c){
+  const status=c.querySelector("[data-status]"),btn=c.querySelector("[data-fetch]"),result=c.querySelector("[data-result]");
+  btn.disabled=true;status.className="loading";status.innerHTML='<span class="dot"></span>Consultando el API…';result.innerHTML="";
+  try{
+    const url=buildUrl(ep,c),t0=performance.now();
+    const resp=await fetch(url,{headers:{Accept:"application/json"},cache:"no-store"});
+    const text=await resp.text();let data;try{data=JSON.parse(text)}catch{data=text}
+    if(!resp.ok)throw Error("HTTP "+resp.status+" · "+text.slice(0,700));
+    status.className="ok";status.innerHTML='<span class="dot"></span>Respuesta correcta · '+Math.round(performance.now()-t0)+" ms";
+    renderResult(data,result);
+  }catch(e){
+    status.className="bad";status.innerHTML='<span class="dot"></span>'+esc(e.message);
+    result.innerHTML='<div class="overview"><strong>No se pudo completar la consulta.</strong><p class="subtle">'+esc(/Failed to fetch|NetworkError|CORS/i.test(e.message)?"La interfaz sí está cargada, pero la función serverless no ha podido devolver el JSON. Comprueba el último despliegue de Vercel.":e.message)+'</p></div>';
+  }finally{btn.disabled=false}
+}
+$("filter").oninput=render;
+$("all").onclick=async()=>{
+  for(const ep of EPS.filter(x=>x.params.length===0)){
+    const c=[...$("grid").querySelectorAll(".card")].find(x=>x.querySelector(".name").textContent===ep.name);
+    if(c)await fetchEndpoint(ep,c);
+  }
+};
+render();
 </script>
-</body></html>
+</body>
+</html>
