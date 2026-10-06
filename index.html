@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LALIGA Fantasy · API Explorer</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--card:#131b2e;--line:#2b3854;--txt:#eef2ff;--muted:#9aa7bf;--accent:#f5c451;--ok:#37d39a;--bad:#ff6b7d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif}
+main{max-width:1350px;margin:auto;padding:24px}.top{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.top h1{margin:0;font-size:30px}.hint{color:var(--muted)}
+.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin:18px 0}
+input,button,select{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#0f1729;color:var(--txt)}
+button{cursor:pointer}.primary{background:var(--accent);color:#17130b;border-color:var(--accent);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.head{padding:15px;border-bottom:1px solid var(--line)}.name{font-weight:800;font-size:17px}.desc{color:var(--muted);font-size:13px;margin-top:3px}
+.url{margin-top:10px;display:flex;gap:7px}.url code{flex:1;overflow:auto;background:#0a1120;padding:8px;border-radius:8px;font-size:12px}
+.body{padding:14px}.params{display:flex;gap:8px;flex-wrap:wrap}.field{flex:1;min-width:150px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.status{margin-top:10px;display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--muted);font-size:12px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#667085;margin-right:6px}.ok .dot{background:var(--ok)}.bad .dot{background:var(--bad)}
+.result{margin-top:12px}.tabs{display:flex;gap:6px;margin-bottom:8px}.tabs button{font-size:12px;padding:7px 9px}.tabs .active{background:#26334d}
+pre{white-space:pre-wrap;word-break:break-word;max-height:480px;overflow:auto;background:#080d18;border:1px solid #1e2a41;border-radius:10px;padding:12px;font:12px/1.45 ui-monospace,monospace}
+.tablewrap{max-height:480px;overflow:auto;border:1px solid #1e2a41;border-radius:10px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:7px 9px;border-bottom:1px solid #1e2a41;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#151e31}
+details{font:12px/1.45 ui-monospace,monospace}.tree{background:#080d18;border:1px solid #1e2a41;border-radius:10px;padding:9px;max-height:480px;overflow:auto}.k{color:#8fc4ff}.s{color:#83e6ad}.n{color:#f8d86d}.b{color:#ff9fb0}.null{color:#c8b5ff}
+.notice{padding:12px 14px;background:#151f34;border:1px solid #314461;border-radius:12px;color:#cbd5e1;margin:16px 0}.notice strong{color:#fff}
+footer{margin-top:22px;color:var(--muted);font-size:12px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}@media(max-width:600px){.toolbar{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<div class="top"><h1>LALIGA Fantasy · API Explorer</h1><span class="hint">Solo endpoints GET públicos</span></div>
+<div class="toolbar"><input id="filter" placeholder="Filtrar endpoints…"><select id="lang"><option value="">Idioma por defecto</option><option value="es">x-lang=es</option></select><button id="all" class="primary">Cargar públicos</button></div>
+<div class="notice"><strong>Sin servidor propio:</strong> GitHub guarda la página y Vercel ejecuta la función serverless. El navegador llama a <code>/api/laliga/...</code> y la función obtiene el JSON del API de LALIGA Fantasy server-to-server. No intenta desactivar CORS.</div>
+<div id="grid" class="grid"></div>
+<footer>El proxy está bloqueado a los endpoints públicos listados abajo. No acepta URLs arbitrarias, cookies ni cabeceras Authorization.</footer>
+</main>
+<script>
+const API="/api/laliga";
+const EPS=[
+{id:"teams",name:"Teams master",desc:"Datos maestros de equipos",path:"/v3/teams-master",params:[]},
+{id:"players",name:"Players",desc:"Catálogo de jugadores",path:"/v1/competition/1/players",params:[]},
+{id:"mv",name:"Market value",desc:"Histórico de valor de mercado de un jugador",path:"/v1/competition/1/player/{playerId}/market-value",params:[["playerId","ID de jugador","Ej. 12345"]]},
+{id:"current",name:"Current week",desc:"Semana Fantasy actual",path:"/v1/competition/1/week/current",params:[]},
+{id:"calendar",name:"Calendar",desc:"Calendario de una semana",path:"/v1/competition/1/calendar?weekNumber={week}",params:[["week","Semana","Ej. 8"]]},
+{id:"stats",name:"Weekly stats",desc:"Estadísticas semanales",path:"/stats/v1/competition/1/stats/week/{week}",params:[["week","Semana","Ej. 8"]]}
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+function val(v){if(v===null)return '<span class="null">null</span>';if(typeof v==="string")return '<span class="s">"'+esc(v)+'"</span>';if(typeof v==="number")return '<span class="n">'+v+'</span>';if(typeof v==="boolean")return '<span class="b">'+v+'</span>';return esc(v)}
+function tree(v){if(v&&typeof v==="object"){const a=Array.isArray(v),en=Object.entries(v);return '<details open><summary class="k">'+(a?'Array ['+v.length+']':'Object {'+en.length+'}')+'</summary>'+en.map(([k,x])=>'<div style="padding-left:12px"><span class="k">'+esc(k)+'</span>: '+tree(x)+'</div>').join('')+'</details>'}return val(v)}
+function table(v){if(!Array.isArray(v)||!v.length||v.some(x=>!x||typeof x!=="object"||Array.isArray(x)))return null;const ks=[...new Set(v.flatMap(x=>Object.keys(x)))].slice(0,30);return '<div class="tablewrap"><table><thead><tr>'+ks.map(k=>'<th>'+esc(k)+'</th>').join('')+'</tr></thead><tbody>'+v.slice(0,500).map(r=>'<tr>'+ks.map(k=>'<td>'+val(r[k])+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'}
+function urlFor(ep,card){let p=ep.path;for(const [k,,] of ep.params){const el=card.querySelector('[data-p="'+k+'"]');if(!el.value.trim())throw Error("Falta "+k);p=p.replace('{'+k+'}',encodeURIComponent(el.value.trim()))}let u=API+p;const l=$("lang").value;if(l)u+=(u.includes("?")?"&":"?")+"x-lang="+encodeURIComponent(l);return u}
+function card(ep){const c=document.createElement("section");c.className="card";c.innerHTML='<div class="head"><div class="name">'+esc(ep.name)+'</div><div class="desc">'+esc(ep.desc)+'</div><div class="url"><code>'+esc(ep.path)+'</code><button data-copy>Copiar</button></div></div><div class="body">'+(ep.params.length?'<div class="params">'+ep.params.map(([k,l,p])=>'<div class="field"><label>'+esc(l)+'</label><input data-p="'+esc(k)+'" placeholder="'+esc(p)+'"></div>').join('')+'</div>':'<span class="hint">Sin parámetros</span>')+'<div class="status"><span data-status><span class="dot"></span>Sin cargar</span><button class="primary" data-fetch>Fetch JSON</button></div><div class="result" data-result></div></div>';c.querySelector("[data-copy]").onclick=()=>navigator.clipboard.writeText(urlFor(ep,c)).catch(()=>{});c.querySelector("[data-fetch]").onclick=()=>go(ep,c);return c}
+function render(){const q=$("filter").value.toLowerCase();$("grid").replaceChildren(...EPS.filter(e=>(e.name+" "+e.desc+" "+e.path).toLowerCase().includes(q)).map(card))}
+async function go(ep,c){const s=c.querySelector("[data-status]"),b=c.querySelector("[data-fetch]"),r=c.querySelector("[data-result]");b.disabled=true;s.textContent="Cargando…";r.innerHTML="";try{const u=urlFor(ep,c),t0=performance.now(),resp=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"}),txt=await resp.text();let data;try{data=JSON.parse(txt)}catch{data=txt}if(!resp.ok)throw Error("HTTP "+resp.status+" "+resp.statusText+" · "+txt.slice(0,500));s.innerHTML='<span class="dot" style="background:var(--ok)"></span>HTTP '+resp.status+' · '+Math.round(performance.now()-t0)+' ms';const tv=table(data);r.innerHTML='<div class="tabs"><button class="active" data-tab="a">'+(tv?"Tabla":"Vista")+'</button><button data-tab="b">Árbol</button><button data-tab="c">JSON</button></div><div data-v="a">'+(tv||"<span class='hint'>Respuesta no tabular; usa Árbol o JSON.</span>")+'</div><div data-v="b" hidden><div class="tree">'+tree(data)+'</div></div><div data-v="c" hidden><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div>';r.querySelectorAll("[data-tab]").forEach(x=>x.onclick=()=>{r.querySelectorAll("[data-tab]").forEach(y=>y.classList.remove("active"));x.classList.add("active");r.querySelectorAll("[data-v]").forEach(y=>y.hidden=true);r.querySelector('[data-v="'+x.dataset.tab+'"]').hidden=false})}catch(e){s.innerHTML='<span class="dot" style="background:var(--bad)"></span>'+esc(e.message);r.innerHTML='<pre>'+esc(/Failed to fetch|NetworkError|CORS/i.test(e.message)?"El navegador no está viendo el API directamente; revisa que la función de Vercel esté desplegada y accesible.\n\n":"")+esc(e.stack||e.message)+'</pre>'}finally{b.disabled=false}}
+$("filter").oninput=render;$("all").onclick=async()=>{for(const e of EPS.filter(x=>!x.params.length))await go(e,[...$("grid").querySelectorAll(".card")].find(c=>c.querySelector(".name").textContent===e.name))};render();
+</script>
+</body></html>
