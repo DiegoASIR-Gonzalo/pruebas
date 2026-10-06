@@ -31,7 +31,16 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:320px;overflo
 table{width:100%;border-collapse:collapse;font-size:12px}.tablewrap{max-height:320px;overflow:auto}.tablewrap th,.tablewrap td{padding:5px 7px;border-bottom:1px solid #1d2a3e;text-align:left;vertical-align:top;word-break:break-word}.tablewrap th{position:sticky;top:0;background:#121d30;color:#dce7f6}.tablewrap tr:hover td{background:#0e1728}
 code.small{font-size:11px}.subtle{color:var(--muted);font-size:12px}
 details.tech{margin-top:10px;border-top:1px dashed #27364e;padding-top:9px}.tech summary{cursor:pointer;color:#b6c2d4;font-size:12px}
-.hidden{display:none!important}
+.tools-card{grid-column:1/-1;background:linear-gradient(180deg,rgba(16,24,39,.99),rgba(10,17,29,.99));border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.tools-head{padding:11px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.tools-title{font-size:16px;font-weight:850}
+.data-state{font-size:11px;color:var(--muted);white-space:nowrap}.data-state.ok{color:#9ff0cb}.data-state.bad{color:#ff9ead}.data-state.loading{color:#f7d77a}.data-state .dot{margin-right:5px}
+.player-tools{display:grid;grid-template-columns:1fr 245px 105px;gap:7px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.player-list{padding:8px 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:205px;overflow:auto}
+.player-row{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;background:#0c1422;border:1px solid #1e2b40;border-radius:10px;padding:6px 8px}
+.player-avatar{width:36px;height:36px;border-radius:8px;object-fit:contain;background:#080d16}.player-name{font-weight:750;font-size:12px}.player-meta{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-metrics{text-align:right;font-size:10px;color:#cdd8e9}.metric-green{color:#9ff0cb}.metric-gold{color:#ffe29a}
+.rank-head{padding:9px 12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}.ranking{padding:0 12px 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.rank-row{display:grid;grid-template-columns:28px 36px 1fr auto auto;gap:8px;align-items:center;background:#0c1422;border:1px solid #1e2b40;border-radius:10px;padding:6px 8px}.rank-num{font-weight:900;color:#aebbd0;text-align:center}.rank-main{min-width:0}.rank-main b{font-size:12px}.rank-main small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-stat{text-align:right;font-size:10px}.rank-stat strong{display:block;font-size:12px}.rank-empty{padding:10px 0;color:var(--muted);font-size:12px}
+@media(max-width:1100px){.player-list{grid-template-columns:repeat(2,minmax(0,1fr))}.ranking{grid-template-columns:1fr}}
+@media(max-width:700px){.player-tools{grid-template-columns:1fr}.player-list{grid-template-columns:1fr}.rank-row{grid-template-columns:25px 34px 1fr auto}.rank-row .rank-stat:nth-last-child(1){display:none}}\n.hidden{display:none!important}
 @media(max-width:950px){.grid{grid-template-columns:1fr}.media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.hero{display:block}.badge{display:inline-block;margin-top:12px}.toolbar{grid-template-columns:1fr}.media-grid{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
 </style>
 </head>
@@ -59,6 +68,32 @@ details.tech{margin-top:10px;border-top:1px dashed #27364e;padding-top:9px}.tech
     Las respuestas originales siguen disponibles en <strong>JSON original</strong>. Las direcciones que parezcan fotos,
     escudos, logos, avatares o imágenes se muestran visualmente cuando el navegador puede cargarlas.
   </div>
+  <section class="tools-card">
+    <div class="tools-head">
+      <div>
+        <div class="tools-title">🔎 Buscar jugadores</div>
+        <div class="subtle">La lista se carga una vez en segundo plano y después la búsqueda es instantánea.</div>
+      </div>
+      <span id="playersState" class="data-state"><span class="dot"></span>Preparando lista…</span>
+    </div>
+    <div class="player-tools">
+      <input id="playerSearch" type="search" placeholder="Nombre, apodo o equipo…">
+      <select id="rankBy" aria-label="Criterio del ranking">
+        <option value="efficiency">Mejor relación puntos / valor</option>
+        <option value="average">Mayor media de puntos</option>
+        <option value="market">Mayor valor de mercado</option>
+      </select>
+      <select id="rankLimit" aria-label="Número de jugadores">
+        <option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option>
+      </select>
+    </div>
+    <div id="playerSearchResults" class="player-list"></div>
+    <div class="rank-head">
+      <div><strong>⭐ Mejores jugadores</strong> <span class="subtle">según los datos disponibles en la lista pública</span></div>
+      <button class="ghost" id="refreshPlayers">Actualizar lista</button>
+    </div>
+    <div id="ranking" class="ranking"></div>
+  </section>
 
   <div id="grid" class="grid"></div>
 
