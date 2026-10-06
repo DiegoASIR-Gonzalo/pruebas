@@ -1,5 +1,6 @@
 {
-  "functions": {
-    "api/laliga/[...path].js": { "maxDuration": 30 }
+  "$schema":"https://openapi.vercel.sh/vercel.json",
+  "functions":{
+    "api/laliga.js":{"maxDuration":30}
   }
 }
