@@ -21,3 +21,5 @@ Browser -> /api/laliga/... -> Vercel Function -> fantasy-api.llt-services.com
 Esto evita que el navegador tenga que resolver el CORS del API de LALIGA Fantasy directamente.
 
 No se aceptan URLs arbitrarias, cookies ni cabeceras Authorization.
+
+https://pruebas-xi-eight.vercel.app/
