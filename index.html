@@ -378,8 +378,8 @@ main.wrap{padding-bottom:96px!important}
         </div>
         <div id="googleFlow" class="google-flow hidden">
           <div class="google-step"><b>1.</b><span>Abre el login oficial de LALIGA y entra con Google.</span></div>
-          <div class="google-step"><b>2.</b><span>En la pestaña <strong>Network/Red</strong>, busca la petición <code>authredirect://com.lfp.laligafantasy</code> (puede aparecer como cancelada).</span></div>
-          <div class="google-step"><b>3.</b><span>Copia la URL completa que contiene <code>code=...</code> y pégala aquí.</span></div>
+          <div class="google-step"><b>2.</b><span>En <strong>Network/Red → All/Todas</strong> (no solo Fetch/XHR), busca <code>authredirect://com.lfp.laligafantasy</code>. Puede aparecer como <strong>(canceled)/(cancelada)</strong>; es normal porque el navegador no puede abrir ese protocolo.</span></div>
+          <div class="google-step"><b>3.</b><span>Selecciona esa línea aunque figure como cancelada y copia la <strong>Request URL</strong> completa. Debe contener <code>code=...</code> y normalmente también <code>state=...</code>.</span></div>
           <input id="googleCode" autocomplete="off" placeholder="authredirect://com.lfp.laligafantasy?code=…&state=…">
           <div class="auth-actions">
             <button type="button" id="cancelGoogleFlow">← Volver</button>
