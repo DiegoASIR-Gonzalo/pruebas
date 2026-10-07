@@ -128,7 +128,48 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 @media(min-width:700px){body{padding:18px 0}.app-shell{width:430px;min-height:calc(100vh - 36px);margin:auto;border:1px solid #222;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.8)}.bottom-nav{position:absolute}}
 @media(max-width:699px){.app-shell{width:100%}}
 
-
+/* ===== Responsive desktop layout + fixed bottom navigation ===== */
+.bottom-nav{position:fixed!important;left:50%!important;bottom:0!important;transform:translateX(-50%)!important;width:min(100%,760px)!important;height:68px!important;z-index:100!important;background:#050505!important;border-top:1px solid #252525!important;box-shadow:0 -8px 24px rgba(0,0,0,.55)!important}
+main.wrap{padding-bottom:96px!important}
+@media(min-width:700px){
+  body{padding:0!important;background:#050505!important}
+  .app-shell{width:100%!important;max-width:none!important;min-height:100vh!important;margin:0!important;border:0!important;overflow:visible!important;box-shadow:none!important}
+  .topbar .wrap{width:min(1280px,94vw)!important;padding:0!important}
+  .mobile-brand{font-size:19px!important}
+  .nav{gap:2px!important}
+  .nav button{font-size:12px!important;padding:8px 12px!important}
+  main.wrap{width:min(1280px,94vw)!important;padding:0 0 104px!important}
+  .hero{padding:34px 0 22px!important;margin:0 auto 18px!important}
+  .hero h1{font-size:clamp(34px,4vw,52px)!important}
+  .hero p{font-size:14px!important;max-width:760px;margin:8px auto 0!important}
+  .search-box{max-width:100%!important;padding:0!important}
+  .searchline input{font-size:15px!important;padding:14px 16px!important}
+  .searchline button{font-size:13px!important;padding:13px 20px!important}
+  .results{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 18px!important}
+  .player{min-height:76px!important;padding:12px 14px!important;grid-template-columns:54px 1fr auto!important;gap:13px!important}
+  .avatar{width:54px!important;height:54px!important}
+  .pname{font-size:14px!important}.pmeta{font-size:11px!important}.stats{font-size:10px!important}.stats b{font-size:13px!important}
+  .best-panel{margin-top:26px!important;padding:18px!important}
+  .best-head h2{font-size:20px!important}.best-head p{font-size:12px!important}
+  .best-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:1px!important}
+  .best-card{min-height:96px!important;padding:12px!important;grid-template-columns:34px 64px 1fr!important;gap:12px!important}
+  .best-avatar{width:64px!important;height:64px!important}.best-name{font-size:14px!important}.best-team{font-size:11px!important}.best-pill{font-size:9px!important}
+  .teams-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important}
+  .team-card{min-height:92px!important;padding:14px!important;grid-template-columns:54px 1fr!important}
+  .team-logo{width:54px!important;height:54px!important}.team-name{font-size:14px!important}.team-short,.team-count{font-size:10px!important}
+  .team-toolbar{margin:0 0 12px!important}.team-toolbar input{font-size:13px!important;padding:11px!important}
+  #api .tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:0!important;gap:16px!important}
+  .api-card{min-height:170px!important}
+  .bottom-nav{width:min(100%,760px)!important;height:68px!important}
+  .bottom-nav button{font-size:10px!important;padding:8px 4px 5px!important;gap:4px!important}
+  .bottom-nav .ico{font-size:21px!important}
+}
+@media(min-width:1100px){
+  .results{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .best-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+  .teams-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  #api .tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
 </style>
 </head>
 <body>
