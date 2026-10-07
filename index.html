@@ -23,7 +23,8 @@ main{padding:30px 0 55px}.hero{text-align:center;margin:6vh auto 22px}.hero h1{m
 .tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.api-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}.api-head{padding:11px 13px;border-bottom:1px solid var(--line)}.api-name{font-weight:850}.api-desc{font-size:12px;color:var(--muted);margin-top:2px}.api-body{padding:11px 13px}.api-route{font:11px ui-monospace,monospace;color:#bfd0e8;background:#09111d;border:1px solid #1a293e;border-radius:8px;padding:7px;overflow:auto}.api-row{display:flex;gap:7px;margin-top:8px}.api-row input{flex:1;min-width:0}
 pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto;padding:11px;background:#080d16;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:flex;justify-content:center;align-items:center;padding:14px;z-index:30}.modal.hidden{display:none}.dialog{width:min(760px,100%);max-height:88vh;overflow:auto;background:#101927;border:1px solid #34445f;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.45)}.dialog-head{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.close{background:transparent;border:0;font-size:23px;line-height:1;padding:0 4px}.profile{display:grid;grid-template-columns:92px 1fr;gap:13px;padding:14px}.profile-img{width:92px;height:92px;border-radius:14px;object-fit:contain;background:#080e18;border:1px solid #233149}.profile h2{margin:0;font-size:22px}.profile .team{color:var(--muted);font-size:12px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.chip{font-size:11px;padding:4px 7px;border-radius:999px;background:#17233a;border:1px solid #2b3c58;color:#c9d7ea}.highlight{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:0 14px 12px}.highlight>div{background:#0c1524;border:1px solid #1e2d43;border-radius:10px;padding:8px}.highlight span{display:block;color:var(--muted);font-size:10px}.highlight b{font-size:15px}.modal-tabs{display:flex;gap:6px;padding:0 14px 9px}.modal-tabs button{font-size:11px;padding:6px 8px}.modal-tabs .active{background:#24334c;border-color:#4c607e}.modal-body{padding:0 14px 14px}.kv{display:grid;grid-template-columns:190px 1fr;gap:1px;background:#1c293e;border:1px solid #1c293e;border-radius:10px;overflow:hidden}.kv>div{padding:6px 8px;background:#0d1523;font-size:11px;word-break:break-word}.key{color:#a9cbff;font-weight:700}.media-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.media-card{background:#0b1320;border:1px solid #24334a;border-radius:9px;overflow:hidden}.media-card img{width:100%;height:75px;display:block;object-fit:contain;background:#080d16}.media-card div{font-size:9px;color:var(--muted);padding:4px 6px}
-.notice{max-width:820px;margin:14px auto 0;color:var(--muted);font-size:11px;text-align:center}.hidden{display:none!important}
+.notice{max-width:820px;margin:14px auto 0;color:var(--muted);font-size:11px;text-align:center}.week-strip{display:flex;gap:5px;overflow-x:auto;padding:6px 0;margin-bottom:7px}.week-btn{min-width:48px;padding:5px 6px;border-radius:8px;background:#0c1524;border:1px solid #24334a;color:#cbd7e8;text-align:center}.week-btn span{display:block;font-size:9px;color:#8fa0b8}.week-btn b{font-size:12px}.week-btn.selected{background:#263750;border-color:#6d83a2;color:#fff}.week-title{display:flex;justify-content:space-between;align-items:center;background:#0c1524;border:1px solid #223149;border-radius:9px;padding:7px 9px;margin-bottom:7px;font-size:12px}.week-title>strong{font-size:15px;color:#a9efd0}.ideal{margin-left:7px;color:#ffe29a;font-size:10px}.week-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.week-stat{border:1px solid #203049;background:#0b1320;border-radius:8px;padding:6px;text-align:center}.week-stat span{display:block;color:#91a1b7;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.week-stat b{display:block;font-size:14px;margin-top:2px}.week-stat em{display:block;color:#9fe8c6;font-style:normal;font-size:9px}
+.hidden{display:none!important}
 @media(max-width:760px){.results,.tool-grid{grid-template-columns:1fr}.highlight{grid-template-columns:1fr 1fr}.profile{grid-template-columns:70px 1fr}.profile-img{width:70px;height:70px}}@media(max-width:500px){.nav button{font-size:11px}.hero{margin-top:4vh}.highlight{grid-template-columns:1fr}.media-grid{grid-template-columns:repeat(2,1fr)}.kv{grid-template-columns:1fr}}
 </style>
 </head>
@@ -98,7 +99,7 @@ points:"Puntos",fantasyPoints:"Puntos Fantasy",score:"Puntuación",rating:"Valor
 goals:"Goles",assists:"Asistencias",shots:"Tiros",minutes:"Minutos",matches:"Partidos",appearances:"Apariciones",starts:"Titularidades",
 yellowCards:"Tarjetas amarillas",redCards:"Tarjetas rojas",goalsConceded:"Goles encajados",cleanSheets:"Porterías a cero",saves:"Paradas",
 season:"Temporada",competition:"Competición",week:"Jornada",weekNumber:"Número de jornada",matchday:"Jornada",date:"Fecha",time:"Hora",
-home:"Local",away:"Visitante",homeTeam:"Equipo local",awayTeam:"Equipo visitante",statistics:"Estadísticas",stats:"Estadísticas",
+home:"Local",away:"Visitante",homeTeam:"Equipo local",awayTeam:"Equipo visitante",statistics:"Estadísticas",stats:"Estadísticas",mins_played:"Minutos",saves:"Paradas",goal_assist:"Asistencias",effective_clearance:"Despejes",ball_recovery:"Recuperaciones",won_contest:"Duelos",pen_area_entries:"Entradas al área",goals_conceded:"Goles encajados",poss_lost_all:"Pérdidas",yellow_card:"Tarjetas amarillas",red_card:"Tarjetas rojas",marca_points:"Puntos DAZN",touches:"Toques",passes:"Pases",accurate_passes:"Pases precisos",key_passes:"Pases clave",crosses:"Centros",tackles:"Entradas",interceptions:"Intercepciones",clearances:"Despejes",recoveries:"Recuperaciones",duels_won:"Duelos ganados",fouls:"Faltas",offsides:"Fueras de juego",shots:"Tiros",shots_on_target:"Tiros a puerta",
 description:"Descripción",url:"URL",href:"Enlace",data:"Datos",items:"Elementos",results:"Resultados",meta:"Metadatos",metadata:"Metadatos",
 updatedAt:"Actualizado",createdAt:"Creado",timestamp:"Marca de tiempo",type:"Tipo",category:"Categoría",rank:"Posición",ranking:"Clasificación",
 injury:"Lesión",injured:"Lesionado",availability:"Disponibilidad",suspension:"Sanción"
@@ -122,9 +123,57 @@ function mediaList(data,out=[]){if(Array.isArray(data)){data.slice(0,200).forEac
 function valuesTable(data){if(!Array.isArray(data)||!data.length||data.some(x=>!obj(x)||Array.isArray(x)))return null;const keys=[...new Set(data.flatMap(x=>Object.keys(x)))].slice(0,24);return'<div class="kv">'+keys.map(k=>'<div class="key">'+esc(tr(k))+'</div><div>'+esc(String(data[0]?.[k]??""))+'</div>').join("")+'</div>'}
 function profileData(data){const name=first(data,["nickname","name","fullName","displayName","shortName"])||"Jugador",team=first(data,["teamName","clubName","team","club"])||"Equipo no indicado",position=first(data,["position","positions","role"]),avg=num(first(data,["averagePoints","average_points","averageScore","averagePointsPerGame"])),last=num(first(data,["lastSeasonPoints","last_season_points","seasonPoints","points"])),market=first(data,["marketValue","market_value","currentMarketValue","fantasyValue","price","value"]),im=imageFor(data);return{ id:first(data,["id","playerId","player_id"]),name,team,position,avg,last,market,im }}
 function renderPlayer(data){
-  const p=profileData(data),media=mediaList(data);let simple=Object.entries(obj(data)?data:{}).slice(0,100);
-  $("modalContent").innerHTML='<div class="profile">'+(p.im?'<img class="profile-img" src="'+esc(p.im)+'" alt="" onerror="this.style.visibility=\'hidden\'">':'<div class="profile-img"></div>')+'<div><h2>'+esc(p.name)+'</h2><div class="team">'+esc(p.team)+'</div><div class="chips">'+(p.position?'<span class="chip">'+esc(String(p.position))+'</span>':"")+(p.id?'<span class="chip">ID '+esc(String(p.id))+'</span>':"")+'</div></div></div><div class="highlight"><div><span>Media de puntos</span><b class="green">'+(p.avg===null?"—":p.avg.toLocaleString("es-ES"))+'</b></div><div><span>Últimos puntos</span><b>'+ (p.last===null?"—":p.last.toLocaleString("es-ES"))+'</b></div><div><span>Valor de mercado</span><b class="gold">'+money(p.market)+'</b></div></div><div class="modal-tabs"><button class="active" data-tab="summary">Resumen</button><button data-tab="fields">Todos los campos</button>'+(media.length?'<button data-tab="media">Imágenes ('+media.length+')</button>':"")+'<button data-tab="json">JSON original</button></div><div class="modal-body"><div data-view="summary">'+(simple.length?'<div class="kv">'+simple.map(([k,v])=>'<div class="key">'+esc(tr(k))+'</div><div>'+ (obj(v)?'<span class="subtle">'+(Array.isArray(v)?"Lista":"Objeto")+'</span>':scalar(v))+'</div>').join("")+'</div>':"Sin datos")+'</div><div data-view="fields" class="hidden">'+translatedTree(data)+'</div>'+(media.length?'<div data-view="media" class="hidden"><div class="media-grid">'+media.slice(0,50).map(([k,v])=>'<div class="media-card"><img src="'+esc(v)+'" alt="" loading="lazy"><div>'+esc(tr(k))+'</div></div>').join("")+'</div></div>':"")+'<div data-view="json" class="hidden"><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div></div>';
-  $("modalContent").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{$("modalContent").querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("modalContent").querySelectorAll("[data-view]").forEach(x=>x.classList.add("hidden"));$("modalContent").querySelector('[data-view="'+b.dataset.tab+'"]').classList.remove("hidden")});
+  const p=profileData(data),media=mediaList(data),master=obj(data?.playerMaster)?data.playerMaster:data;
+  const stats=Array.isArray(master?.playerStats)?master.playerStats:[];
+  const safeId=p.id;
+  const basicEntries=Object.entries(obj(data)?data:{}).filter(([k])=>!["playerMaster","seasons","marketPlayer"].includes(k)).slice(0,80);
+  $("modalContent").innerHTML=
+    '<div class="profile">'+
+      (p.im?'<img class="profile-img" src="'+esc(p.im)+'" alt="" onerror="this.style.visibility=\'hidden\'">':'<div class="profile-img"></div>')+
+      '<div><h2>'+esc(p.name)+'</h2><div class="team">'+esc(p.team)+'</div><div class="chips">'+
+        (p.position?'<span class="chip">'+esc(String(p.position))+'</span>':"")+
+        (safeId?'<span class="chip">ID '+esc(String(safeId))+'</span>':"")+
+      '</div></div></div>'+
+    '<div class="highlight"><div><span>Puntos</span><b>'+(p.last===null?"—":p.last.toLocaleString("es-ES"))+'</b></div>'+
+      '<div><span>Media de puntos</span><b class="green">'+(p.avg===null?"—":p.avg.toLocaleString("es-ES",{maximumFractionDigits:2}))+'</b></div>'+
+      '<div><span>Valor de mercado</span><b class="gold">'+money(p.market)+'</b></div></div>'+
+    '<div class="modal-tabs"><button class="active" data-tab="summary">Resumen</button>'+
+      (stats.length?'<button data-tab="weeks">Por jornadas ('+stats.length+')</button>':"")+
+      '<button data-tab="fields">Más datos</button>'+(media.length?'<button data-tab="media">Imágenes ('+media.length+')</button>':"")+
+      '<button data-tab="json">JSON original</button></div>'+
+    '<div class="modal-body"><div data-view="summary"><div class="kv">'+
+      [["Nombre",p.name],["Posición",p.position||"—"],["Equipo",p.team||"—"],["Puntos",p.last===null?"—":p.last],["Media de puntos",p.avg===null?"—":p.avg],["Valor de mercado",money(p.market)]].map(([k,v])=>'<div class="key">'+esc(k)+'</div><div>'+scalar(v)+'</div>').join("")+
+    '</div></div>'+
+    (stats.length?'<div data-view="weeks" class="hidden"><div class="week-strip">'+
+      [...stats].sort((a,b)=>Number(a.weekNumber)-Number(b.weekNumber)).map(st=>'<button type="button" class="week-btn" data-week="'+esc(st.weekNumber)+'"><span>J'+esc(st.weekNumber)+'</span><b>'+esc(st.totalPoints??0)+'</b></button>').join("")+
+    '</div><div id="weekDetail"></div></div>':"")+
+    '<div data-view="fields" class="hidden"><div class="kv">'+basicEntries.map(([k,v])=>'<div class="key">'+esc(tr(k))+'</div><div>'+ (obj(v)?'<span class="subtle">'+(Array.isArray(v)?"Lista":"Objeto")+'</span>':scalar(v))+'</div>').join("")+'</div></div>'+
+    (media.length?'<div data-view="media" class="hidden"><div class="media-grid">'+media.slice(0,40).map(([k,v])=>'<div class="media-card"><img src="'+esc(v)+'" alt="" loading="lazy"><div>'+esc(tr(k))+'</div></div>').join("")+'</div></div>':"")+
+    '<div data-view="json" class="hidden"><pre>'+esc(JSON.stringify(data,null,2))+'</pre></div></div>';
+
+  const renderWeek=(weekValue)=>{
+    const stat=stats.find(st=>String(st.weekNumber)===String(weekValue)),detail=$("weekDetail");if(!stat||!detail)return;
+    document.querySelectorAll(".week-btn").forEach(b=>b.classList.toggle("selected",String(b.dataset.week)===String(weekValue)));
+    const raw=obj(stat.stats)?stat.stats:{};
+    const rows=Object.entries(raw).map(([key,val])=>{
+      const value=Array.isArray(val)?val[0]:val, points=Array.isArray(val)?val[1]:null;
+      return {key,value,points};
+    }).filter(x=>x.value!==0&&x.value!==null&&x.value!==undefined&&x.value!=="");
+    const preferred=["mins_played","goals","goal_assist","saves","touches","passes","accurate_passes","key_passes","effective_clearance","ball_recovery","won_contest","pen_area_entries","shots","shots_on_target","yellow_card","red_card","goals_conceded","poss_lost_all","marca_points"];
+    rows.sort((a,b)=>{const ai=preferred.indexOf(a.key),bi=preferred.indexOf(b.key);return(ai<0?999:ai)-(bi<0?999:bi)});
+    detail.innerHTML='<div class="week-title"><div><b>Jornada '+esc(stat.weekNumber)+'</b>'+(stat.isInIdealFormation?'<span class="ideal">★ Titular ideal</span>':"")+'</div><strong>'+esc(stat.totalPoints??0)+' pts</strong></div>'+
+      '<div class="week-stats">'+rows.map(x=>'<div class="week-stat"><span>'+esc(tr(x.key))+'</span><b>'+esc(String(x.value))+'</b>'+(x.points!==null&&x.points!==0?'<em>'+(x.points>0?"+":"")+esc(String(x.points))+' pts</em>':"")+'</div>').join("")+'</div>';
+  };
+  if(stats.length){
+    const sorted=[...stats].sort((a,b)=>Number(a.weekNumber)-Number(b.weekNumber));
+    renderWeek(sorted[sorted.length-1].weekNumber);
+    $("modalContent").querySelectorAll(".week-btn").forEach(b=>b.onclick=()=>renderWeek(b.dataset.week));
+  }
+  $("modalContent").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{
+    $("modalContent").querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");$("modalContent").querySelectorAll("[data-view]").forEach(x=>x.classList.add("hidden"));
+    const view=$("modalContent").querySelector('[data-view="'+b.dataset.tab+'"]');if(view)view.classList.remove("hidden");
+  });
 }
 function translatedTree(v,l=0){if(Array.isArray(v))return'<div>'+v.slice(0,300).map((x,i)=>'<details style="padding:3px 0" '+(l<1?"open":"")+'><summary class="key">Elemento '+(i+1)+'</summary><div style="padding-left:10px">'+translatedTree(x,l+1)+'</div></details>').join('')+'</div>';if(obj(v))return Object.entries(v).map(([k,x])=>isImageValue(k,x)?'<div>'+imageCard(k,x)+'</div>':obj(x)?'<details style="padding:3px 0" '+(l<1?"open":"")+'><summary class="key">'+esc(tr(k))+'</summary><div style="padding-left:10px">'+translatedTree(x,l+1)+'</div></details>':'<div style="padding:3px 0"><span class="key">'+esc(tr(k))+'</span>: '+scalar(x)+'</div>').join('');return scalar(v)}
 function isImageValue(k,v){return typeof v==="string"&&isImageKey(k)&&imgUrl(v)}
