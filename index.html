@@ -449,20 +449,12 @@ function showAuth(){
   checkAuth();
 }
 $("authButton").onclick=showAuth;
-$("googleLogin").onclick=async()=>{
+$("googleLogin").onclick=()=>{
   const state=$("googleState");
-  try{
-    const r=await fetch("/api/auth?provider=google",{headers:{Accept:"application/json"},cache:"no-store",redirect:"manual"});
-    if(r.type==="opaqueredirect" || r.status===0) throw new Error("popup");
-    if(r.redirected){window.location.href=r.url;return}
-    // Normal path: the endpoint redirects to LALIGA; use a new tab so this app remains available.
-    window.open("/api/auth?provider=google","_blank");
-    $("loginChoices").classList.add("hidden");$("emailLoginChoice").classList.add("hidden");$("googleLogin").classList.add("hidden");$("googleFlow").classList.remove("hidden");
-    state.className="auth-state show";state.textContent="Se ha abierto el login oficial de LALIGA en otra pestaña.";
-  }catch{
-    window.open("/api/auth?provider=google","_blank");
-    $("loginChoices").classList.add("hidden");$("googleFlow").classList.remove("hidden");
-  }
+  const popup=window.open("/api/auth?provider=google","_blank");
+  $("loginChoices").classList.add("hidden");$("emailLoginChoice").classList.add("hidden");$("googleLogin").classList.add("hidden");$("googleFlow").classList.remove("hidden");
+  state.className="auth-state show";
+  state.textContent=popup?"Se ha abierto el login oficial de LALIGA en otra pestaña.":"El navegador bloqueó la pestaña nueva; permite ventanas emergentes y vuelve a pulsar el botón.";
 };
 $("emailLoginChoice").onclick=()=>{$("loginForm").classList.remove("hidden");$("emailLoginChoice").classList.add("hidden");$("googleLogin").classList.add("hidden");$("loginState").className="auth-state";$("loginState").textContent=""};
 $("backLoginChoices").onclick=()=>{$("loginForm").classList.add("hidden");$("emailLoginChoice").classList.remove("hidden");$("googleLogin").classList.remove("hidden");$("loginState").className="auth-state";$("loginState").textContent=""};
