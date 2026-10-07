@@ -11,6 +11,15 @@ const attempts=new Map();
 
 function json(res,status,body){res.status(status).setHeader("Content-Type","application/json; charset=utf-8").setHeader("Cache-Control","no-store").end(JSON.stringify(body))}
 function parseCookies(v){const out={};for(const part of String(v||"").split(";")){const i=part.indexOf("=");if(i>0)out[part.slice(0,i).trim()]=decodeURIComponent(part.slice(i+1).trim());}return out}
+function cookie(name,value,maxAge,extra=""){return name+"="+encodeURIComponent(value)+"; Max-Age="+maxAge+"; Path=/; HttpOnly; Secure; SameSite=Lax"+extra}
+function origin(req){
+  const proto=String(req.headers["x-forwarded-proto"]||"https").split(",")[0];
+  const host=String(req.headers["x-forwarded-host"]||req.headers.host||"");
+  return proto+"://"+host;
+}
+function base64url(buf){return Buffer.from(buf).toString("base64").replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function randomUrlSafe(bytes=32){return base64url(require("crypto").randomBytes(bytes))}
+function pkceChallenge(verifier){return base64url(require("crypto").createHash("sha256").update(verifier).digest())}
 function tokenPayload(token){try{const p=token.split(".")[1];return JSON.parse(Buffer.from(p,"base64url").toString("utf8"))}catch{return null}}
 function sameOrigin(req){
   const origin=req.headers.origin;
@@ -27,6 +36,71 @@ function allowedAttempt(req){
 }
 
 export default async function handler(req,res){
+  if(req.method==="GET" && req.query?.provider==="google"){
+    const state=randomUrlSafe(24), verifier=randomUrlSafe(48), nonce=randomUrlSafe(24);
+    const redirectUri=origin(req)+"/api/auth?callback=google";
+    const authorize="https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/authorize";
+    const params=new URLSearchParams({
+      p:"B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",
+      client_id:CLIENT_ID,
+      response_type:"code",
+      redirect_uri:redirectUri,
+      scope:"openid offline_access",
+      code_challenge:pkceChallenge(verifier),
+      code_challenge_method:"S256",
+      state,
+      nonce
+    });
+    res.setHeader("Set-Cookie",[
+      cookie("lf_oauth_state",state,600),
+      cookie("lf_oauth_verifier",verifier,600),
+      cookie("lf_oauth_nonce",nonce,600)
+    ]);
+    return res.redirect(302,authorize+"?"+params.toString());
+  }
+
+  if(req.method==="GET" && req.query?.callback==="google"){
+    const code=typeof req.query?.code==="string"?req.query.code:"";
+    const state=typeof req.query?.state==="string"?req.query.state:"";
+    const cookies=parseCookies(req.headers.cookie);
+    const verifier=cookies.lf_oauth_verifier||"";
+    const expected=cookies.lf_oauth_state||"";
+    if(!code || !state || !verifier || state!==expected)return res.redirect(302,"/?login=error&reason=oauth_state");
+    try{
+      const redirectUri=origin(req)+"/api/auth?callback=google";
+      const upstream=await fetch(TOKEN_URL+"?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded","Accept":"application/json"},
+        body:new URLSearchParams({
+          grant_type:"authorization_code",
+          client_id:CLIENT_ID,
+          code,
+          redirect_uri:redirectUri,
+          code_verifier:verifier,
+          scope:"openid offline_access"
+        }),
+        cache:"no-store"
+      });
+      const data=await upstream.json().catch(()=>({}));
+      if(!upstream.ok)return res.redirect(302,"/?login=error&reason=oauth_exchange");
+      const token=typeof data.access_token==="string"?data.access_token:(typeof data.id_token==="string"?data.id_token:"");
+      if(!token)return res.redirect(302,"/?login=error&reason=oauth_token");
+      const p=tokenPayload(token);
+      if(!p?.exp || p.exp*1000<=Date.now())return res.redirect(302,"/?login=error&reason=oauth_expired");
+      const maxAge=Math.max(60,Math.floor((p.exp*1000-Date.now())/1000));
+      res.setHeader("Set-Cookie",[
+        cookie(COOKIE,token,maxAge,"; SameSite=Strict"),
+        cookie("lf_oauth_state","",0),
+        cookie("lf_oauth_verifier","",0),
+        cookie("lf_oauth_nonce","",0)
+      ]);
+      return res.redirect(302,"/?login=success");
+    }catch(e){
+      console.error("LALIGA OAuth error",e instanceof Error?e.message:String(e));
+      return res.redirect(302,"/?login=error&reason=oauth_unavailable");
+    }
+  }
+
   if(req.method==="GET"){
     const token=parseCookies(req.headers.cookie)[COOKIE];
     if(!token)return json(res,200,{authenticated:false});
