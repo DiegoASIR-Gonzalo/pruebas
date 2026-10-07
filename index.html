@@ -125,7 +125,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -238,6 +238,10 @@ main.wrap{padding-bottom:96px!important}
   .compare-value{font-size:25px}
   .compare-metric{font-size:10px}
 }
+.api-hidden{margin:18px 10px 28px;border-top:1px solid #181818;background:#070707;color:#777}
+.api-hidden summary{cursor:pointer;list-style:none;padding:10px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#555}
+.api-hidden summary::-webkit-details-marker{display:none}
+.api-hidden[open] summary{color:#888;border-bottom:1px solid #181818}
 </style>
 </head>
 <body>
@@ -250,7 +254,6 @@ main.wrap{padding-bottom:96px!important}
       <button data-section="teams">Equipos</button>
       <button data-section="forgotten">Olvidados</button>
       <button data-section="compare">Comparador</button>
-      <button data-section="api">Explorador API</button>
       <button id="authButton" class="auth-button">Iniciar sesión</button>
     </nav>
   </div>
@@ -269,23 +272,6 @@ main.wrap{padding-bottom:96px!important}
       </div>
       <div id="loadState" class="statusline loading"><span><span class="dot"></span>Cargando jugadores…</span><span id="count"></span></div>
       <div id="results" class="results"></div>
-      <section class="best-panel" aria-labelledby="bestTitle">
-        <div class="best-head">
-          <div>
-            <h2 id="bestTitle">Mejores Jugadores (Actualmente)</h2>
-            <p>Los jugadores con mayor media de puntos, ordenados de mayor a menor.</p>
-          </div>
-          <label class="best-select">Mostrar
-            <select id="bestLimit" aria-label="Número de mejores jugadores">
-              <option value="5">Top 5</option>
-              <option value="10">Top 10</option>
-              <option value="15">Top 15</option>
-            </select>
-          </label>
-        </div>
-        <div id="bestState" class="best-state">Esperando datos…</div>
-        <div id="bestResults" class="best-grid"></div>
-      </section>
       <div class="notice">Pulsa un resultado para abrir su ficha completa. Los datos se consultan desde <code>/v1/competition/1/players</code> y la ficha individual desde <code>/v1/competition/1/player/{id}</code>.</div>
     </div>
   </section>
@@ -316,6 +302,10 @@ main.wrap{padding-bottom:96px!important}
     </div>
     <div id="forgottenState" class="statusline"><span><span class="dot"></span>Esperando datos…</span></div>
     <div id="forgottenGrid" class="forgotten-panel"></div>
+    <details class="api-hidden">
+      <summary>Herramientas técnicas</summary>
+      <div id="apiGrid" class="tool-grid"></div>
+    </details>
   </section>
 
   <section id="compare" class="section">
@@ -346,10 +336,6 @@ main.wrap{padding-bottom:96px!important}
     </div>
   </section>
 
-  <section id="api" class="section">
-    <div class="hero" style="margin-top:1vh"><h1 style="font-size:32px">Explorador API</h1><p>Herramientas avanzadas para consultar los endpoints públicos.</p></div>
-    <div id="apiGrid" class="tool-grid"></div>
-  </section>
 </main>
 
 <nav class="bottom-nav" aria-label="Navegación principal">
@@ -357,7 +343,6 @@ main.wrap{padding-bottom:96px!important}
   <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
   <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
-  <button data-section="api"><span class="ico">⇄</span><span>Mercado</span></button>
   <button id="bottomAuth"><span class="ico">♙</span><span>Perfil</span></button>
 </nav>
 
@@ -522,25 +507,7 @@ function playerCard(p,teamFallback=""){
     '<div class="stats"><span class="gold">'+money(p.market)+'</span><br><span class="green">'+(p.avg===null?"Media —":"Media "+p.avg.toLocaleString("es-ES"))+'</span></div></button>'
 }
 function renderSearch(){const q=$("search").value.trim().toLowerCase(),box=$("results");if(!players){box.innerHTML='<div class="empty">Cargando la lista de jugadores…</div>';return}const rows=players.filter(p=>!q||[p.name,p.team,String(p.id||"")].some(x=>String(x).toLowerCase().includes(q))).slice(0,40);box.innerHTML=rows.length?rows.map(p=>playerCard(p)).join(""):'<div class="empty">No se ha encontrado ningún jugador.</div>';box.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.id))}
-async function renderBestPlayers(){
-  const box=$("bestResults"), state=$("bestState"), limit=Number($("bestLimit").value||5);
-  if(!players){state.textContent="Cargando jugadores…";box.innerHTML="";return}
-  const ranked=players.filter(p=>p.avg!==null && Number.isFinite(p.avg)).sort((a,b)=>
-    b.avg-a.avg || ((b.market??-Infinity)-(a.market??-Infinity)) || String(a.name).localeCompare(String(b.name),"es")
-  ).slice(0,limit);
-  state.textContent=ranked.length?("Ordenado por media de puntos · "+ranked.length+" jugadores mostrados"):"No hay medias de puntos disponibles en el catálogo actual.";
-  box.innerHTML=ranked.length?ranked.map((p,i)=>
-    '<button type="button" class="best-card" data-best-id="'+esc(p.id||"")+'">'+
-      '<div class="best-rank">#'+(i+1)+'</div>'+
-      (p.image?'<img class="best-avatar" src="'+esc(p.image)+'" alt="" loading="lazy">':'<div class="best-avatar"></div>')+
-      '<div><div class="best-name">'+esc(p.name)+'</div>'+
-      '<div class="best-team">'+esc(p.team||"Equipo no indicado")+'</div>'+
-      '<div class="best-meta"><span class="best-pill green">Media '+p.avg.toLocaleString("es-ES",{maximumFractionDigits:2})+'</span>'+
-      '<span class="best-pill gold">'+money(p.market)+'</span></div></div></button>'
-  ).join(""):'<div class="empty">Todavía no hay datos suficientes para crear el ranking.</div>';
-  box.querySelectorAll("[data-best-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.bestId));
-}
-function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
+function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderForgotten();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderForgotten();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
 function teamLogo(t){return t?.image&&imgUrl(t.image)?t.image:null}
 function setTeamsState(type,text){$("teamsState").className="statusline "+type;$("teamsState").innerHTML='<span><span class="dot"></span>'+esc(text)+'</span>'}
 function renderTeams(){
@@ -561,7 +528,7 @@ function renderTeamDetail(id){
   $("teamPlayersGrid").querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.id));
 }
 function openTeam(id){renderTeamDetail(id)}
-$("teamSearch").oninput=renderTeams;$("bestLimit").onchange=renderBestPlayers;$("backTeams").onclick=()=>{$("teamDetail").classList.add("hidden");$("teamGrid").classList.remove("hidden")};
+$("teamSearch").oninput=renderTeams;$("backTeams").onclick=()=>{$("teamDetail").classList.add("hidden");$("teamGrid").classList.remove("hidden")};
 async function loadTeams(){
   if(teamsLoading)return teamsLoading;
   teamsLoading=(async()=>{try{
@@ -570,7 +537,7 @@ async function loadTeams(){
     if(!r.ok)throw Error("HTTP "+r.status);
     teams=normalizeTeams(await r.json());
     localStorage.setItem("lf_teams_cache_v1",JSON.stringify({ts:Date.now(),data:teams.map(t=>t.raw)}));
-    if(players||forgottenPlayers.length){const raw=[...(players||[]),...forgottenPlayers].map(x=>x.raw);players=normalizePlayers(raw);renderSearch();renderBestPlayers();renderForgotten()}
+    if(players||forgottenPlayers.length){const raw=[...(players||[]),...forgottenPlayers].map(x=>x.raw);players=normalizePlayers(raw);renderSearch();renderForgotten()}
     renderTeams();setTeamsState("ok",teams.length+" equipos cargados");
   }catch(e){
     try{const saved=localStorage.getItem("lf_teams_cache_v1");if(saved){teams=normalizeTeams(JSON.parse(saved).data);renderTeams();setTeamsState("ok","Equipos desde caché");return}}catch{}
@@ -846,7 +813,6 @@ document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
-renderBestPlayers();
 renderForgotten();
 populateComparePlayers();
 checkAuth();
