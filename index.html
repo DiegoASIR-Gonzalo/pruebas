@@ -118,7 +118,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -129,6 +129,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 @media(max-width:699px){.app-shell{width:100%}}
 
 /* ===== Responsive desktop layout + fixed bottom navigation ===== */
+.bottom-nav{grid-template-columns:repeat(5,1fr)!important}
 .bottom-nav{position:fixed!important;left:50%!important;bottom:0!important;transform:translateX(-50%)!important;width:min(100%,760px)!important;height:68px!important;z-index:100!important;background:#050505!important;border-top:1px solid #252525!important;box-shadow:0 -8px 24px rgba(0,0,0,.55)!important}
 main.wrap{padding-bottom:96px!important}
 @media(min-width:700px){
@@ -170,6 +171,56 @@ main.wrap{padding-bottom:96px!important}
   .teams-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   #api .tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
+
+/* ===== Comparador de jugadores ===== */
+.compare-panel{padding:0 10px 24px}
+.compare-toolbar{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:0 0 16px}
+.compare-select{min-width:0;background:#080808!important;border:1px solid #292929!important;padding:12px 10px!important;font-size:12px!important;color:#eee!important}
+.compare-action{padding:12px 18px!important;background:var(--red)!important;border-color:var(--red)!important;color:#fff!important;font-weight:800}
+.compare-stage{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:14px;align-items:stretch}
+.compare-player{min-width:0;background:#090909;border:1px solid #292929;display:flex;flex-direction:column;min-height:360px}
+.compare-photo{aspect-ratio:1/1;background:#050505;border-bottom:1px solid #292929;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.compare-photo img{width:100%;height:100%;object-fit:contain}
+.compare-placeholder{font-size:11px;color:#555;text-align:center;padding:20px}
+.compare-info{padding:12px 14px}
+.compare-name{font-size:18px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compare-team{font-size:11px;color:#777;margin-top:3px}
+.compare-vs{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#777}
+.compare-summary{margin-top:18px;border-top:1px solid #292929}
+.compare-summary-title{padding:12px 0 9px;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#aaa}
+.compare-row{display:grid;grid-template-columns:minmax(80px,1fr) minmax(70px,130px) minmax(80px,1fr);align-items:center;min-height:62px;border-top:1px solid #202020}
+.compare-value{font-size:20px;font-weight:900;padding:0 8px}
+.compare-value.left{text-align:right}.compare-value.right{text-align:left}
+.compare-value.better{color:#fff}.compare-value.worse{color:#666}
+.compare-metric{text-align:center;font-size:9px;color:#777;text-transform:uppercase;line-height:1.3}
+.compare-bar{height:3px;background:#1d1d1d;margin:4px 8px 0;position:relative}
+.compare-bar span{display:block;height:100%;background:var(--red)}
+.compare-note{font-size:9px;color:#555;line-height:1.5;margin-top:12px}
+.compare-empty{border:1px solid #222;background:#080808;padding:28px 16px;text-align:center;color:#666;font-size:11px}
+.compare-status{font-size:10px;color:#666;min-height:15px;margin:-8px 0 12px}
+@media(max-width:699px){
+  .compare-toolbar{grid-template-columns:1fr 1fr;}
+  .compare-action{grid-column:1/-1}
+  .compare-stage{grid-template-columns:1fr;gap:0}
+  .compare-vs{height:42px}
+  .compare-player{min-height:0}
+  .compare-name{font-size:16px}
+  .compare-summary{margin-top:16px}
+  .compare-row{grid-template-columns:minmax(64px,1fr) 82px minmax(64px,1fr);min-height:58px}
+  .compare-value{font-size:17px}
+}
+@media(min-width:700px){
+  .compare-panel{padding:0}
+  .compare-toolbar{grid-template-columns:1fr 1fr auto;max-width:920px;margin-left:auto;margin-right:auto}
+  .compare-stage{max-width:920px;margin:auto;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);gap:22px}
+  .compare-player{min-height:520px}
+  .compare-info{padding:16px 18px}
+  .compare-name{font-size:22px}
+  .compare-summary{max-width:920px;margin-left:auto;margin-right:auto}
+  .compare-row{min-height:72px;grid-template-columns:minmax(120px,1fr) 150px minmax(120px,1fr)}
+  .compare-value{font-size:25px}
+  .compare-metric{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -180,6 +231,7 @@ main.wrap{padding-bottom:96px!important}
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
+      <button data-section="compare">Comparador</button>
       <button data-section="api">Explorador API</button>
       <button id="authButton" class="auth-button">Iniciar sesión</button>
     </nav>
@@ -239,6 +291,28 @@ main.wrap{padding-bottom:96px!important}
     </section>
   </section>
 
+  <section id="compare" class="section">
+    <div class="hero" style="margin-top:1vh">
+      <h1 style="font-size:32px">Comparador de jugadores</h1>
+      <p>Compara minutos, puntos y regularidad positiva usando las jornadas disponibles en la ficha de cada jugador.</p>
+    </div>
+    <div class="compare-panel">
+      <div class="compare-toolbar">
+        <select id="comparePlayerA" class="compare-select" aria-label="Primer jugador">
+          <option value="">Jugador 1</option>
+        </select>
+        <select id="comparePlayerB" class="compare-select" aria-label="Segundo jugador">
+          <option value="">Jugador 2</option>
+        </select>
+        <button id="compareButton" type="button" class="compare-action">Comparar</button>
+      </div>
+      <div id="compareStatus" class="compare-status" aria-live="polite"></div>
+      <div id="compareOutput">
+        <div class="compare-empty">Selecciona dos jugadores para ver la comparación.</div>
+      </div>
+    </div>
+  </section>
+
   <section id="api" class="section">
     <div class="hero" style="margin-top:1vh"><h1 style="font-size:32px">Explorador API</h1><p>Herramientas avanzadas para consultar los endpoints públicos.</p></div>
     <div id="apiGrid" class="tool-grid"></div>
@@ -248,6 +322,7 @@ main.wrap{padding-bottom:96px!important}
 <nav class="bottom-nav" aria-label="Navegación principal">
   <button class="active" data-section="home"><span class="ico">♜</span><span>Clasificación</span></button>
   <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
+  <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
   <button data-section="api"><span class="ico">⇄</span><span>Mercado</span></button>
   <button id="bottomAuth"><span class="ico">♙</span><span>Perfil</span></button>
 </nav>
@@ -414,7 +489,7 @@ async function renderBestPlayers(){
   ).join(""):'<div class="empty">Todavía no hay datos suficientes para crear el ranking.</div>';
   box.querySelectorAll("[data-best-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.bestId));
 }
-function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
+function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
 function teamLogo(t){return t?.image&&imgUrl(t.image)?t.image:null}
 function setTeamsState(type,text){$("teamsState").className="statusline "+type;$("teamsState").innerHTML='<span><span class="dot"></span>'+esc(text)+'</span>'}
 function renderTeams(){
@@ -528,6 +603,93 @@ function isImageValue(k,v){return typeof v==="string"&&isImageKey(k)&&imgUrl(v)}
 function isImageKey(k){return/(image|photo|avatar|logo|badge|crest|icon|picture|cover|thumbnail|url)/i.test(k)}
 function imageCard(k,v){return'<figure class="media-card"><img src="'+esc(v)+'" alt="" loading="lazy"><div>'+esc(tr(k))+'</div></figure>'}
 async function openPlayer(id){if(!id)return;const cached=players?.find(p=>String(p.id)===String(id));$("modalTitle").textContent=cached?.name||"Jugador";$("modalRoute").textContent="/v1/competition/1/player/"+id;$("modalContent").innerHTML='<div class="modal-body"><div class="empty">Cargando ficha…</div></div>';$("modal").classList.remove("hidden");$("modal").setAttribute("aria-hidden","false");try{const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/player/"+encodeURIComponent(id)),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const data=await r.json();const p=profileData(data);$("modalTitle").textContent=p.name;renderPlayer(data)}catch(e){$("modalContent").innerHTML='<div class="modal-body"><div class="empty">No se pudo cargar la ficha del jugador.<br>'+esc(e.message)+'</div></div>'}}
+
+// ===== Comparador de jugadores =====
+const compareDetails=new Map();
+function populateComparePlayers(){
+  const a=$("comparePlayerA"),b=$("comparePlayerB");
+  if(!a||!b||!players)return;
+  const sorted=[...players].filter(p=>p.id!=null).sort((x,y)=>String(x.name).localeCompare(String(y.name),"es"));
+  const options='<option value="">Selecciona jugador…</option>'+sorted.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+(p.team?' · '+esc(p.team):'')+'</option>').join('');
+  a.innerHTML=options;b.innerHTML=options;
+}
+function statScalar(v){return Array.isArray(v)?v[0]:v}
+function playerComparisonStats(data,fallback){
+  const master=obj(data?.playerMaster)?data.playerMaster:data;
+  const stats=Array.isArray(master?.playerStats)?master.playerStats:[];
+  let minuteTotal=0,minuteWeeks=0,pointsTotal=0,pointsWeeks=0,positiveWeeks=0;
+  stats.forEach(st=>{
+    const raw=obj(st?.stats)?st.stats:{};
+    const mins=num(statScalar(raw.mins_played));
+    const pts=num(st?.totalPoints);
+    if(mins!==null){minuteTotal+=mins;minuteWeeks++}
+    if(pts!==null){pointsTotal+=pts;pointsWeeks++;if(pts>0)positiveWeeks++}
+  });
+  const avgMinutes=minuteWeeks?minuteTotal/minuteWeeks:null;
+  const avgPoints=pointsWeeks?pointsTotal/pointsWeeks:(fallback?.avg??null);
+  const positivePct=pointsWeeks?(positiveWeeks/pointsWeeks)*100:null;
+  const image=imageFor(data)||fallback?.image||null;
+  const name=master?.nickname||master?.name||fallback?.name||"Jugador";
+  const team=obj(master?.team)?(master.team.name||master.team.shortName):fallback?.team||"";
+  return {id:master?.id??fallback?.id,name,team,image,avgMinutes,avgPoints,positivePct,weeks:Math.max(minuteWeeks,pointsWeeks),positiveWeeks};
+}
+async function getComparePlayer(id){
+  if(!id)throw Error("Selecciona un jugador");
+  if(compareDetails.has(String(id)))return compareDetails.get(String(id));
+  const fallback=players?.find(p=>String(p.id)===String(id));
+  const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/player/"+encodeURIComponent(id)),{headers:{Accept:"application/json"},cache:"no-store"});
+  if(!r.ok)throw Error("No se pudo cargar "+(fallback?.name||"el jugador"));
+  const data=await r.json();
+  const out=playerComparisonStats(data,fallback);
+  compareDetails.set(String(id),out);
+  return out;
+}
+function compareNumber(v,digits=1){return v===null?"—":Number(v).toLocaleString("es-ES",{minimumFractionDigits:digits,maximumFractionDigits:digits})}
+function comparePercent(v){return v===null?"—":Number(v).toLocaleString("es-ES",{maximumFractionDigits:0})+"%"}
+function compareCard(p){
+  return '<article class="compare-player">'+
+    '<div class="compare-photo">'+(p.image?'<img src="'+esc(p.image)+'" alt="'+esc(p.name)+'">':'<div class="compare-placeholder">Imagen no disponible</div>')+'</div>'+ 
+    '<div class="compare-info"><div class="compare-name">'+esc(p.name)+'</div><div class="compare-team">'+esc(p.team||"Equipo no indicado")+'</div></div>'+
+  '</article>';
+}
+function metricRow(label,a,b,format,maxValue){
+  const av=a===null?null:Number(a),bv=b===null?null:Number(b);
+  let aBetter=false,bBetter=false;
+  if(av!==null&&bv!==null&&av!==bv){aBetter=av>bv;bBetter=bv>av}
+  const aa=format(a),bb=format(b);
+  const ap=av!==null&&maxValue>0?Math.max(4,Math.min(100,av/maxValue*100)):0;
+  const bp=bv!==null&&maxValue>0?Math.max(4,Math.min(100,bv/maxValue*100)):0;
+  return '<div class="compare-row">'+
+    '<div><div class="compare-value left '+(aBetter?'better':(bBetter?'worse':'') )+'">'+aa+'</div><div class="compare-bar"><span style="width:'+ap+'%"></span></div></div>'+
+    '<div class="compare-metric">'+label+'</div>'+ 
+    '<div><div class="compare-value right '+(bBetter?'better':(aBetter?'worse':'') )+'">'+bb+'</div><div class="compare-bar"><span style="width:'+bp+'%"></span></div></div>'+ 
+  '</div>';
+}
+function renderComparison(a,b){
+  const maxMinutes=Math.max(a.avgMinutes||0,b.avgMinutes||0,1),maxPoints=Math.max(a.avgPoints||0,b.avgPoints||0,1),maxPositive=100;
+  $("compareOutput").innerHTML='<div class="compare-stage">'+compareCard(a)+'<div class="compare-vs">VS</div>'+compareCard(b)+'</div>'+ 
+    '<section class="compare-summary" aria-label="Comparación estadística">'+
+      '<div class="compare-summary-title">Comparativa Fantasy</div>'+ 
+      metricRow('Media de minutos / jornada',a.avgMinutes,b.avgMinutes,v=>compareNumber(v,1),maxMinutes)+
+      metricRow('Media de puntos / jornada',a.avgPoints,b.avgPoints,v=>compareNumber(v,2),maxPoints)+
+      metricRow('Jornadas con puntos positivos',a.positivePct,b.positivePct,comparePercent,maxPositive)+
+      '<div class="compare-note">La regularidad positiva indica el porcentaje de jornadas analizadas en las que el jugador consiguió más de 0 puntos Fantasy. No es una garantía futura; es un dato histórico calculado con las jornadas disponibles.</div>'+ 
+    '</section>';
+}
+async function runComparison(){
+  const aId=$("comparePlayerA")?.value,bId=$("comparePlayerB")?.value,status=$("compareStatus");
+  if(!aId||!bId){status.textContent="Selecciona los dos jugadores antes de comparar.";return}
+  if(aId===bId){status.textContent="Elige dos jugadores diferentes.";return}
+  status.textContent="Cargando estadísticas de ambos jugadores…";
+  $("compareButton").disabled=true;
+  try{const [a,b]=await Promise.all([getComparePlayer(aId),getComparePlayer(bId)]);renderComparison(a,b);status.textContent=a.weeks||b.weeks?"Comparación basada en las jornadas disponibles en sus fichas.":"No hay jornadas suficientes para calcular estadísticas."}
+  catch(e){status.textContent=e.message||"No se pudo realizar la comparación."}
+  finally{$("compareButton").disabled=false}
+}
+$("compareButton")?.addEventListener("click",runComparison);
+$("comparePlayerA")?.addEventListener("change",()=>{$("compareStatus").textContent=""});
+$("comparePlayerB")?.addEventListener("change",()=>{$("compareStatus").textContent=""});
+
 function apiCard(ep){const c=document.createElement("article");c.className="api-card";c.innerHTML='<div class="api-head"><div class="api-name">'+esc(ep.name)+'</div><div class="api-desc">'+esc(ep.desc)+'</div></div><div class="api-body"><div class="api-route">'+esc(ep.path)+'</div>'+(ep.params.length?'<div class="api-row">'+ep.params.map(([k,l,p])=>'<input data-p="'+esc(k)+'" placeholder="'+esc(p)+'">').join(''):'')+'<button class="primary" data-go>Consultar</button></div><div class="api-result"></div></div>';c.querySelector("[data-go]").onclick=async()=>{const btn=c.querySelector("[data-go]"),r=c.querySelector(".api-result");try{let p=ep.path;for(const[k]of ep.params){const x=c.querySelector('[data-p="'+k+'"]');if(!x.value.trim())throw Error("Falta "+k);p=p.replace("{"+k+"}",encodeURIComponent(x.value.trim()))}const u=API+"?path="+encodeURIComponent(p.split("?")[0])+(p.includes("?")?"&"+p.split("?")[1]:"");btn.disabled=true;const rr=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"});const raw=await rr.text();if(!rr.ok)throw Error("HTTP "+rr.status+" · "+raw.slice(0,500));r.innerHTML='<pre>'+esc(JSON.stringify(JSON.parse(raw),null,2))+'</pre>'}catch(e){r.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}finally{btn.disabled=false}};return c}
 $("search").oninput=renderSearch;$("reload").onclick=()=>{localStorage.removeItem(CACHE_KEY);loadPlayers(true)};
 async function checkAuth(){
@@ -610,6 +772,7 @@ $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAt
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
 renderBestPlayers();
+populateComparePlayers();
 checkAuth();
 const loginQuery=new URLSearchParams(location.search);
 if(loginQuery.get("login")==="success" || loginQuery.get("login")==="error"){
