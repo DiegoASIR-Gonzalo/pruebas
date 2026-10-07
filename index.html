@@ -75,6 +75,23 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflo
       </div>
       <div id="loadState" class="statusline loading"><span><span class="dot"></span>Cargando jugadores…</span><span id="count"></span></div>
       <div id="results" class="results"></div>
+      <section class="best-panel" aria-labelledby="bestTitle">
+        <div class="best-head">
+          <div>
+            <h2 id="bestTitle">Mejores Jugadores (Actualmente)</h2>
+            <p>Los jugadores con mayor media de puntos, ordenados de mayor a menor.</p>
+          </div>
+          <label class="best-select">Mostrar
+            <select id="bestLimit" aria-label="Número de mejores jugadores">
+              <option value="5">Top 5</option>
+              <option value="10">Top 10</option>
+              <option value="15">Top 15</option>
+            </select>
+          </label>
+        </div>
+        <div id="bestState" class="best-state">Esperando datos…</div>
+        <div id="bestResults" class="best-grid"></div>
+      </section>
       <div class="notice">Pulsa un resultado para abrir su ficha completa. Los datos se consultan desde <code>/v1/competition/1/players</code> y la ficha individual desde <code>/v1/competition/1/player/{id}</code>.</div>
     </div>
   </section>
@@ -236,11 +253,11 @@ function renderTeamDetail(id){
   $("teamGrid").classList.add("hidden");$("teamDetail").classList.remove("hidden");
   $("teamDetailTitle").innerHTML='<div class="team-detail-title">'+(teamLogo(t)?'<img src="'+esc(t.image)+'" alt="">':"")+'<div><div>'+esc(t.name)+'</div><div class="subtle">'+esc(t.shortName||"")+'</div></div></div>';
   const rows=(players||[]).filter(p=>String(p.teamId)===String(id));
-  $("teamPlayersGrid").innerHTML=rows.length?rows.map(p=>'<button type="button" class="player" data-id="'+esc(p.id||"")+'">'+(p.image?'<img class="avatar" src="'+esc(p.image)+'" alt="" loading="lazy">':'<div class="avatar"></div>')+'<div><div class="pname">'+esc(p.name)+'</div><div class="pmeta">'+esc(p.team||t.name)+'</div></div><div class="stats"><span class="gold">'+money(p.market)+'</span><br><span class="green">'+(p.avg===null?"Media —":"Media "+p.avg.toLocaleString("es-ES"))+'</span></div></button>').join(""):'<div class="empty">No hay jugadores asociados a este equipo en el catálogo público.</div>';
+  $("teamPlayersGrid").innerHTML=rows.length?rows.map(p=>playerCard(p,t.name)).join(""):'<div class="empty">No hay jugadores asociados a este equipo en el catálogo público.</div>';
   $("teamPlayersGrid").querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.id));
 }
 function openTeam(id){renderTeamDetail(id)}
-$("teamSearch").oninput=renderTeams;\n$("bestLimit").onchange=renderBestPlayers;$("backTeams").onclick=()=>{$("teamDetail").classList.add("hidden");$("teamGrid").classList.remove("hidden")};
+$("teamSearch").oninput=renderTeams;$("bestLimit").onchange=renderBestPlayers;$("backTeams").onclick=()=>{$("teamDetail").classList.add("hidden");$("teamGrid").classList.remove("hidden")};
 async function loadTeams(){
   if(teamsLoading)return teamsLoading;
   teamsLoading=(async()=>{try{
