@@ -37,6 +37,20 @@ main{padding:30px 0 55px}.hero{text-align:center;margin:6vh auto 22px}.hero h1{m
 .best-name{font-weight:850;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .best-team{color:var(--muted);font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .best-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.auth-button{font-size:11px!important;background:#111d2e!important}
+.auth-button.logged{border-color:#3a8c6f;color:#a4f2d1}
+.auth-box{padding:16px}
+.auth-box h2{margin:0 0 4px;font-size:20px}
+.auth-box p{margin:0 0 13px;color:var(--muted);font-size:11px;line-height:1.45}
+.auth-form{display:grid;gap:8px}
+.auth-form input{width:100%}
+.auth-actions{display:flex;gap:7px;justify-content:flex-end;margin-top:3px}
+.auth-note{font-size:10px;color:#8495ad;line-height:1.4;margin-top:9px}
+.auth-state{font-size:11px;padding:8px 10px;border-radius:9px;margin-top:8px;display:none}
+.auth-state.show{display:block;background:#0c1524;border:1px solid #263750}
+.auth-state.good{color:#a4f2d1;border-color:#245b49}
+.auth-state.error{color:#ffb0bd;border-color:#61313c}
+
 .best-pill{font-size:10px;padding:4px 6px;border-radius:999px;background:#17233a;border:1px solid #2b3c58}
 .best-pill.green{color:#a4f2d1}
 .best-pill.gold{color:#ffe29a}
@@ -58,6 +72,7 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflo
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
       <button data-section="api">Explorador API</button>
+      <button id="authButton" class="auth-button">Iniciar sesión</button>
     </nav>
   </div>
 </header>
@@ -120,6 +135,34 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflo
     <div id="apiGrid" class="tool-grid"></div>
   </section>
 </main>
+
+<div id="authModal" class="modal hidden" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="dialog-head">
+      <div><div id="authTitle" class="api-name">Iniciar sesión en LALIGA Fantasy</div><div class="subtle">Prueba experimental de autenticación</div></div>
+      <button class="close" id="closeAuth" aria-label="Cerrar">×</button>
+    </div>
+    <div class="auth-box">
+      <div id="loginPanel">
+        <h2>Tu cuenta de LALIGA</h2>
+        <p>Introduce tus credenciales aquí. La contraseña se envía por HTTPS a tu función de Vercel y desde allí al proveedor de identidad de LALIGA. No se muestra ni se guarda en el navegador.</p>
+        <form id="loginForm" class="auth-form">
+          <input id="loginEmail" type="email" autocomplete="username" placeholder="Correo electrónico" required>
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+          <div class="auth-actions"><button type="submit" class="primary" id="loginSubmit">Entrar</button></div>
+        </form>
+        <div class="auth-note">Esta primera prueba está pensada para cuentas locales de LALIGA con correo y contraseña. Los accesos mediante Google, Apple u otros proveedores pueden requerir un flujo OAuth distinto.</div>
+        <div id="loginState" class="auth-state"></div>
+      </div>
+      <div id="sessionPanel" style="display:none">
+        <h2>Sesión activa</h2>
+        <p>La web tiene una sesión de LALIGA almacenada en una cookie HttpOnly. El token no se expone al JavaScript.</p>
+        <div id="sessionInfo" class="auth-state show good"></div>
+        <div class="auth-actions"><button id="logoutButton">Cerrar sesión</button></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="modal" class="modal hidden" aria-hidden="true">
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -352,8 +395,53 @@ function imageCard(k,v){return'<figure class="media-card"><img src="'+esc(v)+'" 
 async function openPlayer(id){if(!id)return;const cached=players?.find(p=>String(p.id)===String(id));$("modalTitle").textContent=cached?.name||"Jugador";$("modalRoute").textContent="/v1/competition/1/player/"+id;$("modalContent").innerHTML='<div class="modal-body"><div class="empty">Cargando ficha…</div></div>';$("modal").classList.remove("hidden");$("modal").setAttribute("aria-hidden","false");try{const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/player/"+encodeURIComponent(id)),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const data=await r.json();const p=profileData(data);$("modalTitle").textContent=p.name;renderPlayer(data)}catch(e){$("modalContent").innerHTML='<div class="modal-body"><div class="empty">No se pudo cargar la ficha del jugador.<br>'+esc(e.message)+'</div></div>'}}
 function apiCard(ep){const c=document.createElement("article");c.className="api-card";c.innerHTML='<div class="api-head"><div class="api-name">'+esc(ep.name)+'</div><div class="api-desc">'+esc(ep.desc)+'</div></div><div class="api-body"><div class="api-route">'+esc(ep.path)+'</div>'+(ep.params.length?'<div class="api-row">'+ep.params.map(([k,l,p])=>'<input data-p="'+esc(k)+'" placeholder="'+esc(p)+'">').join(''):'')+'<button class="primary" data-go>Consultar</button></div><div class="api-result"></div></div>';c.querySelector("[data-go]").onclick=async()=>{const btn=c.querySelector("[data-go]"),r=c.querySelector(".api-result");try{let p=ep.path;for(const[k]of ep.params){const x=c.querySelector('[data-p="'+k+'"]');if(!x.value.trim())throw Error("Falta "+k);p=p.replace("{"+k+"}",encodeURIComponent(x.value.trim()))}const u=API+"?path="+encodeURIComponent(p.split("?")[0])+(p.includes("?")?"&"+p.split("?")[1]:"");btn.disabled=true;const rr=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"});const raw=await rr.text();if(!rr.ok)throw Error("HTTP "+rr.status+" · "+raw.slice(0,500));r.innerHTML='<pre>'+esc(JSON.stringify(JSON.parse(raw),null,2))+'</pre>'}catch(e){r.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}finally{btn.disabled=false}};return c}
 $("search").oninput=renderSearch;$("reload").onclick=()=>{localStorage.removeItem(CACHE_KEY);loadPlayers(true)};
+async function checkAuth(){
+  try{
+    const r=await fetch("/api/auth",{headers:{Accept:"application/json"},cache:"no-store"});
+    const data=await r.json();
+    setAuthUi(data);
+  }catch{setAuthUi({authenticated:false})}
+}
+function setAuthUi(data){
+  const logged=!!data?.authenticated;
+  const b=$("authButton");b.textContent=logged?"Sesión activa":"Iniciar sesión";b.classList.toggle("logged",logged);
+  $("loginPanel").style.display=logged?"none":"block";
+  $("sessionPanel").style.display=logged?"block":"none";
+  if(logged){
+    const exp=data.expiresAt?new Date(data.expiresAt).toLocaleString("es-ES"):"desconocida";
+    $("sessionInfo").textContent="Sesión reconocida. Caducidad aproximada: "+exp;
+  }
+}
+function showAuth(){
+  $("authModal").classList.remove("hidden");$("authModal").setAttribute("aria-hidden","false");
+  checkAuth();
+}
+$("authButton").onclick=showAuth;
+$("closeAuth").onclick=()=>{$("authModal").classList.add("hidden");$("authModal").setAttribute("aria-hidden","true")};
+$("authModal").onclick=e=>{if(e.target===$("authModal"))$("closeAuth").click()};
+$("loginForm").onsubmit=async e=>{
+  e.preventDefault();
+  const btn=$("loginSubmit"),state=$("loginState");
+  state.className="auth-state show";state.textContent="Comprobando credenciales…";btn.disabled=true;
+  try{
+    const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email:$("loginEmail").value,password:$("loginPassword").value}),credentials:"same-origin"});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok)throw Error(data.error||("HTTP "+r.status));
+    $("loginPassword").value="";
+    state.className="auth-state show good";state.textContent="Inicio de sesión correcto.";
+    setAuthUi(data);
+  }catch(err){
+    state.className="auth-state show error";state.textContent=err.message||"No se pudo iniciar sesión.";
+  }finally{btn.disabled=false}
+};
+$("logoutButton").onclick=async()=>{
+  await fetch("/api/auth",{method:"DELETE",credentials:"same-origin",cache:"no-store"}).catch(()=>{});
+  $("loginPassword").value="";setAuthUi({authenticated:false});
+  $("loginState").className="auth-state";$("loginState").textContent="";
+};
+
 document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-section]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));$(b.dataset.section).classList.add("active")});
-$("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click()});
+$("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
 setTimeout(async()=>{await loadTeams();await loadPlayers(false);},50);
