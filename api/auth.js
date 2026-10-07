@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 /**
  * Vercel Node.js Function: /api/auth
  * Experimental LALIGA Fantasy login using the public client used by the official flow.
@@ -11,15 +13,15 @@ const attempts=new Map();
 
 function json(res,status,body){res.status(status).setHeader("Content-Type","application/json; charset=utf-8").setHeader("Cache-Control","no-store").end(JSON.stringify(body))}
 function parseCookies(v){const out={};for(const part of String(v||"").split(";")){const i=part.indexOf("=");if(i>0)out[part.slice(0,i).trim()]=decodeURIComponent(part.slice(i+1).trim());}return out}
-function cookie(name,value,maxAge,extra=""){return name+"="+encodeURIComponent(value)+"; Max-Age="+maxAge+"; Path=/; HttpOnly; Secure; SameSite=Lax"+extra}
+function cookie(name,value,maxAge,sameSite="Lax"){return name+"="+encodeURIComponent(value)+"; Max-Age="+maxAge+"; Path=/; HttpOnly; Secure; SameSite="+sameSite}
 function origin(req){
   const proto=String(req.headers["x-forwarded-proto"]||"https").split(",")[0];
   const host=String(req.headers["x-forwarded-host"]||req.headers.host||"");
   return proto+"://"+host;
 }
 function base64url(buf){return Buffer.from(buf).toString("base64").replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
-function randomUrlSafe(bytes=32){return base64url(require("crypto").randomBytes(bytes))}
-function pkceChallenge(verifier){return base64url(require("crypto").createHash("sha256").update(verifier).digest())}
+function randomUrlSafe(bytes=32){return base64url(crypto.randomBytes(bytes))}
+function pkceChallenge(verifier){return base64url(crypto.createHash("sha256").update(verifier).digest())}
 function tokenPayload(token){try{const p=token.split(".")[1];return JSON.parse(Buffer.from(p,"base64url").toString("utf8"))}catch{return null}}
 function sameOrigin(req){
   const origin=req.headers.origin;
@@ -89,7 +91,7 @@ export default async function handler(req,res){
       if(!p?.exp || p.exp*1000<=Date.now())return res.redirect(302,"/?login=error&reason=oauth_expired");
       const maxAge=Math.max(60,Math.floor((p.exp*1000-Date.now())/1000));
       res.setHeader("Set-Cookie",[
-        cookie(COOKIE,token,maxAge,"; SameSite=Strict"),
+        cookie(COOKIE,token,maxAge,"Strict"),
         cookie("lf_oauth_state","",0),
         cookie("lf_oauth_verifier","",0),
         cookie("lf_oauth_nonce","",0)
