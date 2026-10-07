@@ -121,6 +121,54 @@ export default async function handler(req,res){
     const raw=typeof req.body==="string"?req.body:JSON.stringify(req.body||{});
     if(Buffer.byteLength(raw,"utf8")>8192)return json(res,413,{error:"Solicitud demasiado grande"});
     const body=typeof req.body==="object"&&req.body!==null?req.body:JSON.parse(raw);
+
+    if(body.oauth==="google"){
+      const pasted=typeof body.redirect==="string"?body.redirect.trim():"";
+      const cookies=parseCookies(req.headers.cookie);
+      const verifier=cookies.lf_oauth_verifier||"";
+      const expectedState=cookies.lf_oauth_state||"";
+      if(!pasted || !verifier)return json(res,400,{error:"Primero inicia el flujo de Google y genera un nuevo código."});
+      let code=pasted,state="";
+      try{
+        const u=new URL(pasted);
+        if(u.protocol==="authredirect:" || u.searchParams.has("code")){
+          code=u.searchParams.get("code")||"";
+          state=u.searchParams.get("state")||"";
+        }
+      }catch{}
+      if(!code)code=pasted;
+      if(expectedState && state && state!==expectedState)return json(res,400,{error:"El código pertenece a otro intento de inicio de sesión."});
+
+      const redirectUri="authredirect://com.lfp.laligafantasy";
+      const upstream=await fetch(TOKEN_URL+"?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded","Accept":"application/json"},
+        body:new URLSearchParams({
+          grant_type:"authorization_code",
+          client_id:CLIENT_ID,
+          code,
+          redirect_uri:redirectUri,
+          code_verifier:verifier,
+          scope:"openid offline_access"
+        }),
+        cache:"no-store"
+      });
+      const data=await upstream.json().catch(()=>({}));
+      if(!upstream.ok)return json(res,401,{error:"LALIGA ha rechazado el código. Es de un solo uso y caduca rápidamente."});
+      const token=typeof data.access_token==="string"?data.access_token:(typeof data.id_token==="string"?data.id_token:"");
+      if(!token)return json(res,502,{error:"LALIGA no devolvió un token de sesión"});
+      const p=tokenPayload(token);
+      if(!p?.exp || p.exp*1000<=Date.now())return json(res,502,{error:"El token recibido ya está caducado"});
+      const maxAge=Math.max(60,Math.floor((p.exp*1000-Date.now())/1000));
+      res.setHeader("Set-Cookie",[
+        cookie(COOKIE,token,maxAge,"Strict"),
+        cookie("lf_oauth_state","",0),
+        cookie("lf_oauth_verifier","",0),
+        cookie("lf_oauth_nonce","",0)
+      ]);
+      return json(res,200,{authenticated:true,expiresAt:p.exp*1000});
+    }
+
     const email=typeof body.email==="string"?body.email.trim():"";
     const password=typeof body.password==="string"?body.password:"";
     if(!email || !password)return json(res,400,{error:"Correo y contraseña son obligatorios"});
