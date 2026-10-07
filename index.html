@@ -463,6 +463,17 @@ document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{document.q
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
+renderBestPlayers();
+checkAuth();
+const loginQuery=new URLSearchParams(location.search);
+if(loginQuery.get("login")==="success" || loginQuery.get("login")==="error"){
+  const ok=loginQuery.get("login")==="success";
+  const reason=loginQuery.get("reason");
+  history.replaceState({},document.title,location.pathname);
+  showAuth();
+  $("loginState").className="auth-state show "+(ok?"good":"error");
+  $("loginState").textContent=ok?"Inicio de sesión correcto con LALIGA.":(reason==="oauth_state"?"La validación de seguridad no coincidió.":reason==="oauth_exchange"?"LALIGA no aceptó el código de Google.":"No se pudo completar el inicio de sesión con Google.");
+}
 setTimeout(async()=>{await loadTeams();await loadPlayers(false);},50);
 </script>
 </body>
