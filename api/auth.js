@@ -58,7 +58,7 @@ export default async function handler(req,res){
       cookie("lf_oauth_verifier",verifier,600),
       cookie("lf_oauth_nonce",nonce,600)
     ]);
-    return res.redirect(302,authorize+"?"+params.toString());
+    res.statusCode=302;res.setHeader("Location",authorize+"?"+params.toString());return res.end();
   }
 
   if(req.method==="GET" && req.query?.callback==="google"){
@@ -67,7 +67,7 @@ export default async function handler(req,res){
     const cookies=parseCookies(req.headers.cookie);
     const verifier=cookies.lf_oauth_verifier||"";
     const expected=cookies.lf_oauth_state||"";
-    if(!code || !state || !verifier || state!==expected)return res.redirect(302,"/?login=error&reason=oauth_state");
+    if(!code || !state || !verifier || state!==expected)res.statusCode=302;res.setHeader("Location","/?login=error&reason=oauth_state");return res.end();
     try{
       const redirectUri="authredirect://com.lfp.laligafantasy";
       const upstream=await fetch(TOKEN_URL+"?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",{
@@ -84,11 +84,11 @@ export default async function handler(req,res){
         cache:"no-store"
       });
       const data=await upstream.json().catch(()=>({}));
-      if(!upstream.ok)return res.redirect(302,"/?login=error&reason=oauth_exchange");
+      if(!upstream.ok)res.statusCode=302;res.setHeader("Location","/?login=error&reason=oauth_exchange");return res.end();
       const token=typeof data.access_token==="string"?data.access_token:(typeof data.id_token==="string"?data.id_token:"");
-      if(!token)return res.redirect(302,"/?login=error&reason=oauth_token");
+      if(!token)res.statusCode=302;res.setHeader("Location","/?login=error&reason=oauth_token");return res.end();
       const p=tokenPayload(token);
-      if(!p?.exp || p.exp*1000<=Date.now())return res.redirect(302,"/?login=error&reason=oauth_expired");
+      if(!p?.exp || p.exp*1000<=Date.now())res.statusCode=302;res.setHeader("Location","/?login=error&reason=oauth_expired");return res.end();
       const maxAge=Math.max(60,Math.floor((p.exp*1000-Date.now())/1000));
       res.setHeader("Set-Cookie",[
         cookie(COOKIE,token,maxAge,"Strict"),
@@ -96,10 +96,10 @@ export default async function handler(req,res){
         cookie("lf_oauth_verifier","",0),
         cookie("lf_oauth_nonce","",0)
       ]);
-      return res.redirect(302,"/?login=success");
+      res.statusCode=302;res.setHeader("Location","/?login=success");return res.end();
     }catch(e){
       console.error("LALIGA OAuth error",e instanceof Error?e.message:String(e));
-      return res.redirect(302,"/?login=error&reason=oauth_unavailable");
+      res.statusCode=302;res.setHeader("Location","/?login=error&reason=oauth_unavailable");return res.end();
     }
   }
 
