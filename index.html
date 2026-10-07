@@ -174,13 +174,23 @@ main.wrap{padding-bottom:96px!important}
 
 /* ===== Comparador de jugadores ===== */
 .compare-panel{padding:0 10px 24px}
-.compare-toolbar{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:0 0 16px}
-.compare-select{min-width:0;background:#080808!important;border:1px solid #292929!important;padding:12px 10px!important;font-size:12px!important;color:#eee!important}
+.compare-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;margin:0 0 16px}
+.compare-picker{position:relative;min-width:0}
+.compare-picker label{display:block;font-size:9px;color:#777;text-transform:uppercase;letter-spacing:.08em;margin:0 0 5px}
+.compare-select{width:100%;min-width:0;background:#080808!important;border:1px solid #292929!important;padding:12px 10px!important;font-size:12px!important;color:#eee!important}
+.compare-select:focus{border-color:#777!important;box-shadow:none!important}
+.compare-suggestions{position:absolute;z-index:20;left:0;right:0;top:100%;background:#0b0b0b;border:1px solid #333;border-top:0;max-height:240px;overflow:auto;display:none}
+.compare-suggestions.show{display:block}
+.compare-suggestion{display:flex;width:100%;align-items:center;gap:9px;padding:9px 10px;background:#0b0b0b;border:0;border-bottom:1px solid #1f1f1f;color:#eee;text-align:left;cursor:pointer}
+.compare-suggestion:hover,.compare-suggestion:focus{background:#171717;outline:none}
+.compare-suggestion img{width:30px;height:30px;object-fit:contain;background:#050505;flex:none}
+.compare-suggestion-name{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compare-suggestion-team{font-size:9px;color:#777;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .compare-action{padding:12px 18px!important;background:var(--red)!important;border-color:var(--red)!important;color:#fff!important;font-weight:800}
 .compare-stage{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:14px;align-items:stretch}
 .compare-player{min-width:0;background:#090909;border:1px solid #292929;display:flex;flex-direction:column;min-height:360px}
-.compare-photo{aspect-ratio:1/1;background:#050505;border-bottom:1px solid #292929;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.compare-photo img{width:100%;height:100%;object-fit:contain}
+.compare-photo{height:250px;background:#050505;border-bottom:1px solid #292929;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.compare-photo img{width:78%;height:78%;object-fit:contain}
 .compare-placeholder{font-size:11px;color:#555;text-align:center;padding:20px}
 .compare-info{padding:12px 14px}
 .compare-name{font-size:18px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -203,7 +213,7 @@ main.wrap{padding-bottom:96px!important}
   .compare-action{grid-column:1/-1}
   .compare-stage{grid-template-columns:1fr;gap:0}
   .compare-vs{height:42px}
-  .compare-player{min-height:0}
+  .compare-player{min-height:0}.compare-photo{height:190px}
   .compare-name{font-size:16px}
   .compare-summary{margin-top:16px}
   .compare-row{grid-template-columns:minmax(64px,1fr) 82px minmax(64px,1fr);min-height:58px}
@@ -213,7 +223,7 @@ main.wrap{padding-bottom:96px!important}
   .compare-panel{padding:0}
   .compare-toolbar{grid-template-columns:1fr 1fr auto;max-width:920px;margin-left:auto;margin-right:auto}
   .compare-stage{max-width:920px;margin:auto;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);gap:22px}
-  .compare-player{min-height:520px}
+  .compare-player{min-height:360px}
   .compare-info{padding:16px 18px}
   .compare-name{font-size:22px}
   .compare-summary{max-width:920px;margin-left:auto;margin-right:auto}
@@ -298,12 +308,18 @@ main.wrap{padding-bottom:96px!important}
     </div>
     <div class="compare-panel">
       <div class="compare-toolbar">
-        <select id="comparePlayerA" class="compare-select" aria-label="Primer jugador">
-          <option value="">Jugador 1</option>
-        </select>
-        <select id="comparePlayerB" class="compare-select" aria-label="Segundo jugador">
-          <option value="">Jugador 2</option>
-        </select>
+        <div class="compare-picker" data-picker="A">
+          <label for="compareSearchA">Jugador 1</label>
+          <input id="compareSearchA" class="compare-select" type="search" autocomplete="off" placeholder="Escribe un jugador…" aria-label="Buscar primer jugador" role="combobox" aria-expanded="false">
+          <input id="comparePlayerA" type="hidden" value="">
+          <div id="compareSuggestionsA" class="compare-suggestions" role="listbox"></div>
+        </div>
+        <div class="compare-picker" data-picker="B">
+          <label for="compareSearchB">Jugador 2</label>
+          <input id="compareSearchB" class="compare-select" type="search" autocomplete="off" placeholder="Escribe un jugador…" aria-label="Buscar segundo jugador" role="combobox" aria-expanded="false">
+          <input id="comparePlayerB" type="hidden" value="">
+          <div id="compareSuggestionsB" class="compare-suggestions" role="listbox"></div>
+        </div>
         <button id="compareButton" type="button" class="compare-action">Comparar</button>
       </div>
       <div id="compareStatus" class="compare-status" aria-live="polite"></div>
@@ -607,12 +623,36 @@ async function openPlayer(id){if(!id)return;const cached=players?.find(p=>String
 // ===== Comparador de jugadores =====
 const compareDetails=new Map();
 function populateComparePlayers(){
-  const a=$("comparePlayerA"),b=$("comparePlayerB");
-  if(!a||!b||!players)return;
-  const sorted=[...players].filter(p=>p.id!=null).sort((x,y)=>String(x.name).localeCompare(String(y.name),"es"));
-  const options='<option value="">Selecciona jugador…</option>'+sorted.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+(p.team?' · '+esc(p.team):'')+'</option>').join('');
-  a.innerHTML=options;b.innerHTML=options;
+  if(!players)return;
+  comparePickerState.A.query="";comparePickerState.B.query="";
+  comparePickerState.A.id="";comparePickerState.B.id="";
+  $("compareSearchA").value="";$("compareSearchB").value="";
+  closeCompareSuggestions("A");closeCompareSuggestions("B");
 }
+const comparePickerState={A:{id:"",query:""},B:{id:"",query:""}};
+function closeCompareSuggestions(side){const box=$("compareSuggestions"+side),input=$("compareSearch"+side);if(box)box.classList.remove("show");if(input)input.setAttribute("aria-expanded","false")}
+function renderCompareSuggestions(side){
+  const input=$("compareSearch"+side),box=$("compareSuggestions"+side);if(!input||!box||!players)return;
+  const q=input.value.trim().toLowerCase();
+  const rows=players.filter(p=>p.id!=null && (!q || [p.name,p.team,String(p.id)].some(x=>String(x||"").toLowerCase().includes(q)))).sort((a,b)=>String(a.name).localeCompare(String(b.name),"es")).slice(0,8);
+  box.innerHTML=rows.length?rows.map(p=>'<button type="button" class="compare-suggestion" data-compare-id="'+esc(p.id)+'" data-compare-side="'+side+'">'+(p.image?'<img src="'+esc(p.image)+'" alt="">':'<span style="width:30px;height:30px;display:block;background:#151515"></span>')+'<span><span class="compare-suggestion-name">'+esc(p.name)+'</span><span class="compare-suggestion-team">'+esc(p.team||"Equipo no indicado")+'</span></span></button>').join(''):'<div class="compare-placeholder">No se encuentra ese jugador</div>';
+  box.classList.add("show");input.setAttribute("aria-expanded","true");
+  box.querySelectorAll("[data-compare-id]").forEach(btn=>btn.addEventListener("click",()=>selectComparePlayer(side,btn.dataset.compareId)));
+}
+function selectComparePlayer(side,id){
+  const p=players?.find(x=>String(x.id)===String(id));if(!p)return;
+  comparePickerState[side].id=String(p.id);comparePickerState[side].query=p.name;
+  $("comparePlayer"+side).value=String(p.id);$("compareSearch"+side).value=p.name;
+  closeCompareSuggestions(side);$("compareStatus").textContent="";
+}
+function setupComparePicker(side){
+  const input=$("compareSearch"+side);if(!input)return;
+  input.addEventListener("focus",()=>renderCompareSuggestions(side));
+  input.addEventListener("input",()=>{comparePickerState[side].id="";$("comparePlayer"+side).value="";renderCompareSuggestions(side)});
+  input.addEventListener("keydown",e=>{if(e.key==="Escape")closeCompareSuggestions(side);});
+}
+setupComparePicker("A");setupComparePicker("B");
+document.addEventListener("click",e=>{if(!e.target.closest(".compare-picker")){closeCompareSuggestions("A");closeCompareSuggestions("B")}});
 function statScalar(v){return Array.isArray(v)?v[0]:v}
 function playerComparisonStats(data,fallback){
   const master=obj(data?.playerMaster)?data.playerMaster:data;
