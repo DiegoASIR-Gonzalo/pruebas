@@ -40,7 +40,7 @@ function allowedAttempt(req){
 export default async function handler(req,res){
   if(req.method==="GET" && req.query?.provider==="google"){
     const state=randomUrlSafe(24), verifier=randomUrlSafe(48), nonce=randomUrlSafe(24);
-    const redirectUri=origin(req)+"/api/auth?callback=google";
+    // This native client only accepts the registered app redirect URI.\n    // We use it for the exploratory Google flow and manually capture the code.\n    const redirectUri="authredirect://com.lfp.laligafantasy";
     const authorize="https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/authorize";
     const params=new URLSearchParams({
       p:"B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",
@@ -69,7 +69,7 @@ export default async function handler(req,res){
     const expected=cookies.lf_oauth_state||"";
     if(!code || !state || !verifier || state!==expected)return res.redirect(302,"/?login=error&reason=oauth_state");
     try{
-      const redirectUri=origin(req)+"/api/auth?callback=google";
+      const redirectUri="authredirect://com.lfp.laligafantasy";
       const upstream=await fetch(TOKEN_URL+"?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN",{
         method:"POST",
         headers:{"Content-Type":"application/x-www-form-urlencoded","Accept":"application/json"},
