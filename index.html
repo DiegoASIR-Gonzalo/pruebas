@@ -75,12 +75,67 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflo
 .notice{max-width:820px;margin:14px auto 0;color:var(--muted);font-size:11px;text-align:center}.week-strip{display:flex;gap:5px;overflow-x:auto;padding:6px 0;margin-bottom:7px}.week-btn{min-width:48px;padding:5px 6px;border-radius:8px;background:#0c1524;border:1px solid #24334a;color:#cbd7e8;text-align:center}.week-btn span{display:block;font-size:9px;color:#8fa0b8}.week-btn b{font-size:12px}.week-btn.selected{background:#263750;border-color:#6d83a2;color:#fff}.week-title{display:flex;justify-content:space-between;align-items:center;background:#0c1524;border:1px solid #223149;border-radius:9px;padding:7px 9px;margin-bottom:7px;font-size:12px}.week-title>strong{font-size:15px;color:#a9efd0}.ideal{margin-left:7px;color:#ffe29a;font-size:10px}.week-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.week-stat{border:1px solid #203049;background:#0b1320;border-radius:8px;padding:6px;text-align:center}.week-stat span{display:block;color:#91a1b7;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.week-stat b{display:block;font-size:14px;margin-top:2px}.week-stat em{display:block;color:#9fe8c6;font-style:normal;font-size:9px}
 .team-toolbar{display:flex;gap:8px;align-items:center;margin:10px 0 12px}.team-toolbar input{flex:1}.teams-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.team-card{width:100%;min-height:82px;text-align:left;background:linear-gradient(180deg,#101a2a,#0d1523);border:1px solid var(--line);border-radius:12px;padding:9px;display:grid;grid-template-columns:44px 1fr;gap:9px;align-items:center}.team-card:hover{background:#121d2d;border-color:#49627f}.team-logo{width:44px;height:44px;object-fit:contain;background:#080e18;border-radius:10px}.team-name{font-size:13px;font-weight:800}.team-short{font-size:10px;color:var(--muted)}.team-count{font-size:10px;color:#a5b5ca;margin-top:2px}.team-detail{margin-top:12px}.team-detail-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}.team-detail-title{display:flex;align-items:center;gap:9px;font-weight:850}.team-detail-title img{width:36px;height:36px;object-fit:contain}.team-player{position:relative}.team-player .player{height:100%}.hidden{display:none!important}
 @media(max-width:760px){.results,.tool-grid{grid-template-columns:1fr}.highlight{grid-template-columns:1fr 1fr}.profile{grid-template-columns:70px 1fr}.profile-img{width:70px;height:70px}}@media(max-width:500px){.nav button{font-size:11px}.hero{margin-top:4vh}.highlight{grid-template-columns:1fr}.media-grid{grid-template-columns:repeat(2,1fr)}.kv{grid-template-columns:1fr}}
+
+/* ===== Mobile Fantasy UI ===== */
+ :root{--bg:#050505;--panel:#0b0b0b;--panel2:#080808;--line:#202020;--txt:#f2f2f2;--muted:#777;--gold:#f2c300;--blue:#777;--green:#35c878;--red:#e50914}
+html,body{background:#050505;color:var(--txt)}
+body{background:#050505;min-height:100vh}
+*,*::before,*::after{border-radius:0!important}
+button,input,select{border-radius:0!important}
+button,input,select{background:#090909;border:1px solid #242424;color:#f2f2f2}
+.topbar{height:58px;background:#050505;border-bottom:1px solid #252525;box-shadow:none}
+.topbar .wrap{width:min(100%,430px);padding:0 12px}
+.logo{font-size:15px}
+.mobile-brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:900}
+.mobile-brand .hamb{font-size:22px}
+.nav{gap:0}
+.nav button{font-size:10px;padding:7px 6px;border:0;background:transparent!important;color:#707070}
+.nav button.active{color:#fff;border-bottom:2px solid var(--red)}
+main.wrap{width:min(100%,430px);padding:0 0 78px}
+.hero{text-align:left;margin:0;padding:18px 14px 12px}
+.hero h1{font-size:23px;letter-spacing:-.02em}
+.hero p{font-size:11px;line-height:1.45;color:#777}
+.search-box{max-width:none;padding:0 10px}
+.searchline{gap:0}
+.searchline input{background:#080808;border:1px solid #292929;padding:11px 12px;font-size:12px}
+.searchline button{padding:10px 12px;background:var(--red);border-color:var(--red);color:#fff;font-size:11px}
+.statusline{font-size:9px;margin:7px 2px;color:#707070}
+.results{grid-template-columns:1fr;gap:0}
+.player{grid-template-columns:40px 1fr auto;gap:10px;border:0;border-bottom:1px solid #202020;border-radius:0;background:#0b0b0b;padding:9px 10px;min-height:60px}
+.player:hover{background:#111}
+.avatar{width:40px;height:40px;border-radius:0!important;background:#151515;object-fit:contain}
+.pname{font-size:12px}.pmeta{font-size:9px;color:#777}.stats{font-size:9px}.stats b{font-size:11px}
+.best-panel{margin:14px 0 0;border:0;border-top:1px solid #252525;border-radius:0;background:#080808;padding:12px 10px}
+.best-head h2{font-size:15px}.best-head p{font-size:9px;color:#707070}.best-select{font-size:9px}.best-select select{font-size:9px;padding:5px}
+.best-grid{grid-template-columns:1fr;gap:0}
+.best-card{grid-template-columns:28px 48px 1fr;gap:9px;border:0;border-bottom:1px solid #202020;border-radius:0;background:#0b0b0b;padding:8px 4px}
+.best-avatar{width:48px;height:48px;border-radius:0!important;background:#151515}
+.best-rank{font-size:14px}.best-name{font-size:12px}.best-team{font-size:9px;color:#777}.best-meta{margin-top:4px}.best-pill{font-size:8px;padding:3px 5px;border-radius:0!important;background:#151515;border:1px solid #252525}
+.notice{font-size:8px;padding:8px 6px;color:#666}
+.team-toolbar{margin:0 10px 8px;gap:0}.team-toolbar input{background:#080808;border-color:#292929;font-size:11px;padding:9px}
+.teams-grid{grid-template-columns:1fr;gap:0}
+.team-card{min-height:64px;border:0;border-bottom:1px solid #202020;border-radius:0;background:#0b0b0b;padding:8px 12px;grid-template-columns:42px 1fr}
+.team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
+.team-detail{padding:0 10px}
+#api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
+.modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
+.modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.profile-img,.media-card img{background:#050505}.highlight>div,.week-stat,.kv>div{background:#0b0b0b;border-color:#202020}.chip,.week-btn,.best-pill{background:#111;border-color:#252525}.subtle{color:#666}
+.app-shell{border-radius:0!important}
+@media(max-width:699px){.topbar .nav{display:none}}
+@media(min-width:700px){body{padding:18px 0}.app-shell{width:430px;min-height:calc(100vh - 36px);margin:auto;border:1px solid #222;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.8)}.bottom-nav{position:absolute}}
+@media(max-width:699px){.app-shell{width:100%}}
+
+
 </style>
 </head>
 <body>
+<div class="app-shell">
 <header class="topbar">
   <div class="wrap">
-    <div class="logo">⚽ LALIGA Fantasy</div>
+    <div class="mobile-brand"><span class="hamb">☰</span><span>LALIGA<span style="color:#ff3d45">Fantasy</span></span></div>
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
@@ -148,6 +203,13 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflo
     <div id="apiGrid" class="tool-grid"></div>
   </section>
 </main>
+
+<nav class="bottom-nav" aria-label="Navegación principal">
+  <button class="active" data-section="home"><span class="ico">♜</span><span>Clasificación</span></button>
+  <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
+  <button data-section="api"><span class="ico">⇄</span><span>Mercado</span></button>
+  <button id="bottomAuth"><span class="ico">♙</span><span>Perfil</span></button>
+</nav>
 
 <div id="authModal" class="modal hidden" aria-hidden="true">
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -495,7 +557,14 @@ $("logoutButton").onclick=async()=>{
   $("loginState").className="auth-state";$("loginState").textContent="";
 };
 
-document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-section]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));$(b.dataset.section).classList.add("active")});
+document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-section]").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".bottom-nav [data-section]").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  const bb=document.querySelector('.bottom-nav [data-section="'+b.dataset.section+'"]');if(bb)bb.classList.add("active");
+  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+  $(b.dataset.section).classList.add("active");
+});
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
@@ -511,6 +580,8 @@ if(loginQuery.get("login")==="success" || loginQuery.get("login")==="error"){
   $("loginState").textContent=ok?"Inicio de sesión correcto con LALIGA.":(reason==="oauth_state"?"La validación de seguridad no coincidió.":reason==="oauth_exchange"?"LALIGA no aceptó el código de Google.":"No se pudo completar el inicio de sesión con Google.");
 }
 setTimeout(async()=>{await loadTeams();await loadPlayers(false);},50);
+document.getElementById("bottomAuth").onclick=showAuth;
 </script>
+</div>
 </body>
 </html>
