@@ -782,7 +782,7 @@ async function loadCalendarWeek(week){
   const list=$("calendarList");if(list)list.innerHTML='<div class="calendar-empty">Cargando partidos…</div>';
   try{
     if(!teams)await loadTeams();
-    const path="/v1/competition/1/calendar?weekNumber="+encodeURIComponent(parsed);
+    const path="/v1/competition/1/calendar&weekNumber="+encodeURIComponent(parsed);
     const r=await fetch(API+"?path="+encodeURIComponent(path),{headers:{Accept:"application/json"},cache:"no-store"});
     if(!r.ok)throw Error("HTTP "+r.status);
     const raw=await r.json();
