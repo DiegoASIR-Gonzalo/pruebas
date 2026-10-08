@@ -238,6 +238,10 @@ main.wrap{padding-bottom:96px!important}
   .compare-value{font-size:25px}
   .compare-metric{font-size:10px}
 }
+
+/* ===== Calendario para usuarios ===== */
+.calendar-panel{max-width:1100px;margin:0 auto;padding:0 10px}.calendar-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.calendar-nav{display:flex;gap:6px}.calendar-nav button{font-size:12px}.calendar-current{font-size:12px;color:#9aa8bc;text-align:center}.calendar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.match-card{background:#0b0b0b;border:1px solid #292929;padding:13px}.match-date{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}.match-teams{display:grid;grid-template-columns:1fr 34px 1fr;align-items:center;gap:8px}.match-team{font-weight:800;font-size:13px}.match-team.away{text-align:right}.match-score{text-align:center;font-weight:900;font-size:14px}.match-time{margin-top:8px;color:#999;font-size:10px;text-align:center}.calendar-empty{border:1px dashed #333;padding:24px;text-align:center;color:#777}.calendar-info{margin:0 0 14px;padding:13px;background:#0b0b0b;border:1px solid #252525}.calendar-info h2{margin:0;font-size:17px}.calendar-info p{margin:4px 0 0;color:#777;font-size:11px}.calendar-loading{color:#777;font-size:11px;padding:15px 0}.calendar-error{color:#ff9baa;border:1px solid #61313c;padding:12px;background:#12090b}
+@media(max-width:699px){.calendar-toolbar{align-items:stretch;flex-direction:column}.calendar-current{text-align:left}.calendar-grid{grid-template-columns:1fr}.match-card{padding:11px}.calendar-panel{padding:0 10px}}
 </style>
 </head>
 <body>
@@ -250,7 +254,7 @@ main.wrap{padding-bottom:96px!important}
       <button data-section="teams">Equipos</button>
       <button data-section="forgotten">Olvidados</button>
       <button data-section="compare">Comparador</button>
-      <button data-section="api">Explorador API</button>
+      <button data-section="calendar">Calendario</button>
       <button id="authButton" class="auth-button">Iniciar sesión</button>
     </nav>
   </div>
@@ -346,9 +350,23 @@ main.wrap{padding-bottom:96px!important}
     </div>
   </section>
 
-  <section id="api" class="section">
-    <div class="hero" style="margin-top:1vh"><h1 style="font-size:32px">Explorador API</h1><p>Herramientas avanzadas para consultar los endpoints públicos.</p></div>
-    <div id="apiGrid" class="tool-grid"></div>
+  <section id="calendar" class="section">
+    <div class="hero" style="margin-top:1vh">
+      <h1 style="font-size:32px">Calendario</h1>
+      <p>Consulta los partidos de cada jornada de forma sencilla. Elige una jornada y mira quién juega, cuándo y contra quién.</p>
+    </div>
+    <div class="calendar-panel">
+      <div class="calendar-toolbar">
+        <div class="calendar-nav">
+          <button type="button" id="calendarPrev">← Anterior</button>
+          <button type="button" class="primary" id="calendarCurrent">Jornada actual</button>
+          <button type="button" id="calendarNext">Siguiente →</button>
+        </div>
+        <div id="calendarState" class="calendar-current">Cargando calendario…</div>
+      </div>
+      <div id="calendarInfo" class="calendar-info"></div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
   </section>
 </main>
 
@@ -357,7 +375,7 @@ main.wrap{padding-bottom:96px!important}
   <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
   <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
-  <button data-section="api"><span class="ico">⇄</span><span>Mercado</span></button>
+  <button data-section="calendar"><span class="ico">▣</span><span>Calendario</span></button>
   <button id="bottomAuth"><span class="ico">♙</span><span>Perfil</span></button>
 </nav>
 
@@ -765,7 +783,49 @@ $("compareButton")?.addEventListener("click",runComparison);
 $("comparePlayerA")?.addEventListener("change",()=>{$("compareStatus").textContent=""});
 $("comparePlayerB")?.addEventListener("change",()=>{$("compareStatus").textContent=""});
 
-function apiCard(ep){const c=document.createElement("article");c.className="api-card";c.innerHTML='<div class="api-head"><div class="api-name">'+esc(ep.name)+'</div><div class="api-desc">'+esc(ep.desc)+'</div></div><div class="api-body"><div class="api-route">'+esc(ep.path)+'</div>'+(ep.params.length?'<div class="api-row">'+ep.params.map(([k,l,p])=>'<input data-p="'+esc(k)+'" placeholder="'+esc(p)+'">').join(''):'')+'<button class="primary" data-go>Consultar</button></div><div class="api-result"></div></div>';c.querySelector("[data-go]").onclick=async()=>{const btn=c.querySelector("[data-go]"),r=c.querySelector(".api-result");try{let p=ep.path;for(const[k]of ep.params){const x=c.querySelector('[data-p="'+k+'"]');if(!x.value.trim())throw Error("Falta "+k);p=p.replace("{"+k+"}",encodeURIComponent(x.value.trim()))}const u=API+"?path="+encodeURIComponent(p.split("?")[0])+(p.includes("?")?"&"+p.split("?")[1]:"");btn.disabled=true;const rr=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"});const raw=await rr.text();if(!rr.ok)throw Error("HTTP "+rr.status+" · "+raw.slice(0,500));r.innerHTML='<pre>'+esc(JSON.stringify(JSON.parse(raw),null,2))+'</pre>'}catch(e){r.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}finally{btn.disabled=false}};return c}
+let calendarWeek=null,calendarLoading=null;
+function calendarValue(o,keys){return first(o,keys)}
+function normalizeCalendar(raw){
+  let a=Array.isArray(raw)?raw:null;
+  if(!a&&obj(raw)) for(const k of ["matches","fixtures","games","items","results","data","content","calendar"]) if(Array.isArray(raw[k])){a=raw[k];break}
+  return (a||[]).map(m=>{
+    const home=first(m,["homeTeam","home","local","home_team"]);
+    const away=first(m,["awayTeam","away","visitante","away_team"]);
+    const hn=obj(home)?first(home,["name","shortName","teamName"]):home;
+    const an=obj(away)?first(away,["name","shortName","teamName"]):away;
+    return {raw:m,date:first(m,["date","matchDate","startDate","datetime","kickoff"]),time:first(m,["time","startTime","kickoffTime"]),home:hn||"Local",away:an||"Visitante",homeScore:first(m,["homeScore","localScore","scoreHome"]),awayScore:first(m,["awayScore","visitorScore","scoreAway"])};
+  });
+}
+function formatCalendarDate(v){if(!v)return"Fecha por confirmar";const d=new Date(v);if(Number.isNaN(d.getTime()))return String(v);return d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})}
+function formatCalendarTime(v,date){if(v)return String(v).slice(0,5);if(date){const d=new Date(date);if(!Number.isNaN(d.getTime()))return d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}return"Hora por confirmar"}
+function renderCalendar(raw,week){
+  const rows=normalizeCalendar(raw),grid=$("calendarGrid"),info=$("calendarInfo");
+  $("calendarState").textContent="Jornada "+week+" · "+(rows.length?rows.length+" partidos":"sin partidos encontrados");
+  info.innerHTML='<h2>Jornada '+esc(week)+'</h2><p>'+(rows.length?'Aquí tienes los partidos de esta jornada, ordenados según los datos disponibles.':'Todavía no hay partidos disponibles para esta jornada.')+'</p>';
+  if(!rows.length){grid.innerHTML='<div class="calendar-empty">No hay partidos disponibles para esta jornada.</div>';return}
+  rows.sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));
+  grid.innerHTML=rows.map(m=>'<article class="match-card"><div class="match-date">'+esc(formatCalendarDate(m.date))+'</div><div class="match-teams"><div class="match-team">'+esc(m.home)+'</div><div class="match-score">'+(m.homeScore!=null||m.awayScore!=null?esc(String(m.homeScore??"—"))+" - "+esc(String(m.awayScore??"—")):"VS")+'</div><div class="match-team away">'+esc(m.away)+'</div></div><div class="match-time">'+esc(formatCalendarTime(m.time,m.date))+'</div></article>').join("");
+}
+async function loadCalendar(week){
+  if(calendarLoading)return calendarLoading;
+  calendarLoading=(async()=>{
+    const state=$("calendarState");state.textContent="Cargando jornada "+week+"…";$("calendarGrid").innerHTML='<div class="calendar-loading">Buscando los partidos…</div>';
+    try{
+      const path="/v1/competition/1/calendar?weekNumber="+encodeURIComponent(week);
+      const r=await fetch(API+"?path="+encodeURIComponent(path),{headers:{Accept:"application/json"},cache:"no-store"});
+      if(!r.ok)throw Error("HTTP "+r.status);
+      const raw=await r.json();calendarWeek=Number(week);renderCalendar(raw,week);
+    }catch(e){state.textContent="No se pudo cargar la jornada";$("calendarGrid").innerHTML='<div class="calendar-error">No hemos podido cargar el calendario. Inténtalo de nuevo en unos segundos.</div>'}
+    finally{calendarLoading=null}
+  })();return calendarLoading;
+}
+async function loadCurrentCalendar(){
+  try{const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/week/current"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error();const raw=await r.json();const w=num(first(raw,["weekNumber","week","currentWeek","number","matchday"]));await loadCalendar(w||1)}catch{await loadCalendar(calendarWeek||1)}
+}
+$("calendarPrev").onclick=()=>loadCalendar(Math.max(1,(calendarWeek||1)-1));
+$("calendarNext").onclick=()=>loadCalendar((calendarWeek||1)+1);
+$("calendarCurrent").onclick=loadCurrentCalendar;
+
 $("search").oninput=renderSearch;$("reload").onclick=()=>{localStorage.removeItem(CACHE_KEY);loadPlayers(true)};
 async function checkAuth(){
   try{
@@ -844,7 +904,6 @@ document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
   $(b.dataset.section).classList.add("active");
 });
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
-$("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
 renderBestPlayers();
 renderForgotten();
@@ -859,7 +918,7 @@ if(loginQuery.get("login")==="success" || loginQuery.get("login")==="error"){
   $("loginState").className="auth-state show "+(ok?"good":"error");
   $("loginState").textContent=ok?"Inicio de sesión correcto con LALIGA.":(reason==="oauth_state"?"La validación de seguridad no coincidió.":reason==="oauth_exchange"?"LALIGA no aceptó el código de Google.":"No se pudo completar el inicio de sesión con Google.");
 }
-setTimeout(async()=>{await loadTeams();await loadPlayers(false);},50);
+setTimeout(async()=>{await loadTeams();await loadPlayers(false);await loadCurrentCalendar();},50);
 document.getElementById("bottomAuth").onclick=showAuth;
 </script>
 </div>
