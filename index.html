@@ -125,7 +125,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -247,6 +247,62 @@ main.wrap{padding-bottom:96px!important}
   .calendar-score{font-size:15px}
 }
 
+
+/* ===== Crear Plantilla ===== */
+.create-team-panel{padding:0 10px 24px}
+.create-team-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+.create-team-format{font-size:10px;color:#aaa;border:1px solid #292929;padding:7px 9px;background:#0b0b0b}
+.create-team-actions{display:flex;gap:7px;align-items:center}
+.create-team-reset{font-size:10px;padding:7px 10px;background:#090909;border-color:#292929;color:#999}
+.create-team-status{font-size:9px;color:#666;min-height:14px;margin:0 0 8px}
+.lineup-pitch{position:relative;overflow:hidden;max-width:760px;margin:0 auto;background:
+  radial-gradient(circle at 50% 52%,rgba(255,255,255,.035) 0 10%,transparent 11%),
+  linear-gradient(90deg,rgba(255,255,255,.018) 0 49.8%,rgba(255,255,255,.055) 49.8% 50.2%,rgba(255,255,255,.018) 50.2% 100%),
+  repeating-linear-gradient(0deg,#0c251d 0 46px,#0d2b21 46px 92px);
+  border:1px solid #315847;min-height:690px;padding:30px 24px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.03),inset 0 0 70px rgba(0,0,0,.24)}
+.lineup-pitch:before{content:"";position:absolute;inset:22px;border:1px solid rgba(240,248,244,.6);pointer-events:none}
+.lineup-pitch:after{content:"";position:absolute;left:50%;top:50%;width:86px;height:86px;border:1px solid rgba(240,248,244,.55);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.05);pointer-events:none}
+.lineup-halfway{position:absolute;left:22px;right:22px;top:50%;height:1px;background:rgba(240,248,244,.58);pointer-events:none}
+.lineup-row{position:relative;z-index:2;display:flex;justify-content:space-around;align-items:center;gap:8px}
+.lineup-row.goalkeeper{justify-content:center}
+.lineup-slot{width:82px;min-width:82px;height:105px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.lineup-slot:focus{outline:1px solid #ff3d45;outline-offset:3px}
+.lineup-card{position:relative;width:76px;height:88px;background:#191c27;border:1px solid #323744;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden;box-shadow:0 7px 12px rgba(0,0,0,.28)}
+.lineup-slot:hover .lineup-card{border-color:#ff3d45;transform:translateY(-1px)}
+.lineup-card.empty{background:rgba(5,8,8,.5);border:1px dashed rgba(238,244,241,.46)}
+.lineup-add{font-size:28px;line-height:1;color:#aeb7b0;margin-top:-8px}
+.lineup-add-label{font-size:8px;color:#c0c8c2;text-transform:uppercase;letter-spacing:.08em}
+.lineup-avatar{width:68px;height:64px;object-fit:contain;background:#151822;display:block}
+.lineup-name{width:100%;background:#f1f2f1;color:#181818;font-size:10px;font-weight:850;line-height:16px;height:19px;padding:1px 4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lineup-team-logo{position:absolute;top:4px;right:4px;width:19px;height:19px;object-fit:contain;background:#07090d}
+.lineup-slot-hint{font-size:8px;color:rgba(245,250,247,.72);text-transform:uppercase;letter-spacing:.04em}
+.lineup-picker{display:grid;gap:8px}
+.lineup-picker-intro{font-size:11px;color:#92989a;line-height:1.45}
+.lineup-picker-search{width:100%;padding:10px 11px!important;background:#070707!important;border-color:#292929!important;font-size:11px!important}
+.lineup-picker-list{display:grid;gap:0;border:1px solid #222;max-height:54vh;overflow:auto;background:#080808}
+.lineup-picker-player{display:grid;width:100%;grid-template-columns:42px 1fr auto;align-items:center;gap:9px;padding:8px 10px;border:0;border-bottom:1px solid #1b1b1b;background:#0b0b0b;color:#eee;text-align:left}
+.lineup-picker-player:hover{background:#151515}
+.lineup-picker-player:disabled{opacity:.32;cursor:not-allowed}
+.lineup-picker-player img{width:38px;height:38px;object-fit:contain;background:#050505}
+.lineup-picker-name{font-size:11px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lineup-picker-team{font-size:9px;color:#777;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lineup-picker-meta{font-size:9px;color:#b4b9b6;text-align:right;white-space:nowrap}
+.create-team-note{max-width:760px;margin:10px auto 0;color:#666;font-size:9px;line-height:1.45;text-align:center}
+@media(max-width:699px){
+  .create-team-toolbar{align-items:flex-start}
+  .create-team-actions{flex-wrap:wrap;justify-content:flex-end}
+  .lineup-pitch{min-height:660px;padding:24px 8px;gap:10px}
+  .lineup-pitch:before{inset:14px}.lineup-halfway{left:14px;right:14px}
+  .lineup-row{gap:2px}
+  .lineup-slot{width:76px;min-width:76px;height:101px}
+  .lineup-card{width:70px;height:84px}.lineup-avatar{width:62px;height:61px}.lineup-name{font-size:9px}
+}
+@media(min-width:700px){
+  .create-team-panel{padding:0}
+  .lineup-pitch{min-height:760px;padding:34px 40px}
+  .lineup-slot{width:106px;min-width:106px;height:122px}.lineup-card{width:92px;height:104px}.lineup-avatar{width:82px;height:78px}.lineup-name{font-size:11px}
+}
+
 /* ===== Comparador de jugadores ===== */
 .compare-panel{padding:0 10px 24px}
 .compare-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;margin:0 0 16px}
@@ -316,6 +372,7 @@ main.wrap{padding-bottom:96px!important}
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
+      <button data-section="create-team">Crear Plantilla</button>
       <button data-section="forgotten">Olvidados</button>
       <button data-section="compare">Comparador</button>
       <button data-section="api">Explorador API</button>
@@ -397,6 +454,32 @@ main.wrap{padding-bottom:96px!important}
     </section>
   </section>
 
+  <section id="create-team" class="section">
+    <div class="hero" style="margin-top:1vh">
+      <h1 style="font-size:32px">Crear Plantilla</h1>
+      <p>Forma tu once en 4-4-2. Pulsa una posición y elige un jugador que pertenezca a esa posición.</p>
+    </div>
+    <div class="create-team-panel">
+      <div class="create-team-toolbar">
+        <div>
+          <div class="create-team-format">Formación · 4-4-2</div>
+          <div id="createTeamStatus" class="create-team-status">Cargando jugadores…</div>
+        </div>
+        <div class="create-team-actions">
+          <button id="clearLineup" type="button" class="create-team-reset">Vaciar plantilla</button>
+        </div>
+      </div>
+      <div id="lineupPitch" class="lineup-pitch" aria-label="Campo de fútbol con formación 4-4-2">
+        <div class="lineup-halfway"></div>
+        <div id="lineupGoalkeeper" class="lineup-row goalkeeper"></div>
+        <div id="lineupDefenders" class="lineup-row"></div>
+        <div id="lineupMidfielders" class="lineup-row"></div>
+        <div id="lineupForwards" class="lineup-row"></div>
+      </div>
+      <div class="create-team-note">Los jugadores disponibles se filtran por su posición indicada por la API. Un mismo jugador no puede ocupar dos posiciones del once.</div>
+    </div>
+  </section>
+
   <section id="forgotten" class="section">
     <div class="hero" style="margin-top:1vh">
       <h1 style="font-size:32px">Olvidados</h1>
@@ -441,11 +524,11 @@ main.wrap{padding-bottom:96px!important}
 </main>
 
 <nav class="bottom-nav" aria-label="Navegación principal">
-  <button class="active" data-section="home"><span class="ico">♜</span><span>Clasificación</span></button>
-  <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
-  <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
+  <button class="active" data-section="home"><span class="ico">♜</span><span>Inicio</span></button>
+  <button data-section="teams"><span class="ico">▦</span><span>Equipos</span></button>
+  <button data-section="create-team"><span class="ico">⚽</span><span>Plantilla</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
-  <button data-section="api"><span class="ico">⇄</span><span>Mercado</span></button>
+  <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
   <button id="bottomAuth"><span class="ico">♙</span><span>Perfil</span></button>
 </nav>
 
@@ -563,7 +646,7 @@ function normalizePlayers(raw){
     const tm=teamForPlayer(p);
     const teamName=first(p,["teamName","clubName"])||tm?.name||tm?.shortName||"";
     const image=imageFor(p);
-    return {raw:p,id:first(p,["id","playerId","player_id"]),name:first(p,["nickname","name","fullName","displayName","shortName"])||"Jugador",team:teamName,teamId:first(p,["teamId","team_id"])||tm?.id||"",image,market:num(first(p,["marketValue","market_value","currentMarketValue","fantasyValue","price","value"])),avg:num(first(p,["averagePoints","average_points","averageScore","averagePointsPerGame"])),last:num(first(p,["lastSeasonPoints","last_season_points","seasonPoints","points"])),status:playerStatus(p)}
+    return {raw:p,id:first(p,["id","playerId","player_id"]),name:first(p,["nickname","name","fullName","displayName","shortName"])||"Jugador",team:teamName,teamId:first(p,["teamId","team_id"])||tm?.id||"",position:first(p,["position","positions","role","playerPosition"]),image,market:num(first(p,["marketValue","market_value","currentMarketValue","fantasyValue","price","value"])),avg:num(first(p,["averagePoints","average_points","averageScore","averagePointsPerGame"])),last:num(first(p,["lastSeasonPoints","last_season_points","seasonPoints","points"])),status:playerStatus(p)}
   });
   forgottenPlayers=normalized.filter(p=>String(p.status||"").trim().toLowerCase()==="out_of_league");
   return normalized.filter(p=>String(p.status||"").trim().toLowerCase()!=="out_of_league");
@@ -628,7 +711,7 @@ async function renderBestPlayers(){
   ).join(""):'<div class="empty">Todavía no hay datos suficientes para crear el ranking.</div>';
   box.querySelectorAll("[data-best-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.bestId));
 }
-function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
+function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();renderLineup();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();renderLineup();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
 function teamLogo(t){const v=typeof t?.image==="string"?t.image.trim():"";return v&&(/^(https?:\/\/|\/|data:image\/)/i.test(v))&&!/^#[0-9a-f]{3,8}$/i.test(v)?v:null}
 function setTeamsState(type,text){$("teamsState").className="statusline "+type;$("teamsState").innerHTML='<span><span class="dot"></span>'+esc(text)+'</span>'}
 function renderTeams(){
@@ -812,6 +895,139 @@ async function loadCurrentWeek(){
   })();
   return currentWeekLoading;
 }
+
+
+// ===== Crear Plantilla =====
+const LINEUP_STORAGE_KEY="lf_lineup_442_v1";
+const LINEUP_SLOTS=[
+  {id:"gk",label:"Portero",group:"goalkeeper",row:"lineupGoalkeeper"},
+  {id:"def1",label:"Defensa",group:"defender",row:"lineupDefenders"},
+  {id:"def2",label:"Defensa",group:"defender",row:"lineupDefenders"},
+  {id:"def3",label:"Defensa",group:"defender",row:"lineupDefenders"},
+  {id:"def4",label:"Defensa",group:"defender",row:"lineupDefenders"},
+  {id:"mid1",label:"Centrocampista",group:"midfielder",row:"lineupMidfielders"},
+  {id:"mid2",label:"Centrocampista",group:"midfielder",row:"lineupMidfielders"},
+  {id:"mid3",label:"Centrocampista",group:"midfielder",row:"lineupMidfielders"},
+  {id:"mid4",label:"Centrocampista",group:"midfielder",row:"lineupMidfielders"},
+  {id:"fwd1",label:"Delantero",group:"forward",row:"lineupForwards"},
+  {id:"fwd2",label:"Delantero",group:"forward",row:"lineupForwards"}
+];
+let lineupSelections={};
+try{lineupSelections=JSON.parse(localStorage.getItem(LINEUP_STORAGE_KEY)||"{}")||{}}catch{lineupSelections={}}
+
+function normPosition(v){
+  if(Array.isArray(v))return v.map(normPosition).join(" ");
+  return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g," ").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
+function playerPositionGroup(p){
+  const value=normPosition(p?.position||first(p?.raw,["position","positions","role","playerPosition"]));
+  if(!value)return null;
+  const tokens=new Set(value.split(/\s+/));
+  if(tokens.has("gk")||tokens.has("por")||value.includes("goalkeeper")||value.includes("portero"))return "goalkeeper";
+  if(tokens.has("def")||tokens.has("df")||tokens.has("d")||tokens.has("cb")||tokens.has("lb")||tokens.has("rb")||tokens.has("lwb")||tokens.has("rwb")||value.includes("defend"))return "defender";
+  if(tokens.has("mid")||tokens.has("mf")||tokens.has("med")||tokens.has("mc")||tokens.has("md")||tokens.has("mi")||tokens.has("dm")||tokens.has("am")||value.includes("midfield")||value.includes("centrocamp"))return "midfielder";
+  if(tokens.has("fwd")||tokens.has("fw")||tokens.has("att")||tokens.has("del")||tokens.has("dc")||tokens.has("st")||tokens.has("cf")||tokens.has("lw")||tokens.has("rw")||value.includes("attack")||value.includes("delanter"))return "forward";
+  return null;
+}
+function lineupPlayerById(id){return (players||[]).find(p=>String(p.id)===String(id))||null}
+function selectedLineupIds(){return new Set(Object.values(lineupSelections).filter(Boolean).map(String))}
+function lineupTeamForPlayer(p){
+  if(!p)return null;
+  if(p.teamId!=null&&teams){const t=teams.find(x=>String(x.id)===String(p.teamId));if(t)return t}
+  return teamForPlayer(p.raw||p);
+}
+function lineupTeamLogo(p){const t=lineupTeamForPlayer(p);return teamLogo(t)}
+function lineupDisplayPlayer(p,slot){
+  const logo=lineupTeamLogo(p);
+  return '<div class="lineup-card">'+
+    (p.image?'<img class="lineup-avatar" src="'+esc(p.image)+'" alt="" loading="lazy">':'<div class="lineup-avatar"></div>')+
+    (logo?'<img class="lineup-team-logo" src="'+esc(logo)+'" alt="" loading="lazy">':"")+ 
+    '<div class="lineup-name">'+esc(p.name)+'</div>'+ 
+  '</div><div class="lineup-slot-hint">'+esc(slot.label)+'</div>';
+}
+function lineupEmptySlot(slot){
+  return '<div class="lineup-card empty"><span class="lineup-add">+</span><span class="lineup-add-label">Añadir</span></div><div class="lineup-slot-hint">'+esc(slot.label)+'</div>';
+}
+function renderLineup(){
+  const status=$("createTeamStatus");
+  if(!status)return;
+  for(const rowId of ["lineupGoalkeeper","lineupDefenders","lineupMidfielders","lineupForwards"]){
+    const row=$(rowId);if(row)row.innerHTML="";
+  }
+  const groupCounts={goalkeeper:0,defender:0,midfielder:0,forward:0};
+  for(const slot of LINEUP_SLOTS){
+    const row=$(slot.row);if(!row)continue;
+    const p=lineupPlayerById(lineupSelections[slot.id]);
+    const button=document.createElement("button");button.type="button";button.className="lineup-slot";button.dataset.slot=slot.id;button.title=p?"Cambiar jugador":"Añadir jugador";
+    button.innerHTML=p?lineupDisplayPlayer(p,slot):lineupEmptySlot(slot);
+    button.onclick=()=>openLineupPicker(slot.id);
+    row.appendChild(button);
+    if(p&&playerPositionGroup(p)===slot.group)groupCounts[slot.group]++;
+  }
+  const filled=LINEUP_SLOTS.filter(s=>lineupPlayerById(lineupSelections[s.id])).length;
+  if(!players){status.textContent="Cargando jugadores…";return}
+  status.textContent=filled+"/11 posiciones ocupadas · " + (filled===11?"Once completo.":"Pulsa una posición para elegir un jugador.");
+}
+function saveLineup(){localStorage.setItem(LINEUP_STORAGE_KEY,JSON.stringify(lineupSelections))}
+function clearLineup(){lineupSelections={};saveLineup();renderLineup()}
+function lineupPickerRows(slot,q=""){
+  const used=selectedLineupIds();
+  const qq=q.trim().toLowerCase();
+  return (players||[]).filter(p=>{
+    if(playerPositionGroup(p)!==slot.group)return false;
+    if(used.has(String(p.id))&&String(lineupSelections[slot.id])!==String(p.id))return false;
+    if(!qq)return true;
+    return [p.name,p.team,String(p.id),String(p.position||"")].some(x=>String(x||"").toLowerCase().includes(qq));
+  }).sort((a,b)=>teamPointsValue(b)-teamPointsValue(a)||String(a.name).localeCompare(String(b.name),"es")).slice(0,80);
+}
+function renderLineupPickerContent(slot,q=""){
+  const rows=lineupPickerRows(slot,q);
+  return '<div class="modal-body lineup-picker">'+
+    '<div class="lineup-picker-intro">Elige un <strong>'+esc(slot.label.toLowerCase())+'</strong>. Solo aparecen jugadores cuya posición coincide con esta plaza.</div>'+
+    '<input id="lineupPickerSearch" class="lineup-picker-search" type="search" placeholder="Buscar jugador…" autocomplete="off" value="'+esc(q)+'">'+
+    '<div id="lineupPickerList" class="lineup-picker-list">'+
+      (rows.length?rows.map(p=>{
+        const logo=lineupTeamLogo(p),disabled=selectedLineupIds().has(String(p.id))&&String(lineupSelections[slot.id])!==String(p.id);
+        return '<button type="button" class="lineup-picker-player" data-lineup-player="'+esc(p.id)+'"'+(disabled?' disabled':'')+'>'+
+          (p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy">':'<span style="width:38px;height:38px;display:block;background:#050505"></span>')+
+          '<span><span class="lineup-picker-name">'+esc(p.name)+'</span><span class="lineup-picker-team">'+esc(p.team||"Equipo no indicado")+'</span></span>'+ 
+          '<span class="lineup-picker-meta">'+esc(positionLabel(p))+'</span></button>';
+      }).join(""):'<div class="empty">No hay jugadores disponibles con esa posición en los datos cargados.</div>')+
+    '</div></div>';
+}
+function positionLabel(p){
+  const g=playerPositionGroup(p);
+  return g==="goalkeeper"?"Portero":g==="defender"?"Defensa":g==="midfielder"?"Medio":g==="forward"?"Delantero":"Posición no indicada";
+}
+function bindLineupPicker(slot){
+  const search=$("lineupPickerSearch"),list=$("lineupPickerList");if(!search||!list)return;
+  search.focus();search.setSelectionRange(search.value.length,search.value.length);
+  search.oninput=()=>{
+    const q=search.value;const html=renderLineupPickerContent(slot,q);
+    const wrap=document.createElement("div");wrap.innerHTML=html;
+    const newSearch=wrap.querySelector("#lineupPickerSearch"),newList=wrap.querySelector("#lineupPickerList");
+    list.replaceWith(newList);search.replaceWith(newSearch);
+    bindLineupPicker(slot);
+  };
+  list.querySelectorAll("[data-lineup-player]").forEach(b=>b.onclick=()=>{
+    const id=String(b.dataset.lineupPlayer);
+    for(const key of Object.keys(lineupSelections))if(String(lineupSelections[key])===id)delete lineupSelections[key];
+    lineupSelections[slot.id]=id;saveLineup();renderLineup();$("closeModal").click();
+  });
+}
+function openLineupPicker(slotId){
+  const slot=LINEUP_SLOTS.find(x=>x.id===slotId);if(!slot)return;
+  if(!players){return}
+  $("modalTitle").textContent="Elegir jugador";
+  $("modalRoute").textContent="Posición: "+slot.label;
+  $("modalContent").innerHTML=renderLineupPickerContent(slot);
+  $("modal").classList.remove("hidden");$("modal").setAttribute("aria-hidden","false");
+  bindLineupPicker(slot);
+}
+$("clearLineup")?.addEventListener("click",()=>{
+  if(Object.keys(lineupSelections).length&&!confirm("¿Vaciar toda la plantilla?"))return;
+  clearLineup();
+});
 
 function scalar(v){if(v===null)return'<span style="color:#c8b7ff">No disponible</span>';if(typeof v==="boolean")return v?"Sí":"No";if(typeof v==="number")return v.toLocaleString("es-ES");return esc(v)}
 function mediaList(data,out=[]){if(Array.isArray(data)){data.slice(0,200).forEach(x=>mediaList(x,out));return out}if(obj(data))for(const[k,v]of Object.entries(data)){if(typeof v==="string"&&imgUrl(v)&&/(image|photo|avatar|logo|badge|crest|icon|picture|thumbnail|url)/i.test(k))out.push([k,v]);else if(obj(v))mediaList(v,out)}return out}
@@ -1082,6 +1298,7 @@ $("apiGrid").replaceChildren(...EPS.map(apiCard));
 renderSearch();
 renderBestPlayers();
 renderForgotten();
+renderLineup();
 populateComparePlayers();
 checkAuth();
 const loginQuery=new URLSearchParams(location.search);
