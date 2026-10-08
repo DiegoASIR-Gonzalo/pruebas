@@ -255,6 +255,10 @@ main.wrap{padding-bottom:96px!important}
 .create-team-actions{display:flex;gap:7px;align-items:center}
 .create-team-reset{font-size:10px;padding:7px 10px;background:#090909;border-color:#292929;color:#999}
 .create-team-status{font-size:9px;color:#666;min-height:14px;margin:0 0 8px}
+.create-team-rating{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto 10px;padding:10px 12px;border:1px solid #232b30;background:#0a0d0e}
+.create-team-rating-label{font-size:9px;color:#777;text-transform:uppercase;letter-spacing:.07em}
+.create-team-rating-value{font-size:22px;font-weight:950;color:#fff}
+.create-team-rating-meta{font-size:9px;color:#777;margin-left:auto;text-align:right}
 .lineup-pitch{position:relative;overflow:hidden;max-width:760px;margin:0 auto;background:
   radial-gradient(circle at 50% 52%,rgba(255,255,255,.035) 0 10%,transparent 11%),
   linear-gradient(90deg,rgba(255,255,255,.018) 0 49.8%,rgba(255,255,255,.055) 49.8% 50.2%,rgba(255,255,255,.018) 50.2% 100%),
@@ -468,6 +472,13 @@ main.wrap{padding-bottom:96px!important}
         <div class="create-team-actions">
           <button id="clearLineup" type="button" class="create-team-reset">Vaciar plantilla</button>
         </div>
+      </div>
+      <div class="create-team-rating" aria-live="polite">
+        <div>
+          <div class="create-team-rating-label">Media de puntos de la plantilla</div>
+          <div id="createTeamRating" class="create-team-rating-value">—</div>
+        </div>
+        <div id="createTeamRatingMeta" class="create-team-rating-meta">Selecciona jugadores para calcularla</div>
       </div>
       <div id="lineupPitch" class="lineup-pitch" aria-label="Campo de fútbol con formación 4-4-2">
         <div class="lineup-halfway"></div>
@@ -916,17 +927,43 @@ let lineupSelections={};
 try{lineupSelections=JSON.parse(localStorage.getItem(LINEUP_STORAGE_KEY)||"{}")||{}}catch{lineupSelections={}}
 
 function normPosition(v){
-  if(Array.isArray(v))return v.map(normPosition).join(" ");
-  return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g," ").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+  if(Array.isArray(v))return v.map(normPosition).filter(Boolean).join(" ");
+  return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
+function positionValues(raw){
+  const out=[];
+  const visit=(v,depth=0)=>{
+    if(v===null||v===undefined||depth>3)return;
+    if(Array.isArray(v)){v.slice(0,12).forEach(x=>visit(x,depth+1));return}
+    if(typeof v!=="object"){out.push(v);return}
+    for(const [k,x] of Object.entries(v)){
+      if(/^(position|positions|role|playerPosition|positionCode|positionId|positionType)$/i.test(k))visit(x,depth+1);
+      else if(depth<2&&/^(playerMaster|master|attributes|metadata|data)$/i.test(k))visit(x,depth+1);
+    }
+  };
+  visit(raw);
+  return out;
+}
+function positionGroupFromValue(v){
+  const value=normPosition(v);
+  if(!value)return null;
+  if(/^0$/.test(value)||/^1$/.test(value))return "goalkeeper";
+  if(/^2$/.test(value))return "defender";
+  if(/^3$/.test(value))return "midfielder";
+  if(/^4$/.test(value)||/^5$/.test(value))return "forward";
+  const tokens=new Set(value.split(/\s+/));
+  if(tokens.has("gk")||tokens.has("por")||tokens.has("goal")||value.includes("goalkeeper")||value.includes("portero"))return "goalkeeper";
+  if(tokens.has("def")||tokens.has("defender")||tokens.has("df")||tokens.has("d")||tokens.has("cb")||tokens.has("lb")||tokens.has("rb")||tokens.has("lwb")||tokens.has("rwb")||value.includes("defend")||value.includes("back"))return "defender";
+  if(tokens.has("mid")||tokens.has("mf")||tokens.has("med")||tokens.has("mc")||tokens.has("md")||tokens.has("mi")||tokens.has("dm")||tokens.has("am")||tokens.has("cm")||value.includes("midfield")||value.includes("centrocamp")||value.includes("medio"))return "midfielder";
+  if(tokens.has("fwd")||tokens.has("fw")||tokens.has("att")||tokens.has("del")||tokens.has("dc")||tokens.has("st")||tokens.has("cf")||tokens.has("lw")||tokens.has("rw")||value.includes("attack")||value.includes("forward")||value.includes("delanter")||value.includes("striker"))return "forward";
+  return null;
 }
 function playerPositionGroup(p){
-  const value=normPosition(p?.position||first(p?.raw,["position","positions","role","playerPosition"]));
-  if(!value)return null;
-  const tokens=new Set(value.split(/\s+/));
-  if(tokens.has("gk")||tokens.has("por")||value.includes("goalkeeper")||value.includes("portero"))return "goalkeeper";
-  if(tokens.has("def")||tokens.has("df")||tokens.has("d")||tokens.has("cb")||tokens.has("lb")||tokens.has("rb")||tokens.has("lwb")||tokens.has("rwb")||value.includes("defend"))return "defender";
-  if(tokens.has("mid")||tokens.has("mf")||tokens.has("med")||tokens.has("mc")||tokens.has("md")||tokens.has("mi")||tokens.has("dm")||tokens.has("am")||value.includes("midfield")||value.includes("centrocamp"))return "midfielder";
-  if(tokens.has("fwd")||tokens.has("fw")||tokens.has("att")||tokens.has("del")||tokens.has("dc")||tokens.has("st")||tokens.has("cf")||tokens.has("lw")||tokens.has("rw")||value.includes("attack")||value.includes("delanter"))return "forward";
+  const candidates=[p?.position,...positionValues(p?.raw)];
+  for(const value of candidates){
+    const group=positionGroupFromValue(value);
+    if(group)return group;
+  }
   return null;
 }
 function lineupPlayerById(id){return (players||[]).find(p=>String(p.id)===String(id))||null}
@@ -954,7 +991,6 @@ function renderLineup(){
   for(const rowId of ["lineupGoalkeeper","lineupDefenders","lineupMidfielders","lineupForwards"]){
     const row=$(rowId);if(row)row.innerHTML="";
   }
-  const groupCounts={goalkeeper:0,defender:0,midfielder:0,forward:0};
   for(const slot of LINEUP_SLOTS){
     const row=$(slot.row);if(!row)continue;
     const p=lineupPlayerById(lineupSelections[slot.id]);
@@ -962,11 +998,19 @@ function renderLineup(){
     button.innerHTML=p?lineupDisplayPlayer(p,slot):lineupEmptySlot(slot);
     button.onclick=()=>openLineupPicker(slot.id);
     row.appendChild(button);
-    if(p&&playerPositionGroup(p)===slot.group)groupCounts[slot.group]++;
   }
-  const filled=LINEUP_SLOTS.filter(s=>lineupPlayerById(lineupSelections[s.id])).length;
+  const filled=LINEUP_SLOTS.map(s=>lineupPlayerById(lineupSelections[s.id])).filter(Boolean);
+  const avgValues=filled.map(p=>num(p.avg)).filter(v=>v!==null);
+  const squadAvg=avgValues.length?avgValues.reduce((a,b)=>a+b,0)/avgValues.length:null;
+  const rating=$("createTeamRating"),ratingMeta=$("createTeamRatingMeta");
+  if(rating&&ratingMeta){
+    rating.textContent=squadAvg===null?"—":squadAvg.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(!filled.length)ratingMeta.textContent="Selecciona jugadores para calcularla";
+    else if(avgValues.length===filled.length)ratingMeta.textContent=filled.length+" jugador"+(filled.length===1?"":"es")+" seleccionados";
+    else ratingMeta.textContent=avgValues.length+" de "+filled.length+" con media disponible";
+  }
   if(!players){status.textContent="Cargando jugadores…";return}
-  status.textContent=filled+"/11 posiciones ocupadas · " + (filled===11?"Once completo.":"Pulsa una posición para elegir un jugador.");
+  status.textContent=filled.length+"/11 posiciones ocupadas · "+(filled.length===11?"Once completo.":"Pulsa una posición para elegir un jugador.");
 }
 function saveLineup(){localStorage.setItem(LINEUP_STORAGE_KEY,JSON.stringify(lineupSelections))}
 function clearLineup(){lineupSelections={};saveLineup();renderLineup()}
@@ -977,13 +1021,16 @@ function lineupPickerRows(slot,q=""){
     if(playerPositionGroup(p)!==slot.group)return false;
     if(used.has(String(p.id))&&String(lineupSelections[slot.id])!==String(p.id))return false;
     if(!qq)return true;
-    return [p.name,p.team,String(p.id),String(p.position||"")].some(x=>String(x||"").toLowerCase().includes(qq));
-  }).sort((a,b)=>teamPointsValue(b)-teamPointsValue(a)||String(a.name).localeCompare(String(b.name),"es")).slice(0,80);
+    return [p.name,p.team,String(p.id),String(p.position||""),positionLabel(p)].some(x=>String(x||"").toLowerCase().includes(qq));
+  }).sort((a,b)=>{
+    const aa=a.avg==null?-Infinity:Number(a.avg),bb=b.avg==null?-Infinity:Number(b.avg);
+    return bb-aa || String(a.name).localeCompare(String(b.name),"es");
+  }).slice(0,120);
 }
 function renderLineupPickerContent(slot,q=""){
   const rows=lineupPickerRows(slot,q);
   return '<div class="modal-body lineup-picker">'+
-    '<div class="lineup-picker-intro">Elige un <strong>'+esc(slot.label.toLowerCase())+'</strong>. Solo aparecen jugadores cuya posición coincide con esta plaza.</div>'+
+    '<div class="lineup-picker-intro">Elige un <strong>'+esc(slot.label.toLowerCase())+'</strong>. '+rows.length+' jugador'+(rows.length===1?'':'es')+' disponible'+(rows.length===1?'':'s')+'. Puedes buscar o elegir directamente de la lista.</div>'+
     '<input id="lineupPickerSearch" class="lineup-picker-search" type="search" placeholder="Buscar jugador…" autocomplete="off" value="'+esc(q)+'">'+
     '<div id="lineupPickerList" class="lineup-picker-list">'+
       (rows.length?rows.map(p=>{
@@ -1015,11 +1062,16 @@ function bindLineupPicker(slot){
     lineupSelections[slot.id]=id;saveLineup();renderLineup();$("closeModal").click();
   });
 }
-function openLineupPicker(slotId){
+async function openLineupPicker(slotId){
   const slot=LINEUP_SLOTS.find(x=>x.id===slotId);if(!slot)return;
-  if(!players){return}
   $("modalTitle").textContent="Elegir jugador";
   $("modalRoute").textContent="Posición: "+slot.label;
+  if(!players){
+    $("modalContent").innerHTML='<div class="modal-body"><div class="empty">Cargando jugadores…</div></div>';
+    $("modal").classList.remove("hidden");$("modal").setAttribute("aria-hidden","false");
+    await loadPlayers(false);
+    if(!players){$("modalContent").innerHTML='<div class="modal-body"><div class="empty">No se pudo cargar la lista de jugadores.</div></div>';return}
+  }
   $("modalContent").innerHTML=renderLineupPickerContent(slot);
   $("modal").classList.remove("hidden");$("modal").setAttribute("aria-hidden","false");
   bindLineupPicker(slot);
