@@ -125,7 +125,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -136,7 +136,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 @media(max-width:699px){.app-shell{width:100%}}
 
 /* ===== Responsive desktop layout + fixed bottom navigation ===== */
-.bottom-nav{grid-template-columns:repeat(6,1fr)!important}
+.bottom-nav{grid-template-columns:repeat(7,1fr)!important}
 .bottom-nav{position:fixed!important;left:50%!important;bottom:0!important;transform:translateX(-50%)!important;width:min(100%,760px)!important;height:68px!important;z-index:100!important;background:#050505!important;border-top:1px solid #252525!important;box-shadow:0 -8px 24px rgba(0,0,0,.55)!important}
 main.wrap{padding-bottom:96px!important}
 @media(min-width:700px){
@@ -177,6 +177,56 @@ main.wrap{padding-bottom:96px!important}
   .best-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
   .teams-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   #api .tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+/* ===== Calendario ===== */
+.calendar-panel{padding:0 10px 24px}
+.calendar-toolbar{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.calendar-nav{display:flex;align-items:center;gap:6px}
+.calendar-nav button{padding:8px 10px;background:#0b0b0b;border-color:#292929}
+.calendar-week-input{width:88px;text-align:center;font-weight:800;background:#090909!important}
+.calendar-current{margin-left:auto;font-size:9px;color:#777;text-transform:uppercase;letter-spacing:.08em}
+.calendar-status{font-size:10px;color:#666;min-height:16px;margin:-2px 0 10px}
+.calendar-week-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid #292929;padding:8px 0 10px;margin-bottom:0}
+.calendar-week-title{font-size:20px;font-weight:900;letter-spacing:-.02em}
+.calendar-week-subtitle{font-size:10px;color:#777;margin-top:3px}
+.calendar-count{font-size:10px;color:#aaa;white-space:nowrap}
+.calendar-list{display:grid;gap:0;border-top:1px solid #202020}
+.calendar-day{border-bottom:1px solid #202020}
+.calendar-day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;background:#070707}
+.calendar-day-name{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#aaa}
+.calendar-day-date{font-size:10px;color:#666}
+.calendar-match{display:grid;grid-template-columns:58px minmax(0,1fr) 64px;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid #181818}
+.calendar-time{font-size:10px;color:#777;text-align:center}
+.calendar-teams{display:grid;gap:7px;min-width:0}
+.calendar-team-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;min-width:0}
+.calendar-team-logo{width:30px;height:30px;object-fit:contain;background:#151515;display:block}
+.calendar-team-name{font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calendar-team-role{font-size:8px;color:#555;margin-top:1px;text-transform:uppercase;letter-spacing:.06em}
+.calendar-score{display:grid;gap:4px;text-align:center;font-size:13px;font-weight:900}
+.calendar-score span{display:block}
+.calendar-score .scheduled{font-size:9px;color:#555;font-weight:700}
+.calendar-status-pill{font-size:8px;color:#777;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.calendar-empty{border:1px dashed #333;padding:28px 16px;text-align:center;color:#666;font-size:11px}
+.calendar-error{border:1px solid #54242a;background:#13090a;padding:14px;color:#ef9da6;font-size:10px;line-height:1.45}
+.calendar-route-note{font-size:9px;color:#555;margin-top:10px}
+@media(max-width:699px){
+  .calendar-toolbar{align-items:stretch}
+  .calendar-current{display:none}
+  .calendar-week-title{font-size:17px}
+  .calendar-match{grid-template-columns:48px minmax(0,1fr) 54px;gap:7px}
+  .calendar-team-name{font-size:11px}
+}
+@media(min-width:700px){
+  .calendar-panel{padding:0}
+  .calendar-toolbar{max-width:920px;margin:0 auto 12px}
+  .calendar-week-head,.calendar-list{max-width:920px;margin-left:auto;margin-right:auto}
+  .calendar-match{grid-template-columns:76px minmax(0,1fr) 90px;padding:13px 8px}
+  .calendar-team-row{grid-template-columns:38px minmax(0,1fr) auto}
+  .calendar-team-logo{width:36px;height:36px}
+  .calendar-team-name{font-size:14px}
+  .calendar-time{font-size:11px}
+  .calendar-score{font-size:15px}
 }
 
 /* ===== Comparador de jugadores ===== */
@@ -247,6 +297,7 @@ main.wrap{padding-bottom:96px!important}
     <div class="mobile-brand"><span class="hamb">☰</span><span>LALIGA<span style="color:#ff3d45">Fantasy</span></span></div>
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
+      <button data-section="calendar">Calendario</button>
       <button data-section="teams">Equipos</button>
       <button data-section="forgotten">Olvidados</button>
       <button data-section="compare">Comparador</button>
@@ -287,6 +338,31 @@ main.wrap{padding-bottom:96px!important}
         <div id="bestResults" class="best-grid"></div>
       </section>
       <div class="notice">Pulsa un resultado para abrir su ficha completa. Los datos se consultan desde <code>/v1/competition/1/players</code> y la ficha individual desde <code>/v1/competition/1/player/{id}</code>.</div>
+    </div>
+  </section>
+
+  <section id="calendar" class="section">
+    <div class="hero" style="margin-top:1vh">
+      <h1 style="font-size:32px">Calendario</h1>
+      <p>Consulta los partidos de cada jornada, con los escudos de los dos equipos y su horario.</p>
+    </div>
+    <div class="calendar-panel">
+      <div class="calendar-toolbar">
+        <div class="calendar-nav">
+          <button id="calendarPrev" type="button" aria-label="Jornada anterior">←</button>
+          <input id="calendarWeek" class="calendar-week-input" type="number" min="1" step="1" value="1" aria-label="Número de jornada">
+          <button id="calendarNext" type="button" aria-label="Jornada siguiente">→</button>
+        </div>
+        <button id="calendarReload" type="button">Actualizar</button>
+        <span id="calendarCurrent" class="calendar-current"></span>
+      </div>
+      <div id="calendarStatus" class="calendar-status" aria-live="polite"></div>
+      <div id="calendarWeekHead" class="calendar-week-head">
+        <div><div id="calendarWeekTitle" class="calendar-week-title">Jornada 1</div><div id="calendarWeekSubtitle" class="calendar-week-subtitle">Cargando calendario…</div></div>
+        <div id="calendarCount" class="calendar-count"></div>
+      </div>
+      <div id="calendarList" class="calendar-list"></div>
+      <div class="calendar-route-note">Datos consultados desde <code>/v1/competition/1/calendar?weekNumber={week}</code>. Los escudos se enlazan con el catálogo de equipos mediante <code>localId</code> y <code>visitorId</code>.</div>
     </div>
   </section>
 
@@ -354,6 +430,7 @@ main.wrap{padding-bottom:96px!important}
 
 <nav class="bottom-nav" aria-label="Navegación principal">
   <button class="active" data-section="home"><span class="ico">♜</span><span>Clasificación</span></button>
+  <button data-section="calendar"><span class="ico">◷</span><span>Calendario</span></button>
   <button data-section="teams"><span class="ico">▦</span><span>Equipo</span></button>
   <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
@@ -497,7 +574,7 @@ function normalizeTeams(raw){
   if(!a&&obj(raw))for(const k of ["teams","items","results","data","content"])if(Array.isArray(raw[k])){a=raw[k];break}
   return(a||[]).map(t=>({
     raw:t,id:first(t,["id","teamId","team_id"]),name:first(t,["name","fullName","teamName"])||"Equipo",shortName:first(t,["shortName","short_name"])||"",slug:first(t,["slug"]),
-    image:first(t,["badgeColor","badge","logo","image","shield","crest","badgeWhite","logoUrl"])||""
+    image:first(t,["logo","logoUrl","image","badge","badgeWhite","shield","crest"])||""
   })).filter(t=>t.id!==null&&t.id!==undefined)
 }
 function teamForPlayer(p){
@@ -541,7 +618,7 @@ async function renderBestPlayers(){
   box.querySelectorAll("[data-best-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.bestId));
 }
 function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
-function teamLogo(t){return t?.image&&imgUrl(t.image)?t.image:null}
+function teamLogo(t){const v=typeof t?.image==="string"?t.image.trim():"";return v&&(/^(https?:\/\/|\/|data:image\/)/i.test(v))&&!/^#[0-9a-f]{3,8}$/i.test(v)?v:null}
 function setTeamsState(type,text){$("teamsState").className="statusline "+type;$("teamsState").innerHTML='<span><span class="dot"></span>'+esc(text)+'</span>'}
 function renderTeams(){
   const q=$("teamSearch").value.trim().toLowerCase();
@@ -578,6 +655,170 @@ async function loadTeams(){
   }finally{teamsLoading=null}})();
   return teamsLoading
 }
+
+let calendarMatches=[];
+let calendarLoading=null;
+let calendarWeekNumber=1;
+let calendarCurrentNumber=null;
+
+function setCalendarStatus(text,type=""){
+  const el=$("calendarStatus");
+  if(!el)return;
+  el.className="calendar-status"+(type?" "+type:"");
+  el.textContent=text||"";
+}
+function teamByCalendarId(id){
+  if(id===null||id===undefined||id===""||!teams)return null;
+  return teams.find(t=>String(t.id)===String(id))||null;
+}
+function calendarTeamId(match,side){
+  return first(match,side==="local"
+    ?["localId","local_id","homeId","home_id","localTeamId","homeTeamId"]
+    :["visitorId","visitor_id","awayId","away_id","visitorTeamId","awayTeamId"]);
+}
+function calendarTeam(match,side){
+  const id=calendarTeamId(match,side);
+  const fromCatalog=teamByCalendarId(id);
+  if(fromCatalog)return {id:fromCatalog.id,name:fromCatalog.name||fromCatalog.shortName||"Equipo",shortName:fromCatalog.shortName||"",image:fromCatalog.image||""};
+  const name=first(match,side==="local"
+    ?["localName","homeName","homeTeamName","localTeamName"]
+    :["visitorName","awayName","awayTeamName","visitorTeamName"]);
+  const embedded=first(match,side==="local"?["localTeam","homeTeam"]:["visitorTeam","awayTeam"]);
+  const objTeam=obj(embedded)?embedded:null;
+  return {
+    id:id??objTeam?.id??null,
+    name:name||objTeam?.name||objTeam?.shortName||(id!=null?"Equipo #"+id:"Equipo"),
+    shortName:objTeam?.shortName||"",
+    image:first(objTeam||{},["badgeColor","badge","logo","image","shield","crest","badgeWhite","logoUrl"])||""
+  };
+}
+function calendarDateValue(match){
+  const raw=first(match,["dateTime","startDate","startDateTime","matchDate","scheduledAt","kickoff","date","startTime"]);
+  if(raw===null||raw===undefined||raw==="")return null;
+  const d=new Date(raw);
+  return Number.isNaN(d.getTime())?String(raw):d;
+}
+function calendarDateParts(match){
+  const raw=calendarDateValue(match);
+  if(!raw)return {date:"Fecha por confirmar",time:"Hora por confirmar",key:"unknown"};
+  if(raw instanceof Date){
+    return {
+      date:raw.toLocaleDateString("es-ES",{weekday:"long",day:"2-digit",month:"long"}),
+      time:raw.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}),
+      key:raw.toISOString().slice(0,10)
+    };
+  }
+  const text=String(raw);
+  const m=text.match(/(\d{4}-\d{2}-\d{2})/);
+  const time=text.match(/(?:T|\s)(\d{1,2}:\d{2})/);
+  let date=text;
+  if(m){const d=new Date(m[1]+"T00:00:00");date=d.toLocaleDateString("es-ES",{weekday:"long",day:"2-digit",month:"long"});}
+  return {date,time:time?time[1]:"Hora por confirmar",key:m?m[1]:text};
+}
+function calendarScore(match,side){
+  const keys=side==="local"
+    ?["localScore","homeScore","localGoals","homeGoals","homeResult","localResult"]
+    :["visitorScore","awayScore","visitorGoals","awayGoals","awayResult","visitorResult"];
+  const direct=first(match,keys);
+  if(typeof direct==="number")return direct;
+  if(typeof direct==="string"&&direct.trim()!==""&&Number.isFinite(Number(direct)))return Number(direct);
+  const score=first(match,["score","result","scores"]);
+  if(obj(score)){
+    const nested=side==="local"?first(score,["local","home","homeScore","localScore"]):first(score,["visitor","away","awayScore","visitorScore"]);
+    if(nested!==null&&nested!==undefined&&nested!=="")return nested;
+  }
+  return null;
+}
+function calendarStatus(match){
+  const status=first(match,["status","matchStatus","state"]);
+  if(!status)return "";
+  const normalized=String(status).toLowerCase();
+  const map={scheduled:"programado",upcoming:"próximo",live:"en directo",in_progress:"en directo",finished:"finalizado",completed:"finalizado",postponed:"aplazado",cancelled:"cancelado",canceled:"cancelado"};
+  return map[normalized]||String(status);
+}
+function normalizeCalendar(raw){
+  let source=Array.isArray(raw)?raw:null;
+  if(!source&&obj(raw)){
+    for(const k of ["matches","games","fixtures","calendar","items","results","data","content"]){if(Array.isArray(raw[k])){source=raw[k];break}}
+    if(!source){
+      const candidate=first(raw,["matches","games","fixtures"]);
+      if(Array.isArray(candidate))source=candidate;
+    }
+  }
+  return (source||[]).filter(x=>obj(x)).map((match,index)=>({raw:match,index,date:calendarDateParts(match),local:calendarTeam(match,"local"),visitor:calendarTeam(match,"visitor"),localScore:calendarScore(match,"local"),visitorScore:calendarScore(match,"visitor"),status:calendarStatus(match)}));
+}
+function calendarWeekLabel(week){return "Jornada "+Number(week)}
+function renderCalendar(){
+  const list=$("calendarList"),title=$("calendarWeekTitle"),subtitle=$("calendarWeekSubtitle"),count=$("calendarCount");
+  if(!list||!title||!subtitle||!count)return;
+  const rows=[...calendarMatches].sort((a,b)=>String(a.date.key).localeCompare(String(b.date.key)));
+  title.textContent=calendarWeekLabel(calendarWeekNumber);
+  const uniqueDays=[...new Set(rows.map(x=>x.date.key))].filter(Boolean).length;
+  subtitle.textContent=rows.length?(uniqueDays===1?"1 día de partidos":uniqueDays+" días de partidos"):"No hay partidos disponibles para esta jornada.";
+  count.textContent=rows.length?(rows.length+" partido"+(rows.length===1?"":"s")):"";
+  $("calendarWeek").value=calendarWeekNumber;
+  if(!rows.length){list.innerHTML='<div class="calendar-empty">No hay partidos disponibles para esta jornada.</div>';return;}
+  const groups=[];
+  rows.forEach(row=>{let g=groups.find(x=>x.key===row.date.key);if(!g){g={key:row.date.key,date:row.date.date,items:[]};groups.push(g)}g.items.push(row)});
+  list.innerHTML=groups.map(g=>'<section class="calendar-day"><div class="calendar-day-head"><span class="calendar-day-name">'+esc(g.date)+'</span><span class="calendar-day-date">'+(g.items.length+" partido"+(g.items.length===1?"":"s"))+'</span></div>'+g.items.map(row=>{
+    const local=row.local||{},visitor=row.visitor||{};
+    const localImg=teamLogo(local)||null,visitorImg=teamLogo(visitor)||null;
+    const scoreKnown=row.localScore!==null||row.visitorScore!==null;
+    const status=row.status;
+    return '<article class="calendar-match">'+
+      '<div class="calendar-time"><div>'+esc(row.date.time)+'</div>'+(status?'<div class="calendar-status-pill">'+esc(status)+'</div>':'')+'</div>'+ 
+      '<div class="calendar-teams">'+
+        '<div class="calendar-team-row">'+(localImg?'<img class="calendar-team-logo" src="'+esc(localImg)+'" alt="" loading="lazy">':'<div class="calendar-team-logo"></div>')+'<div><div class="calendar-team-name">'+esc(local.name||"Equipo local")+'</div><div class="calendar-team-role">Local</div></div>'+'</div>'+ 
+        '<div class="calendar-team-row">'+(visitorImg?'<img class="calendar-team-logo" src="'+esc(visitorImg)+'" alt="" loading="lazy">':'<div class="calendar-team-logo"></div>')+'<div><div class="calendar-team-name">'+esc(visitor.name||"Equipo visitante")+'</div><div class="calendar-team-role">Visitante</div></div>'+'</div>'+ 
+      '</div>'+ 
+      '<div class="calendar-score">'+(scoreKnown?'<span>'+esc(row.localScore??"—")+'</span><span>'+esc(row.visitorScore??"—")+'</span>':'<span class="scheduled">—</span><span class="scheduled">vs</span>')+'</div>'+ 
+    '</article>';
+  }).join('')+'</section>').join('');
+}
+async function loadCalendarWeek(week){
+  const parsed=Math.max(1,Math.floor(Number(week)||1));
+  calendarWeekNumber=parsed;
+  setCalendarStatus("Cargando "+calendarWeekLabel(parsed).toLowerCase()+"…");
+  const list=$("calendarList");if(list)list.innerHTML='<div class="calendar-empty">Cargando partidos…</div>';
+  try{
+    if(!teams)await loadTeams();
+    const path="/v1/competition/1/calendar?weekNumber="+encodeURIComponent(parsed);
+    const r=await fetch(API+"?path="+encodeURIComponent(path),{headers:{Accept:"application/json"},cache:"no-store"});
+    if(!r.ok)throw Error("HTTP "+r.status);
+    const raw=await r.json();
+    calendarMatches=normalizeCalendar(raw);
+    calendarCurrentNumber=Number(first(raw,["currentWeek","currentWeekNumber","weekNumber"]));
+    $("calendarCurrent").textContent=Number.isFinite(calendarCurrentNumber)&&calendarCurrentNumber?"Jornada actual: "+calendarCurrentNumber:"";
+    renderCalendar();
+    setCalendarStatus(calendarMatches.length?(calendarMatches.length+" partidos cargados"):"Jornada sin partidos");
+  }catch(e){
+    calendarMatches=[];
+    $("calendarWeekTitle").textContent=calendarWeekLabel(parsed);
+    $("calendarWeekSubtitle").textContent="No se ha podido consultar esta jornada.";
+    $("calendarCount").textContent="";
+    list.innerHTML='<div class="calendar-error">No se pudo cargar el calendario.<br><span>'+esc(e.message||"Error desconocido")+'</span></div>';
+    setCalendarStatus("Error al cargar la jornada");
+  }
+}
+async function loadCalendarCurrent(){
+  if(calendarLoading)return calendarLoading;
+  calendarLoading=(async()=>{
+    try{
+      let week=null;
+      try{
+        const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/week/current"),{headers:{Accept:"application/json"},cache:"no-store"});
+        if(r.ok)week=Number(first(await r.json(),["weekNumber","week","number"]));
+      }catch{}
+      if(!Number.isFinite(week)||week<1)week=calendarWeekNumber||1;
+      await loadCalendarWeek(week);
+    }finally{calendarLoading=null}
+  })();
+  return calendarLoading;
+}
+$("calendarPrev").onclick=()=>loadCalendarWeek(calendarWeekNumber-1);
+$("calendarNext").onclick=()=>loadCalendarWeek(calendarWeekNumber+1);
+$("calendarReload").onclick=()=>loadCalendarWeek(calendarWeekNumber);
+$("calendarWeek").onchange=()=>loadCalendarWeek($("calendarWeek").value);
 
 function scalar(v){if(v===null)return'<span style="color:#c8b7ff">No disponible</span>';if(typeof v==="boolean")return v?"Sí":"No";if(typeof v==="number")return v.toLocaleString("es-ES");return esc(v)}
 function mediaList(data,out=[]){if(Array.isArray(data)){data.slice(0,200).forEach(x=>mediaList(x,out));return out}if(obj(data))for(const[k,v]of Object.entries(data)){if(typeof v==="string"&&imgUrl(v)&&/(image|photo|avatar|logo|badge|crest|icon|picture|thumbnail|url)/i.test(k))out.push([k,v]);else if(obj(v))mediaList(v,out)}return out}
@@ -859,7 +1100,7 @@ if(loginQuery.get("login")==="success" || loginQuery.get("login")==="error"){
   $("loginState").className="auth-state show "+(ok?"good":"error");
   $("loginState").textContent=ok?"Inicio de sesión correcto con LALIGA.":(reason==="oauth_state"?"La validación de seguridad no coincidió.":reason==="oauth_exchange"?"LALIGA no aceptó el código de Google.":"No se pudo completar el inicio de sesión con Google.");
 }
-setTimeout(async()=>{await loadTeams();await loadPlayers(false);},50);
+setTimeout(async()=>{await loadTeams();await loadPlayers(false);await loadCalendarCurrent();},50);
 document.getElementById("bottomAuth").onclick=showAuth;
 </script>
 </div>
