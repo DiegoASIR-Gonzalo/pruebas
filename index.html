@@ -292,6 +292,32 @@ main.wrap{padding-bottom:96px!important}
 .lineup-picker-team{font-size:9px;color:#777;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lineup-picker-meta{font-size:9px;color:#b4b9b6;text-align:right;white-space:nowrap}
 .create-team-note{max-width:760px;margin:10px auto 0;color:#666;font-size:9px;line-height:1.45;text-align:center}
+
+/* ===== Asistente de Plantilla ===== */
+.lineup-agent{max-width:760px;margin:14px auto 0;border:1px solid #252b30;background:#090c0d}
+.lineup-agent-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border-bottom:1px solid #20262a}
+.lineup-agent-title{font-size:12px;font-weight:900}
+.lineup-agent-sub{font-size:9px;color:#777;margin-top:2px}
+.lineup-agent-badge{font-size:9px;padding:4px 6px;border:1px solid #2b3439;color:#a7b2ae;background:#0d1112}
+.lineup-agent-body{padding:10px 12px}
+.lineup-agent-query{display:flex;gap:7px;margin-bottom:9px}
+.lineup-agent-query input{flex:1;min-width:0;background:#070707!important;border-color:#292929!important;font-size:10px!important;padding:9px 10px!important}
+.lineup-agent-query button{font-size:10px;padding:8px 10px;background:#ff3d45;border-color:#ff3d45;color:#fff;font-weight:800}
+.lineup-agent-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.lineup-agent-actions button{font-size:9px;padding:6px 8px;background:#0b0b0b;border-color:#272c2f;color:#bbb}
+.lineup-agent-actions button:hover{color:#fff;border-color:#555}
+.lineup-agent-result{border-top:1px solid #1d2326;padding-top:9px;color:#b9c1bd;font-size:10px;line-height:1.5}
+.lineup-agent-result strong{color:#f2f4f3}
+.lineup-agent-result ul{margin:7px 0 0 16px;padding:0}
+.lineup-agent-result li{margin:4px 0}
+.lineup-agent-player{display:inline-flex;align-items:center;gap:5px;margin:2px 4px 2px 0;padding:3px 5px;border:1px solid #242b2e;background:#0d1112}
+.lineup-agent-player img{width:20px;height:20px;object-fit:contain;background:#050505}
+.lineup-agent-empty{color:#6d7571}
+@media(max-width:699px){
+  .lineup-agent{margin-top:10px}
+  .lineup-agent-query{flex-direction:column}
+  .lineup-agent-query button{width:100%}
+}
 @media(max-width:699px){
   .create-team-toolbar{align-items:flex-start}
   .create-team-actions{flex-wrap:wrap;justify-content:flex-end}
@@ -488,6 +514,28 @@ main.wrap{padding-bottom:96px!important}
         <div id="lineupForwards" class="lineup-row"></div>
       </div>
       <div class="create-team-note">Los jugadores disponibles se filtran por su posición indicada por la API. Un mismo jugador no puede ocupar dos posiciones del once.</div>
+
+      <section class="lineup-agent" aria-labelledby="lineupAgentTitle">
+        <div class="lineup-agent-head">
+          <div>
+            <div id="lineupAgentTitle" class="lineup-agent-title">Asistente de plantilla</div>
+            <div class="lineup-agent-sub">Analiza los jugadores cargados desde la API y te propone mejoras por posición.</div>
+          </div>
+          <span class="lineup-agent-badge">Basado en datos actuales</span>
+        </div>
+        <div class="lineup-agent-body">
+          <div class="lineup-agent-query">
+            <input id="lineupAgentQuery" type="search" autocomplete="off" placeholder="Ej. ¿Qué delantero debería cambiar?">
+            <button id="lineupAgentAsk" type="button">Analizar</button>
+          </div>
+          <div class="lineup-agent-actions">
+            <button type="button" data-agent-prompt="improve">¿Qué debería mejorar?</button>
+            <button type="button" data-agent-prompt="best">Dame alternativas mejores</button>
+            <button type="button" data-agent-prompt="empty">¿Qué puestos me faltan?</button>
+          </div>
+          <div id="lineupAgentResult" class="lineup-agent-result" aria-live="polite">Selecciona jugadores y te indicaré qué posiciones tienen más margen de mejora.</div>
+        </div>
+      </section>
     </div>
   </section>
 
@@ -722,7 +770,7 @@ async function renderBestPlayers(){
   ).join(""):'<div class="empty">Todavía no hay datos suficientes para crear el ranking.</div>';
   box.querySelectorAll("[data-best-id]").forEach(b=>b.onclick=()=>openPlayer(b.dataset.bestId));
 }
-function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();renderLineup();populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();renderLineup();populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
+function loadPlayers(force=false){if(loading)return loading;loading=(async()=>{try{setState("loading",force?"Actualizando lista…":"Cargando jugadores…");if(!force){const saved=localStorage.getItem(CACHE_KEY);if(saved){try{const x=JSON.parse(saved);if(Date.now()-x.ts<15*60*1000){players=normalizePlayers(x.data);renderSearch();renderBestPlayers();renderForgotten();renderLineup();lineupAgentAnalyze({type:"improve"});populateComparePlayers();setState("ok","Lista cargada desde caché");return}}catch{}}}const r=await fetch(API+"?path="+encodeURIComponent("/v1/competition/1/players"),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const raw=await r.json();players=normalizePlayers(raw);localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:Array.isArray(raw)?raw:(raw.players||raw.items||raw.results||raw.data||raw.content||raw)}));renderSearch();renderBestPlayers();renderForgotten();renderLineup();lineupAgentAnalyze({type:"improve"});populateComparePlayers();if(teams)renderTeams();setState("ok","Lista actualizada")}catch(e){players=null;setState("bad","No se pudo cargar la lista");$("results").innerHTML='<div class="empty">No se pudo cargar el catálogo de jugadores. <button class="primary" onclick="loadPlayers(true)">Reintentar</button></div>'}finally{loading=null}})();return loading}
 function teamLogo(t){const v=typeof t?.image==="string"?t.image.trim():"";return v&&(/^(https?:\/\/|\/|data:image\/)/i.test(v))&&!/^#[0-9a-f]{3,8}$/i.test(v)?v:null}
 function setTeamsState(type,text){$("teamsState").className="statusline "+type;$("teamsState").innerHTML='<span><span class="dot"></span>'+esc(text)+'</span>'}
 function renderTeams(){
@@ -1013,7 +1061,7 @@ function renderLineup(){
   status.textContent=filled.length+"/11 posiciones ocupadas · "+(filled.length===11?"Once completo.":"Pulsa una posición para elegir un jugador.");
 }
 function saveLineup(){localStorage.setItem(LINEUP_STORAGE_KEY,JSON.stringify(lineupSelections))}
-function clearLineup(){lineupSelections={};saveLineup();renderLineup()}
+function clearLineup(){lineupSelections={};saveLineup();renderLineup();lineupAgentAnalyze({type:"improve"})}
 function lineupPickerRows(slot,q=""){
   const used=selectedLineupIds();
   const qq=q.trim().toLowerCase();
@@ -1059,7 +1107,7 @@ function bindLineupPicker(slot){
   list.querySelectorAll("[data-lineup-player]").forEach(b=>b.onclick=()=>{
     const id=String(b.dataset.lineupPlayer);
     for(const key of Object.keys(lineupSelections))if(String(lineupSelections[key])===id)delete lineupSelections[key];
-    lineupSelections[slot.id]=id;saveLineup();renderLineup();$("closeModal").click();
+    lineupSelections[slot.id]=id;saveLineup();renderLineup();lineupAgentAnalyze({type:"improve"});$("closeModal").click();
   });
 }
 async function openLineupPicker(slotId){
@@ -1080,6 +1128,100 @@ $("clearLineup")?.addEventListener("click",()=>{
   if(Object.keys(lineupSelections).length&&!confirm("¿Vaciar toda la plantilla?"))return;
   clearLineup();
 });
+
+// ===== Mini agente de plantilla =====
+function lineupAgentSelected(){
+  return LINEUP_SLOTS.map(slot=>{
+    const p=lineupPlayerById(lineupSelections[slot.id]);
+    return {slot,p};
+  });
+}
+function lineupAgentRoleFromText(text){
+  const q=normPosition(text);
+  if(/portero|porter|gk|goalkeeper|guardameta/.test(q))return "goalkeeper";
+  if(/defensa|defender|def|lateral|central/.test(q))return "defender";
+  if(/centrocamp|medi|midfield|medio|volante/.test(q))return "midfielder";
+  if(/delanter|forward|attack|striker|punta/.test(q))return "forward";
+  return null;
+}
+function lineupAgentRoleLabel(group){
+  return group==="goalkeeper"?"portero":group==="defender"?"defensa":group==="midfielder"?"centrocampista":"delantero";
+}
+function lineupAgentCandidates(group,excludeIds=new Set(),limit=5){
+  return (players||[])
+    .filter(p=>playerPositionGroup(p)===group && p.avg!==null && Number.isFinite(Number(p.avg)) && !excludeIds.has(String(p.id)))
+    .sort((a,b)=>Number(b.avg)-Number(a.avg)||String(a.name).localeCompare(String(b.name),"es"))
+    .slice(0,limit);
+}
+function lineupAgentPill(p){
+  return '<span class="lineup-agent-player">'+(p.image?'<img src="'+esc(p.image)+'" alt="">':'')+'<strong>'+esc(p.name)+'</strong> <span>'+Number(p.avg).toLocaleString("es-ES",{maximumFractionDigits:2})+' pts</span></span>';
+}
+function lineupAgentRender(html){const box=$("lineupAgentResult");if(box)box.innerHTML=html}
+function lineupAgentAnalyze(prompt="improve"){
+  if(!players){lineupAgentRender('Todavía estoy cargando los jugadores de la competición.');return}
+  const selected=lineupAgentSelected();
+  const selectedIds=selected.filter(x=>x.p).map(x=>String(x.p.id));
+  const filled=selected.filter(x=>x.p);
+  if(!filled.length){
+    const top=LINEUP_SLOTS.reduce((acc,slot)=>{
+      if(!acc[slot.group])acc[slot.group]=lineupAgentCandidates(slot.group,new Set(),3);
+      return acc;
+    },{});
+    lineupAgentRender('<strong>Tu plantilla está vacía.</strong> Empieza por elegir los jugadores mejor valorados en cada posición. '+
+      Object.entries(top).map(([g,rows])=>'<div><strong>'+lineupAgentRoleLabel(g)+':</strong> '+(rows.length?rows.map(lineupAgentPill).join(" "):"sin datos suficientes")+'</div>').join(''));
+    return;
+  }
+  const role=prompt.role||lineupAgentRoleFromText(prompt.text||"");
+  const exclude=new Set(selectedIds);
+  const targetSlots=role?selected.filter(x=>x.slot.group===role):selected;
+  const advice=[];
+  targetSlots.forEach(({slot,p})=>{
+    const pool=lineupAgentCandidates(slot.group,exclude,4);
+    if(!p){
+      if(pool.length)advice.push({gain:Number(pool[0].avg),html:'<li><strong>'+slot.label+':</strong> está libre. Mejor disponible: '+lineupAgentPill(pool[0])+'</li>'});
+      return;
+    }
+    const better=pool.filter(x=>Number(x.avg)>Number(p.avg)).slice(0,2);
+    if(better.length){
+      advice.push({gain:Number(better[0].avg)-Number(p.avg),html:'<li><strong>'+esc(p.name)+'</strong> ('+Number(p.avg).toLocaleString("es-ES",{maximumFractionDigits:2})+' pts) puede mejorar por '+better.map(lineupAgentPill).join(' ')+'</li>'});
+    }
+  });
+  advice.sort((a,b)=>b.gain-a.gain);
+  if(prompt.type==="empty"){
+    const empty=selected.filter(x=>!x.p);
+    if(!empty.length){lineupAgentRender('<strong>Tienes las 11 posiciones ocupadas.</strong> Puedo buscarte mejoras sobre los jugadores actuales.');return}
+    const groups=[...new Set(empty.map(x=>x.slot.group))];
+    const rows=groups.map(g=>{const best=lineupAgentCandidates(g,exclude,3);return '<li><strong>'+lineupAgentRoleLabel(g)+':</strong> '+(best.length?best.map(lineupAgentPill).join(' '):'sin datos suficientes')+'</li>'}).join('');
+    lineupAgentRender('<strong>Te faltan '+empty.length+' posiciones.</strong><ul>'+rows+'</ul>');return;
+  }
+  if(prompt.type==="best"){
+    const groups=role?[role]:[...new Set(selected.map(x=>x.slot.group))];
+    const rows=groups.map(g=>{const best=lineupAgentCandidates(g,exclude,3);return '<li><strong>'+lineupAgentRoleLabel(g)+':</strong> '+(best.length?best.map(lineupAgentPill).join(' '):'sin alternativas con media disponible')+'</li>'}).join('');
+    lineupAgentRender('<strong>Estas son las alternativas mejor valoradas</strong> '+(role?('para '+lineupAgentRoleLabel(role)+'.'): 'por posición.')+'<ul>'+rows+'</ul>');return;
+  }
+  if(!advice.length){
+    lineupAgentRender('<strong>No veo una mejora clara con los datos disponibles.</strong> Tu selección ya está entre las mejores medias disponibles en '+(role?'esa posición.':'las posiciones ocupadas.')+'');return;
+  }
+  const squadPlayers=filled.map(x=>x.p).filter(p=>p.avg!==null);
+  const currentAvg=squadPlayers.length?squadPlayers.reduce((a,p)=>a+Number(p.avg),0)/squadPlayers.length:null;
+  lineupAgentRender('<strong>Prioridad de mejora:</strong><ul>'+advice.slice(0,5).map(x=>x.html).join('')+'</ul>'+(currentAvg!==null?'<div style="margin-top:8px">Media actual de la plantilla: <strong>'+currentAvg.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+' pts</strong>.</div>':''));
+}
+function lineupAgentRunQuery(){
+  const input=$("lineupAgentQuery");
+  const text=input?.value.trim()||"";
+  const role=lineupAgentRoleFromText(text);
+  const lower=normPosition(text);
+  const type=/falt|vac|sin cubrir|libre/.test(lower)?"empty":/alternativa|mejor valorad|mejor que|cambiar|sustitu|reemplaz/.test(lower)?"best":"improve";
+  lineupAgentAnalyze({text,role,type});
+}
+$("lineupAgentAsk")?.addEventListener("click",lineupAgentRunQuery);
+$("lineupAgentQuery")?.addEventListener("keydown",e=>{if(e.key==="Enter")lineupAgentRunQuery()});
+document.querySelectorAll("[data-agent-prompt]").forEach(b=>b.addEventListener("click",()=>{
+  const type=b.dataset.agentPrompt;
+  if(type==="improve")lineupAgentAnalyze({type:"improve"});
+  else if(type==="best")lineupAgentAnalyze({type:"best"});
+  else lineupAgentAnalyze({type:"empty"});
+}));
 
 function scalar(v){if(v===null)return'<span style="color:#c8b7ff">No disponible</span>';if(typeof v==="boolean")return v?"Sí":"No";if(typeof v==="number")return v.toLocaleString("es-ES");return esc(v)}
 function mediaList(data,out=[]){if(Array.isArray(data)){data.slice(0,200).forEach(x=>mediaList(x,out));return out}if(obj(data))for(const[k,v]of Object.entries(data)){if(typeof v==="string"&&imgUrl(v)&&/(image|photo|avatar|logo|badge|crest|icon|picture|thumbnail|url)/i.test(k))out.push([k,v]);else if(obj(v))mediaList(v,out)}return out}
