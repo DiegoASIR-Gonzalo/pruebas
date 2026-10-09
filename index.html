@@ -1903,6 +1903,7 @@ async function loadMyLeagues(force=false){
 }
 function renderMyLeagueCards(leagues){
   const host=$("myLeagueCards");
+  host.classList.remove("hidden");
   $("myLeagueDetail").classList.add("hidden");
   host.replaceChildren();
   if(!leagues.length){
@@ -2129,8 +2130,10 @@ async function checkAuth(){
   }catch{privateAuthState={authenticated:false};setAuthUi(privateAuthState)}
 }
 function setAuthUi(data){
+  const wasLogged=!!privateAuthState?.authenticated;
   privateAuthState=data||{authenticated:false};
   const logged=!!data?.authenticated;
+  if(wasLogged&&!logged){privateApiCache.clear();selectedPrivateLeague=null;selectedPrivateRosterTeam=null;selectedPrivateRosterPlayers=[];}
   const b=$("authButton");b.textContent=logged?"Sesión activa":"Iniciar sesión";b.classList.toggle("logged",logged);
   $("loginPanel").style.display=logged?"none":"block";
   $("sessionPanel").style.display=logged?"block":"none";
