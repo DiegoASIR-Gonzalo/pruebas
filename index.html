@@ -125,7 +125,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -136,7 +136,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 @media(max-width:699px){.app-shell{width:100%}}
 
 /* ===== Responsive desktop layout + fixed bottom navigation ===== */
-.bottom-nav{grid-template-columns:repeat(7,1fr)!important}
+.bottom-nav{grid-template-columns:repeat(6,1fr)!important}
 .bottom-nav{position:fixed!important;left:50%!important;bottom:0!important;transform:translateX(-50%)!important;width:min(100%,760px)!important;height:68px!important;z-index:100!important;background:#050505!important;border-top:1px solid #252525!important;box-shadow:0 -8px 24px rgba(0,0,0,.55)!important}
 main.wrap{padding-bottom:96px!important}
 @media(min-width:700px){
@@ -178,12 +178,6 @@ main.wrap{padding-bottom:96px!important}
   .teams-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   #api .tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
-@media(min-width:700px) and (max-width:1000px){
-  .topbar .wrap{gap:8px!important}
-  .mobile-brand{font-size:14px!important;gap:5px!important}
-  .nav{gap:0!important}
-  .nav button{font-size:9px!important;padding:6px 5px!important}
-}
 
 /* ===== Jornada actual ===== */
 .current-week-panel{margin:18px 0 0;border-top:1px solid #252525;background:#080808;padding:13px 12px}
@@ -206,7 +200,7 @@ main.wrap{padding-bottom:96px!important}
 /* ===== Calendario ===== */
 .calendar-panel{padding:0 10px 24px}
 .calendar-toolbar{display:flex;align-items:center;gap:8px;margin:0 0 10px}
-.calendar-nav{display:flex;align-items:center;gap:6px}.calendar-week-label{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.06em}.calendar-nav .calendar-week-input{width:72px}.calendar-refresh{white-space:nowrap}
+.calendar-nav{display:flex;align-items:center;gap:6px}
 .calendar-nav button{padding:8px 10px;background:#0b0b0b;border-color:#292929}
 .calendar-week-input{width:88px;text-align:center;font-weight:800;background:#090909!important}
 .calendar-current{margin-left:auto;font-size:9px;color:#777;text-transform:uppercase;letter-spacing:.08em}
@@ -408,7 +402,6 @@ main.wrap{padding-bottom:96px!important}
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
-      <button data-section="calendar">Calendario</button>
       <button data-section="create-team">Crear Plantilla</button>
       <button data-section="forgotten">Olvidados</button>
       <button data-section="compare">Comparador</button>
@@ -489,31 +482,6 @@ main.wrap{padding-bottom:96px!important}
       <div id="teamSortStatus" class="team-sort-status"></div>
       <div id="teamPlayersGrid" class="results"></div>
     </section>
-  </section>
-
-  <section id="calendar" class="section">
-    <div class="hero" style="margin-top:1vh">
-      <h1 style="font-size:32px">Calendario</h1>
-      <p>Consulta los partidos de cada jornada, ordenados por fecha y hora, con los escudos y marcadores.</p>
-    </div>
-    <div class="calendar-panel">
-      <div class="calendar-toolbar">
-        <div class="calendar-nav">
-          <button id="calendarPrev" type="button" aria-label="Jornada anterior">‹</button>
-          <label class="calendar-week-label" for="calendarWeek">Jornada</label>
-          <input id="calendarWeek" class="calendar-week-input" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Número de jornada">
-          <button id="calendarGo" type="button" class="primary">Ver</button>
-          <button id="calendarNext" type="button" aria-label="Jornada siguiente">›</button>
-        </div>
-        <button id="calendarRefresh" class="calendar-refresh" type="button" aria-label="Actualizar calendario" title="Actualizar calendario">↻ Actualizar</button>
-        <span class="calendar-current">LALIGA · Temporada actual</span>
-      </div>
-      <div id="calendarStatus" class="calendar-status" role="status" aria-live="polite">Elige una jornada para consultar sus partidos.</div>
-      <div id="calendarContent">
-        <div class="calendar-empty">Selecciona una jornada para cargar sus partidos.</div>
-      </div>
-      <div class="calendar-route-note">Datos consultados desde <code>/v1/competition/1/calendar?weekNumber={week}</code>.</div>
-    </div>
   </section>
 
   <section id="create-team" class="section">
@@ -617,7 +585,6 @@ main.wrap{padding-bottom:96px!important}
 <nav class="bottom-nav" aria-label="Navegación principal">
   <button class="active" data-section="home"><span class="ico">♜</span><span>Inicio</span></button>
   <button data-section="teams"><span class="ico">▦</span><span>Equipos</span></button>
-  <button data-section="calendar"><span class="ico">▤</span><span>Calendario</span></button>
   <button data-section="create-team"><span class="ico">⚽</span><span>Plantilla</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
   <button data-section="forgotten"><span class="ico">!</span><span>Olvidados</span></button>
@@ -920,7 +887,6 @@ async function loadTeams(){
     localStorage.setItem("lf_teams_cache_v1",JSON.stringify({ts:Date.now(),data:teams.map(t=>t.raw)}));
     if(players||forgottenPlayers.length){const raw=[...(players||[]),...forgottenPlayers].map(x=>x.raw);players=normalizePlayers(raw);renderSearch();renderBestPlayers();renderForgotten()}
     renderTeams();setTeamsState("ok",teams.length+" equipos cargados");
-    if(calendarRawData!==null&&calendarLoadedWeek!==null)renderCalendar(calendarRawData,calendarLoadedWeek);
   }catch(e){
     try{const saved=localStorage.getItem("lf_teams_cache_v1");if(saved){teams=normalizeTeams(JSON.parse(saved).data);renderTeams();setTeamsState("ok","Equipos desde caché");return}}catch{}
     setTeamsState("bad","No se pudieron cargar los equipos");
@@ -980,11 +946,6 @@ async function loadCurrentWeek(){
       if(!r.ok)throw Error("HTTP "+r.status);
       const raw=await r.json();
       renderCurrentWeek(raw);
-      const detectedWeek=Number(currentWeekScalar(raw,["weekNumber","week","number","currentWeekNumber","currentWeek"]));
-      if(Number.isInteger(detectedWeek)&&detectedWeek>0&&!calendarUserSelected){
-        $("calendarWeek").value=String(detectedWeek);
-        if($("calendar").classList.contains("active"))loadCalendar(detectedWeek,true);
-      }
     }catch(e){
       badge.textContent="No disponible";
       meta.innerHTML='<div class="current-week-error">No se ha podido cargar la jornada actual.</div>';
@@ -994,185 +955,6 @@ async function loadCurrentWeek(){
   return currentWeekLoading;
 }
 
-
-// ===== Calendario por jornada =====
-let calendarLoading=null,calendarLoadingWeek=null,calendarRequestId=0;
-let calendarLoadedWeek=null,calendarRawData=null,calendarUserSelected=false;
-function calendarItems(raw,depth=0){
-  if(Array.isArray(raw))return raw.filter(x=>obj(x));
-  if(!obj(raw)||depth>5)return [];
-  for(const key of ["matches","fixtures","calendar","events","games","matchesList","items","results","data","content"]){
-    if(Array.isArray(raw[key]))return raw[key].filter(x=>obj(x));
-  }
-  for(const key of ["data","content","result","response","calendar","competition"]){
-    if(obj(raw[key])){const found=calendarItems(raw[key],depth+1);if(found.length)return found}
-  }
-  return [];
-}
-function calendarDateValue(match){return first(match,["matchDate","date","kickoffDate","startDate","dateTime","datetime","scheduledAt"])}
-function calendarDateObject(value){
-  if(value===null||value===undefined||value==="")return null;
-  let v=value;
-  if(typeof v==="number")v=new Date(Math.abs(v)<1e12?v*1000:v);
-  else if(typeof v==="string"){
-    const simple=v.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if(simple)v=new Date(Number(simple[1]),Number(simple[2])-1,Number(simple[3]));
-    else v=new Date(v);
-  }
-  const d=v instanceof Date?v:new Date(v);
-  return Number.isNaN(d.getTime())?null:d;
-}
-function calendarDayInfo(match){
-  const value=match?.matchDate??match?.date??calendarDateValue(match);
-  const d=calendarDateObject(value);
-  if(d){
-    const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-    const label=d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-    return {key,label,sort:d.getTime()};
-  }
-  const label=value?String(value):"Fecha por confirmar";
-  return {key:label,label,sort:Number.MAX_SAFE_INTEGER};
-}
-function calendarMatchTimestamp(match){
-  const dateValue=match?.date??match?.matchDate??calendarDateValue(match);
-  const date=calendarDateObject(dateValue);
-  const time=match?.time;
-  if(date&&typeof time==="string"){
-    const tm=time.trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-    const dateHasTime=typeof dateValue==="string"&&/[T ]\d{1,2}:\d{2}/.test(dateValue);
-    if(tm&&!dateHasTime){date.setHours(Number(tm[1]),Number(tm[2]),Number(tm[3]||0),0)}
-  }
-  if(date)return date.getTime();
-  const t=calendarDateObject(time);
-  return t?t.getTime():Number.MAX_SAFE_INTEGER;
-}
-function calendarTimeText(match){
-  const raw=match?.time;
-  if(raw!==null&&raw!==undefined&&raw!==""){
-    const s=String(raw).trim();
-    const tm=s.match(/(?:T|\s)?(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(tm)return String(tm[1]).padStart(2,"0")+":"+tm[2];
-    const d=calendarDateObject(raw);
-    if(d&&typeof raw!=="string")return d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit",hour12:false});
-    return s;
-  }
-  const rawDate=match?.date??match?.matchDate;
-  if(typeof rawDate==="string"){
-    const tm=rawDate.match(/[T ](\d{1,2}):(\d{2})/);
-    if(tm)return String(tm[1]).padStart(2,"0")+":"+tm[2];
-  }
-  return "Por confirmar";
-}
-function calendarScore(v){return v!==null&&v!==undefined&&v!==""&&Number.isFinite(Number(v))?String(Number(v)):null}
-function calendarLogoFrom(source){
-  if(!obj(source))return null;
-  const keys=["logoUrl","logo","imageUrl","image","badgeUrl","badge","badgeWhite","shield","crestUrl","crest","teamLogo","teamLogoUrl","icon"];
-  for(const key of keys){
-    const value=source[key];
-    if(typeof value==="string"&&/^(https?:\/\/|\/|data:image\/)/i.test(value))return value;
-    if(obj(value)){
-      for(const sub of ["url","src","href","default","small","medium","large","original"]){
-        const nested=value[sub];
-        if(typeof nested==="string"&&/^(https?:\/\/|\/|data:image\/)/i.test(nested))return nested;
-      }
-    }
-  }
-  const images=source.images;
-  if(obj(images)){
-    for(const group of Object.values(images)){
-      if(typeof group==="string"&&/^(https?:\/\/|\/|data:image\/)/i.test(group))return group;
-      if(obj(group))for(const value of Object.values(group))if(typeof value==="string"&&/^(https?:\/\/|\/|data:image\/)/i.test(value))return value;
-    }
-  }
-  return null;
-}
-function calendarTeamFor(match,side){
-  const idValue=match?.[side+"Id"];
-  const nestedKeys=side==="local"?["localTeam","homeTeam","local","home"]:["visitorTeam","awayTeam","visitor","away"];
-  const nested=(obj(idValue)?idValue:null)||first(match,nestedKeys);
-  const id=obj(idValue)?first(idValue,["id","teamId","team_id"]):idValue;
-  const team=teams?.find(t=>id!==null&&id!==undefined&&String(t.id)===String(id));
-  const name=team?.name||first(nested,["name","fullName","teamName","shortName","short_name"])||first(match,side==="local"?["localName","localTeamName","homeName","homeTeamName"]:["visitorName","visitorTeamName","awayName","awayTeamName"])||(id!==null&&id!==undefined?"Equipo "+id:(side==="local"?"Equipo local":"Equipo visitante"));
-  const logo=teamLogo(team)||calendarLogoFrom(nested)||calendarLogoFrom(match?.[side+"Team"]);
-  return {id,name:String(name),logo};
-}
-function calendarStatusText(match,hasScores){
-  const raw=first(match,["status","matchStatus","state","phase"]);
-  if(raw){
-    const key=String(raw).toLowerCase();
-    const map={scheduled:"Programado",not_started:"Programado",pending:"Pendiente",finished:"Finalizado",played:"Finalizado",live:"En directo",in_progress:"En juego",postponed:"Aplazado",cancelled:"Cancelado",canceled:"Cancelado"};
-    return map[key]||String(raw);
-  }
-  return hasScores?"Marcador":"Por jugar";
-}
-function renderCalendar(raw,week){
-  const box=$("calendarContent"),status=$("calendarStatus");
-  if(!box||!status)return;
-  const matches=calendarItems(raw).map(match=>({match,day:calendarDayInfo(match),timestamp:calendarMatchTimestamp(match),local:calendarTeamFor(match,"local"),visitor:calendarTeamFor(match,"visitor")}));
-  matches.sort((a,b)=>a.timestamp-b.timestamp||a.day.key.localeCompare(b.day.key)||a.local.name.localeCompare(b.local.name,"es"));
-  if(!matches.length){
-    box.innerHTML='<div class="calendar-week-head"><div><div class="calendar-week-title">Jornada '+esc(week)+'</div><div class="calendar-week-subtitle">Partidos de la jornada seleccionada</div></div><div class="calendar-count">0 partidos</div></div><div class="calendar-empty">La API no ha devuelto partidos para esta jornada.</div>';
-    status.textContent="Jornada "+week+" · no hay partidos disponibles en la respuesta.";
-    return;
-  }
-  const groups=[];
-  for(const item of matches){
-    let group=groups.find(g=>g.key===item.day.key);
-    if(!group){group={key:item.day.key,label:item.day.label,items:[]};groups.push(group)}
-    group.items.push(item);
-  }
-  const dayMarkup=groups.map(group=>'<section class="calendar-day"><div class="calendar-day-head"><span class="calendar-day-name">'+esc(group.label)+'</span><span class="calendar-day-date">'+group.items.length+' partido'+(group.items.length===1?'':'s')+'</span></div>'+group.items.map(item=>{
-    const m=item.match,localScore=calendarScore(m.localScore),visitorScore=calendarScore(m.visitorScore),hasScores=localScore!==null||visitorScore!==null;
-    const scoreMarkup=hasScores?'<span>'+esc(localScore??"—")+'</span><span>'+esc(visitorScore??"—")+'</span>':'<span class="scheduled">—</span><span class="scheduled">—</span>';
-    const localLogo=item.local.logo?'<img class="calendar-team-logo" src="'+esc(item.local.logo)+'" alt="Escudo de '+esc(item.local.name)+'" loading="lazy">':'<div class="calendar-team-logo" aria-hidden="true"></div>';
-    const visitorLogo=item.visitor.logo?'<img class="calendar-team-logo" src="'+esc(item.visitor.logo)+'" alt="Escudo de '+esc(item.visitor.name)+'" loading="lazy">':'<div class="calendar-team-logo" aria-hidden="true"></div>';
-    return '<article class="calendar-match"><div class="calendar-time">'+esc(calendarTimeText(m))+'</div><div class="calendar-teams"><div class="calendar-team-row">'+localLogo+'<span class="calendar-team-name" title="'+esc(item.local.name)+'">'+esc(item.local.name)+'</span></div><div class="calendar-team-row">'+visitorLogo+'<span class="calendar-team-name" title="'+esc(item.visitor.name)+'">'+esc(item.visitor.name)+'</span></div></div><div class="calendar-score">'+scoreMarkup+'<div class="calendar-status-pill">'+esc(calendarStatusText(m,hasScores))+'</div></div></article>';
-  }).join('')+'</section>').join('');
-  box.innerHTML='<div class="calendar-week-head"><div><div class="calendar-week-title">Jornada '+esc(week)+'</div><div class="calendar-week-subtitle">Partidos ordenados por fecha y hora</div></div><div class="calendar-count">'+matches.length+' partido'+(matches.length===1?'':'s')+'</div></div><div class="calendar-list">'+dayMarkup+'</div>';
-  status.textContent="Jornada "+week+" · calendario cargado.";
-}
-async function loadCalendar(weekValue,force=false){
-  const parsed=Number(weekValue),week=Number.isInteger(parsed)&&parsed>0?parsed:1;
-  const input=$("calendarWeek"),status=$("calendarStatus"),box=$("calendarContent");
-  if(!input||!status||!box)return;
-  input.value=String(week);
-  if(calendarLoading&&calendarLoadingWeek===week&&!force)return calendarLoading;
-  const requestId=++calendarRequestId;
-  calendarLoadingWeek=week;
-  status.textContent="Cargando los partidos de la jornada "+week+"…";
-  box.innerHTML='<div class="calendar-empty">Consultando el calendario…</div>';
-  const task=(async()=>{
-    try{
-      const path="/v1/competition/1/calendar?weekNumber="+encodeURIComponent(week);
-      const response=await fetch(API+"?path="+encodeURIComponent(path),{headers:{Accept:"application/json"},cache:"no-store"});
-      if(!response.ok)throw Error("HTTP "+response.status);
-      const raw=await response.json();
-      if(requestId!==calendarRequestId)return;
-      calendarRawData=raw;calendarLoadedWeek=week;
-      renderCalendar(raw,week);
-    }catch(error){
-      if(requestId!==calendarRequestId)return;
-      box.innerHTML='<div class="calendar-error">No se pudo cargar el calendario de la jornada '+esc(week)+'. '+esc(error?.message||"Error desconocido")+'. Comprueba la conexión con la API e inténtalo de nuevo.</div>';
-      status.textContent="Error al consultar la jornada "+week+".";
-    }finally{
-      if(requestId===calendarRequestId){calendarLoading=null;calendarLoadingWeek=null}
-    }
-  })();
-  calendarLoading=task;
-  return task;
-}
-function calendarChangeWeek(delta){
-  calendarUserSelected=true;
-  const current=Number($("calendarWeek").value)||1;
-  const next=Math.max(1,Math.floor(current)+delta);
-  loadCalendar(next,true);
-}
-$("calendarPrev").onclick=()=>calendarChangeWeek(-1);
-$("calendarNext").onclick=()=>calendarChangeWeek(1);
-$("calendarGo").onclick=()=>{calendarUserSelected=true;loadCalendar($("calendarWeek").value,true)};
-$("calendarRefresh").onclick=()=>{calendarUserSelected=true;loadCalendar($("calendarWeek").value,true)};
-$("calendarWeek").addEventListener("change",()=>{calendarUserSelected=true;loadCalendar($("calendarWeek").value,true)});
-$("calendarWeek").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();calendarUserSelected=true;loadCalendar($("calendarWeek").value,true)}});
 
 // ===== Crear Plantilla =====
 const LINEUP_STORAGE_KEY="lf_lineup_442_v1";
@@ -1704,10 +1486,6 @@ document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
   const bb=document.querySelector('.bottom-nav [data-section="'+b.dataset.section+'"]');if(bb)bb.classList.add("active");
   document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
   $(b.dataset.section).classList.add("active");
-  if(b.dataset.section==="calendar"){
-    const week=Number($("calendarWeek").value)||1;
-    if(calendarLoadedWeek!==week)loadCalendar(week);
-  }
 });
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
