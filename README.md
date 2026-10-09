@@ -1,42 +1,55 @@
-# LALIGA Fantasy API Explorer
+# LALIGA Fantasy — Explorador público y panel de cuenta
 
-Aplicación web estática desplegada en Vercel con funciones Node.js para consultar datos públicos de LALIGA Fantasy.
+Aplicación estática desplegada en Vercel con funciones Node.js. Los tokens de LALIGA se conservan en cookies `HttpOnly`; no se entregan al JavaScript del navegador.
 
 ## Despliegue
 
 1. Importa este repositorio en Vercel.
-2. No hace falta un comando de build.
+2. No hace falta comando de build.
 3. Despliega y abre la URL que proporciona Vercel.
 
-Arquitectura de datos públicos:
+## Explorador público
 
-`Navegador → /api/laliga → función Vercel → fantasy-api.llt-services.com/api`
+El buscador público consulta endpoints permitidos a través de `/api/laliga`:
 
-La ruta `/api/laliga` mantiene una lista permitida de endpoints públicos de solo lectura. No acepta rutas arbitrarias ni reenvía cabeceras de autenticación a LALIGA.
+`Navegador → /api/laliga → fantasy-api.llt-services.com/api`
+
+Esta ruta es de solo lectura y limita los endpoints públicos permitidos.
 
 ## Inicio de sesión con Google
 
-El botón usa el flujo de autorización de LALIGA B2C con Authorization Code + PKCE. No se solicita ni se almacena la contraseña de Google o de LALIGA.
+El botón usa Authorization Code + PKCE mediante LALIGA B2C. No pide ni guarda la contraseña de Google o de LALIGA.
 
-Como la URI de retorno registrada por el cliente nativo es `authredirect://com.lfp.laligafantasy`, el navegador puede no poder abrirla como una página web. El flujo implementado resuelve ese caso así:
+1. Pulsa **Continuar con Google** y completa el acceso oficial.
+2. En la pestaña de autenticación abre **F12 → Red/Network → Todas**. Localiza la redirección `authredirect://com.lfp.laligafantasy`.
+3. Copia la cabecera completa `Location` (o la URL completa de la solicitud al esquema personalizado), pégala en el formulario y pulsa **Completar login**.
+4. El servidor valida `state`, canjea el código con el `code_verifier` original y comprueba la cuenta con `GET /v4/user/me`.
 
-1. Pulsa **Continuar con Google** y completa el inicio de sesión en la página oficial de LALIGA.
-2. En las herramientas del navegador abre **Red/Network → Todas** y localiza la redirección `authredirect://com.lfp.laligafantasy`. Copia la cabecera completa `Location` de esa respuesta. Si no aparece, copia la URL de la solicitud del esquema personalizado.
-3. Pega la URL completa en el formulario. Debe incluir `code` y `state`; una URL abreviada o un código ya utilizado no sirve.
-4. El servidor comprueba el estado, utiliza el `code_verifier` guardado para ese intento y canjea el código en `login.laliga.es`.
-5. Antes de confirmar el login, valida la sesión consultando `GET /v4/user/me` en la API de Fantasy.
+La URL de redirección contiene un código de un solo uso. No la publiques ni la envíes en chats. Si el código caduca, vuelve a empezar el login.
 
-Cada intento PKCE caduca a los 15 minutos y el código de autorización es de un solo uso. Si falla o caduca, vuelve a iniciar el proceso desde el principio. Nunca pegues códigos, tokens ni cookies en incidencias, capturas públicas o chats.
+## Panel privado: Mis Ligas
 
-### Cookies y sesiones
+Una vez iniciada la sesión, la sección **Mis Ligas** permite:
 
-Los valores temporales PKCE y los tokens se guardan en cookies `Secure`, `HttpOnly` y con `SameSite` restrictivo. La cookie de sesión tiene el ámbito `/api/auth`; el token no se devuelve en JSON, ni se guarda en `localStorage` o `sessionStorage`, ni queda disponible para el JavaScript de la interfaz. Como Vercel ejecuta funciones sin memoria de sesión persistente compartida, esta versión conserva el token en una cookie HttpOnly del navegador, en lugar de prometer una sesión en memoria del servidor. La ruta de estado intenta renovar la sesión con el refresh token cuando es necesario; la renovación debe considerarse provisional hasta probarla con una cuenta real.
+- Consultar las ligas de la cuenta.
+- Abrir la clasificación y acceder a la plantilla de cada equipo/manager.
+- Ver la alineación disponible del equipo desde la pantalla de plantilla.
+- Consultar el mercado de una liga en modo solo lectura.
+- Consultar la actividad de liga desde la ruta paginada inicial.
 
-## Alcance actual y seguridad
+Las rutas privadas se procesan a través de `/api/auth?path=...`, con una lista permitida explícita y peticiones exclusivamente GET. El token no se pasa al navegador ni al endpoint público `/api/laliga`. El servidor intenta renovar tokens cuando se aproximan a su caducidad, pero la renovación requiere pruebas periódicas contra LALIGA.
 
-- La autenticación identifica y verifica la cuenta; no implementa todavía un proxy general para los endpoints privados de ligas, mercado o plantilla.
-- El explorador público sigue siendo de solo lectura.
-- No hay operaciones de compra, puja, venta, cláusula ni alineación habilitadas.
-- No habilites endpoints privados ni operaciones de escritura sin validar por separado el flujo y añadir confirmaciones explícitas por acción.
+### Estado de verificación
 
-URL de la aplicación: https://fantasy-xi-eight.vercel.app/
+El documento técnico de referencia reporta como comprobadas con cuenta real las lecturas de usuario, ligas, clasificación y plantilla. Las rutas de mercado, actividad y alineación proceden del código de referencia de la comunidad y pueden variar o no estar disponibles para todas las cuentas. La interfaz muestra errores si LALIGA rechaza alguna de ellas.
+
+No se habilitan pujas, compras, ventas, ofertas, cláusulas, blindajes ni cambios de alineación. Esas operaciones modifican el estado de una liga y deben verificarse por separado y requerir confirmación explícita por acción.
+
+## Seguridad y arquitectura
+
+- Los tokens de sesión y los refresh tokens se guardan en cookies `Secure`, `HttpOnly` y con `SameSite` restrictivo, con ámbito `/api/auth`.
+- El proxy privado permite solo rutas de lectura concretas de la competición 1.
+- La interfaz no guarda la respuesta privada en `localStorage`; los datos privados se mantienen en memoria y se borran al cerrar sesión o cuando la sesión deja de ser válida.
+- Si LALIGA responde 401, vuelve a iniciar sesión. No reutilices códigos o tokens de otra sesión.
+
+Aplicación: https://fantasy-xi-eight.vercel.app/
