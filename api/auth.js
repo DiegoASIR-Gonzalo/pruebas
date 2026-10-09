@@ -319,6 +319,100 @@ async function handleStatus(req, res) {
   });
 }
 
+const PRIVATE_READ_ALLOWLIST = [
+  /^\/v4\/user\/me$/,
+  /^\/v1\/competition\/1\/leagues$/,
+  /^\/v1\/competition\/1\/leagues\/[A-Za-z0-9_-]+\/standing$/,
+  /^\/v1\/competition\/1\/leagues\/[A-Za-z0-9_-]+\/standing\/\d+$/,
+  /^\/v1\/competition\/1\/leagues\/[A-Za-z0-9_-]+\/teams\/[A-Za-z0-9_-]+$/,
+  /^\/v1\/competition\/1\/leagues\/[A-Za-z0-9_-]+\/activity\/\d+$/,
+  /^\/v1\/competition\/1\/teams\/[A-Za-z0-9_-]+\/money$/,
+  /^\/v1\/competition\/1\/teams\/[A-Za-z0-9_-]+\/lineup$/,
+  /^\/v1\/competition\/1\/teams\/[A-Za-z0-9_-]+\/lineup\/week\/\d+$/,
+  /^\/v1\/competition\/1\/league\/[A-Za-z0-9_-]+\/market$/,
+  /^\/v1\/competition\/1\/league\/[A-Za-z0-9_-]+\/playerTeam\/[A-Za-z0-9_-]+\/offer$/,
+  /^\/v1\/competition\/1\/player\/[A-Za-z0-9_-]+\/league\/[A-Za-z0-9_-]+$/,
+  /^\/v1\/competition\/1\/league\/[A-Za-z0-9_-]+\/player-team\/[A-Za-z0-9_-]+\/check-shield$/,
+  /^\/v1\/competition\/1\/league\/[A-Za-z0-9_-]+\/team\/[A-Za-z0-9_-]+\/check-daily-reward$/
+];
+
+function privateReadAllowed(path) {
+  return PRIVATE_READ_ALLOWLIST.some(function (rule) { return rule.test(path); });
+}
+
+async function requestFantasyRead(path, token) {
+  const url = new URL(API_BASE + path);
+  url.searchParams.set("x-lang", "es");
+  const response = await fetch(url, {
+    method: "GET",
+    headers: fantasyHeaders(token),
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000)
+  });
+  const text = await response.text();
+  return {
+    status: response.status,
+    contentType: response.headers.get("content-type") || "application/json; charset=utf-8",
+    text: text
+  };
+}
+
+async function handlePrivateRead(req, res) {
+  const pathValue = req.query && req.query.path;
+  const path = Array.isArray(pathValue) ? pathValue[0] : pathValue;
+  if (typeof path !== "string" || path.length > 400 || path.includes("?") || !path.startsWith("/") || !privateReadAllowed(path)) {
+    return json(res, 403, { error: "Endpoint privado no permitido o ruta no válida." });
+  }
+
+  const jar = parseCookies(req.headers.cookie);
+  let token = jar[SESSION_COOKIE] || "";
+  let refreshToken = jar[REFRESH_COOKIE] || "";
+  let didRefresh = false;
+  let refreshAge = DEFAULT_REFRESH_COOKIE_AGE;
+  if (!token) return json(res, 401, { error: "Inicia sesión con Google para consultar tus ligas." });
+
+  if (!tokenExpiry(token) || tokenExpiry(token) <= Date.now() + 120000) {
+    if (!refreshToken) {
+      res.setHeader("Set-Cookie", clearSessionCookies());
+      return json(res, 401, { error: "La sesión ha caducado. Vuelve a iniciar sesión." });
+    }
+    const renewed = await refreshSession(refreshToken);
+    if (!renewed) {
+      res.setHeader("Set-Cookie", clearSessionCookies());
+      return json(res, 401, { error: "La sesión ha caducado. Vuelve a iniciar sesión." });
+    }
+    token = renewed.token;
+    refreshToken = renewed.refreshToken;
+    refreshAge = renewed.refreshAge;
+    didRefresh = true;
+  }
+
+  let result = await requestFantasyRead(path, token);
+  if (result.status === 401 && refreshToken && !didRefresh) {
+    const renewed = await refreshSession(refreshToken);
+    if (renewed) {
+      token = renewed.token;
+      refreshToken = renewed.refreshToken;
+      refreshAge = renewed.refreshAge;
+      didRefresh = true;
+      result = await requestFantasyRead(path, token);
+    }
+  }
+
+  if (didRefresh && result.status !== 401) {
+    res.setHeader("Set-Cookie", sessionCookieHeaders(token, refreshToken, refreshAge));
+  }
+  if (result.status === 401) {
+    res.setHeader("Set-Cookie", clearSessionCookies());
+    return json(res, 401, { error: "LALIGA ha rechazado la sesión. Vuelve a iniciar sesión." });
+  }
+
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Content-Type", result.contentType);
+  return res.status(result.status).end(result.text);
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET" && req.query && req.query.provider === "google") {
     const state = randomUrlSafe(24);
@@ -350,8 +444,13 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
+      if (req.query && req.query.path !== undefined) return await handlePrivateRead(req, res);
       return await handleStatus(req, res);
     } catch (error) {
+      const pathValue = req.query && req.query.path;
+      if (pathValue !== undefined) {
+        return json(res, 502, { error: "No se pudo consultar LALIGA Fantasy. Inténtalo de nuevo." });
+      }
       return json(res, 502, {
         authenticated: false,
         error: "No se pudo comprobar la sesión con LALIGA Fantasy."
