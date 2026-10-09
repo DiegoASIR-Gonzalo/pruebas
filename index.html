@@ -632,32 +632,22 @@ main.wrap{padding-bottom:96px!important}
     <div class="auth-box">
       <div id="loginPanel">
         <h2>Inicia sesión</h2>
-        <p>Elige cómo entras normalmente en LALIGA Fantasy.</p>
+        <p>Conéctate con la cuenta que usas en LALIGA Fantasy. La autenticación ocurre en la página oficial.</p>
         <div class="login-choice" id="loginChoices">
           <button type="button" id="googleLogin" class="google-login"><span class="google-mark">G</span>Continuar con Google</button>
-          <div class="login-divider"><span>o</span></div>
-          <button type="button" id="emailLoginChoice" class="choice-secondary">Iniciar sesión con correo electrónico</button>
         </div>
         <div id="googleFlow" class="google-flow hidden">
-          <div class="google-step"><b>1.</b><span>Abre el login oficial de LALIGA y entra con Google.</span></div>
-          <div class="google-step"><b>2.</b><span>En <strong>Network/Red → All/Todas</strong> (no solo Fetch/XHR), busca <code>authredirect://com.lfp.laligafantasy</code>. Puede aparecer como <strong>(canceled)/(cancelada)</strong>; es normal porque el navegador no puede abrir ese protocolo.</span></div>
-          <div class="google-step"><b>3.</b><span>Selecciona esa línea aunque figure como cancelada y copia la <strong>Request URL</strong> completa. Debe contener <code>code=...</code> y normalmente también <code>state=...</code>.</span></div>
-          <input id="googleCode" autocomplete="off" placeholder="authredirect://com.lfp.laligafantasy?code=…&state=…">
+          <div class="google-step"><b>1.</b><span>Se abrirá el inicio de sesión oficial de LALIGA. Elige Google y completa el acceso normalmente.</span></div>
+          <div class="google-step"><b>2.</b><span>Cuando termine, abre <strong>F12 → Red/Network → Todas</strong> en la pestaña del login. Busca una solicitud que empiece por <code>authredirect://com.lfp.laligafantasy</code>; puede aparecer como cancelada.</span></div>
+          <div class="google-step"><b>3.</b><span>En esa solicitud, abre <strong>Cabeceras/Headers</strong> y copia el valor completo de <strong>Location</strong> si aparece. Si no, copia la <strong>Request URL</strong> de la solicitud <code>authredirect://</code>. La URL debe llevar <code>code=</code> y <code>state=</code>; no copies tokens.</span></div>
+          <input id="googleCode" autocomplete="off" spellcheck="false" placeholder="Pega aquí la URL authredirect completa">
           <div class="auth-actions">
             <button type="button" id="cancelGoogleFlow">← Volver</button>
             <button type="button" class="primary" id="completeGoogle">Completar login</button>
           </div>
           <div id="googleState" class="auth-state"></div>
         </div>
-        <form id="loginForm" class="auth-form hidden">
-          <input id="loginEmail" type="email" autocomplete="username" placeholder="Correo electrónico" required>
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required>
-          <div class="auth-actions">
-            <button type="button" id="backLoginChoices">← Volver</button>
-            <button type="submit" class="primary" id="loginSubmit">Entrar</button>
-          </div>
-        </form>
-        <div class="auth-note">Con Google se abre el flujo oficial de autenticación de LALIGA. La contraseña solo se solicita en el formulario de correo y no se guarda en el navegador.</div>
+        <div class="auth-note">No te pedimos ni guardamos tu contraseña. El código se canjea en el servidor y no se muestra al JavaScript de la página.</div>
         <div id="loginState" class="auth-state"></div>
       </div>
       <div id="sessionPanel" style="display:none">
@@ -1658,7 +1648,8 @@ function setAuthUi(data){
   $("sessionPanel").style.display=logged?"block":"none";
   if(logged){
     const exp=data.expiresAt?new Date(data.expiresAt).toLocaleString("es-ES"):"desconocida";
-    $("sessionInfo").textContent="Sesión reconocida. Caducidad aproximada: "+exp;
+    const manager=typeof data.managerName==="string"&&data.managerName.trim()?data.managerName.trim():null;
+    $("sessionInfo").textContent=(manager?"Cuenta: "+manager+". ":"Sesión reconocida. ")+"Caducidad aproximada: "+exp;
   }
 }
 function showAuth(){
@@ -1669,13 +1660,11 @@ $("authButton").onclick=showAuth;
 $("googleLogin").onclick=()=>{
   const state=$("googleState");
   const popup=window.open("/api/auth?provider=google","_blank");
-  $("loginChoices").classList.add("hidden");$("emailLoginChoice").classList.add("hidden");$("googleLogin").classList.add("hidden");$("googleFlow").classList.remove("hidden");
+  $("loginChoices").classList.add("hidden");$("googleLogin").classList.add("hidden");$("googleFlow").classList.remove("hidden");
   state.className="auth-state show";
-  state.textContent=popup?"Se ha abierto el login oficial de LALIGA en otra pestaña.":"El navegador bloqueó la pestaña nueva; permite ventanas emergentes y vuelve a pulsar el botón.";
+  state.textContent=popup?"Se ha abierto el login oficial. Termina el acceso con Google y después pega aquí la URL de redirección completa.":"El navegador bloqueó la pestaña nueva; permite ventanas emergentes y vuelve a pulsar el botón.";
 };
-$("emailLoginChoice").onclick=()=>{$("loginForm").classList.remove("hidden");$("emailLoginChoice").classList.add("hidden");$("googleLogin").classList.add("hidden");$("loginState").className="auth-state";$("loginState").textContent=""};
-$("backLoginChoices").onclick=()=>{$("loginForm").classList.add("hidden");$("emailLoginChoice").classList.remove("hidden");$("googleLogin").classList.remove("hidden");$("loginState").className="auth-state";$("loginState").textContent=""};
-$("cancelGoogleFlow").onclick=()=>{$("googleFlow").classList.add("hidden");$("loginChoices").classList.remove("hidden");$("emailLoginChoice").classList.remove("hidden");$("googleLogin").classList.remove("hidden");$("googleCode").value="";$("googleState").className="auth-state";$("googleState").textContent=""};
+$("cancelGoogleFlow").onclick=()=>{$("googleFlow").classList.add("hidden");$("loginChoices").classList.remove("hidden");$("googleLogin").classList.remove("hidden");$("googleCode").value="";$("googleState").className="auth-state";$("googleState").textContent=""};
 $("completeGoogle").onclick=async()=>{
   const input=$("googleCode").value.trim(),state=$("googleState"),btn=$("completeGoogle");
   if(!input){state.className="auth-state show error";state.textContent="Pega la URL authredirect completa o el código.";return}
@@ -1684,31 +1673,16 @@ $("completeGoogle").onclick=async()=>{
     const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},credentials:"same-origin",body:JSON.stringify({oauth:"google",redirect:input})});
     const data=await r.json().catch(()=>({}));
     if(!r.ok)throw Error(data.error||("HTTP "+r.status));
-    state.className="auth-state show good";state.textContent="Google autenticado. Sesión LALIGA creada.";
+    state.className="auth-state show good";state.textContent="Cuenta de LALIGA verificada. Sesión iniciada correctamente.";
     $("googleCode").value="";setAuthUi(data);
   }catch(e){state.className="auth-state show error";state.textContent=e.message||"No se pudo completar el login con Google."}
   finally{btn.disabled=false}
 };
 $("closeAuth").onclick=()=>{$("authModal").classList.add("hidden");$("authModal").setAttribute("aria-hidden","true")};
 $("authModal").onclick=e=>{if(e.target===$("authModal"))$("closeAuth").click()};
-$("loginForm").onsubmit=async e=>{
-  e.preventDefault();
-  const btn=$("loginSubmit"),state=$("loginState");
-  state.className="auth-state show";state.textContent="Comprobando credenciales…";btn.disabled=true;
-  try{
-    const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email:$("loginEmail").value,password:$("loginPassword").value}),credentials:"same-origin"});
-    const data=await r.json().catch(()=>({}));
-    if(!r.ok)throw Error(data.error||("HTTP "+r.status));
-    $("loginPassword").value="";
-    state.className="auth-state show good";state.textContent="Inicio de sesión correcto.";
-    setAuthUi(data);
-  }catch(err){
-    state.className="auth-state show error";state.textContent=err.message||"No se pudo iniciar sesión.";
-  }finally{btn.disabled=false}
-};
 $("logoutButton").onclick=async()=>{
   await fetch("/api/auth",{method:"DELETE",credentials:"same-origin",cache:"no-store"}).catch(()=>{});
-  $("loginPassword").value="";setAuthUi({authenticated:false});
+  $("googleCode").value="";setAuthUi({authenticated:false});
   $("loginState").className="auth-state";$("loginState").textContent="";
 };
 
