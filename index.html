@@ -1740,14 +1740,368 @@ $("comparePlayerB")?.addEventListener("change",()=>{$("compareStatus").textConte
 
 function apiCard(ep){const c=document.createElement("article");c.className="api-card";c.innerHTML='<div class="api-head"><div class="api-name">'+esc(ep.name)+'</div><div class="api-desc">'+esc(ep.desc)+'</div></div><div class="api-body"><div class="api-route">'+esc(ep.path)+'</div>'+(ep.params.length?'<div class="api-row">'+ep.params.map(([k,l,p])=>'<input data-p="'+esc(k)+'" placeholder="'+esc(p)+'">').join(''):'')+'<button class="primary" data-go>Consultar</button></div><div class="api-result"></div></div>';c.querySelector("[data-go]").onclick=async()=>{const btn=c.querySelector("[data-go]"),r=c.querySelector(".api-result");try{let p=ep.path;for(const[k]of ep.params){const x=c.querySelector('[data-p="'+k+'"]');if(!x.value.trim())throw Error("Falta "+k);p=p.replace("{"+k+"}",encodeURIComponent(x.value.trim()))}const u=API+"?path="+encodeURIComponent(p.split("?")[0])+(p.includes("?")?"&"+p.split("?")[1]:"");btn.disabled=true;const rr=await fetch(u,{headers:{Accept:"application/json"},cache:"no-store"});const raw=await rr.text();if(!rr.ok)throw Error("HTTP "+rr.status+" · "+raw.slice(0,500));r.innerHTML='<pre>'+esc(JSON.stringify(JSON.parse(raw),null,2))+'</pre>'}catch(e){r.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}finally{btn.disabled=false}};return c}
 $("search").oninput=renderSearch;$("reload").onclick=()=>{localStorage.removeItem(CACHE_KEY);loadPlayers(true)};
+
+const PRIVATE_API_BASE="/v1/competition/1";
+const privateApiCache=new Map();
+let privateAuthState={authenticated:false};
+let selectedPrivateLeague=null;
+let selectedPrivateStanding=[];
+let selectedPrivateLeagueTab="standing";
+let selectedPrivateRosterTeam=null;
+
+function privateCollection(value,keys,depth=0){
+  if(Array.isArray(value))return value;
+  if(!value||typeof value!=="object"||depth>6)return [];
+  for(const key of keys||[]){
+    if(Array.isArray(value[key]))return value[key];
+    if(value[key]&&typeof value[key]==="object"){
+      const nested=privateCollection(value[key],keys,depth+1);
+      if(nested.length)return nested;
+    }
+  }
+  for(const v of Object.values(value)){
+    if(Array.isArray(v))return v;
+    if(v&&typeof v==="object"){
+      const nested=privateCollection(v,keys,depth+1);
+      if(nested.length)return nested;
+    }
+  }
+  return [];
+}
+function privateField(obj,keys){
+  if(!obj||typeof obj!=="object")return null;
+  for(const k of keys){
+    const v=obj[k];
+    if(v===undefined||v===null||v==="")continue;
+    if(typeof v==="object"){
+      const inner=privateField(v,["name","nickname","managerName","teamName","displayName","title","id","value"]);
+      if(inner!==null)return inner;
+      continue;
+    }
+    return v;
+  }
+  for(const nestedKey of ["team","manager","user","league","playerMaster","player","sellerTeam","owner"]){
+    const v=obj[nestedKey];
+    if(v&&typeof v==="object"){
+      const inner=privateField(v,keys);
+      if(inner!==null)return inner;
+    }
+  }
+  return null;
+}
+function privateId(obj,kind){
+  const keySets={
+    league:["leagueId","id","competitionLeagueId"],
+    team:["teamId","id","managerTeamId"],
+    player:["playerTeamId","id","playerId"]
+  };
+  const v=privateField(obj,keySets[kind]||["id"]);
+  return v===null?null:String(v);
+}
+function privateText(v,fallback="—"){
+  if(v===null||v===undefined||v==="")return fallback;
+  if(typeof v==="object")return fallback;
+  return String(v);
+}
+function privateMoney(value){
+  if(value===null||value===undefined||value==="")return "—";
+  const n=Number(String(value).replace(/[^\d.-]/g,""));
+  if(!Number.isFinite(n))return String(value);
+  return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n);
+}
+function privateDate(value){
+  if(!value)return "—";
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?String(value):d.toLocaleString("es-ES",{dateStyle:"short",timeStyle:"short"});
+}
+function privateErrorMessage(data,status){
+  return data?.error||data?.message||("LALIGA respondió con HTTP "+status+".");
+}
+function privateSetState(message,tone=""){
+  const el=$("myLeaguesState");
+  if(!el)return;
+  el.className="private-state"+(tone?" "+tone:"");
+  el.textContent=message||"";
+}
+function privateSetPanelState(message,tone=""){
+  const el=$("myLeaguePanelState");
+  if(!el)return;
+  el.className="private-state"+(tone?" "+tone:"");
+  el.textContent=message||"";
+}
+async function privateApi(path,force=false){
+  if(!force&&privateApiCache.has(path))return privateApiCache.get(path);
+  const response=await fetch("/api/auth?path="+encodeURIComponent(path),{
+    method:"GET",headers:{Accept:"application/json"},credentials:"same-origin",cache:"no-store"
+  });
+  const raw=await response.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}catch{data={message:raw.slice(0,350)}}
+  if(response.status===401){
+    privateAuthState={authenticated:false};
+    setAuthUi(privateAuthState);
+    $("myLeaguesLogin").classList.remove("hidden");
+    $("myLeaguesContent").classList.add("hidden");
+    throw Error(privateErrorMessage(data,response.status)||"Inicia sesión de nuevo.");
+  }
+  if(!response.ok)throw Error(privateErrorMessage(data,response.status));
+  privateApiCache.set(path,data);
+  return data;
+}
+function privateLeagueName(league){
+  return privateText(privateField(league,["leagueName","name","title","displayName","nickname"]),"Liga sin nombre");
+}
+function privateLeagueId(league){
+  return privateId(league,"league");
+}
+function privateRows(data,kind){
+  const keys=kind==="leagues"
+    ?["leagues","leagueList","items","results","data","content","entries"]
+    :kind==="standing"
+      ?["standing","standings","teams","ranking","classification","table","entries","items","results","data","content"]
+      :kind==="roster"
+        ?["players","teamPlayers","playerTeams","roster","squad","entries","items","results","data","content"]
+        :kind==="market"
+          ?["market","players","listings","marketPlayers","items","entries","results","data","content"]
+          :["activities","activity","movements","items","entries","results","data","content","history"];
+  return privateCollection(data,keys);
+}
+function showPrivateLogin(){
+  $("myLeaguesLogin").classList.remove("hidden");
+  $("myLeaguesContent").classList.add("hidden");
+  privateSetState("Inicia sesión para cargar los datos privados de tu cuenta.");
+}
+async function loadMyLeagues(force=false){
+  $("myLeaguesReload").disabled=true;
+  try{
+    privateSetState("Comprobando sesión…");
+    const authResponse=await fetch("/api/auth",{headers:{Accept:"application/json"},credentials:"same-origin",cache:"no-store"});
+    const authData=await authResponse.json().catch(()=>({authenticated:false}));
+    privateAuthState=authData;
+    setAuthUi(authData);
+    if(!authData.authenticated){showPrivateLogin();return}
+    $("myLeaguesLogin").classList.add("hidden");
+    $("myLeaguesContent").classList.remove("hidden");
+    if(force)privateApiCache.clear();
+    if(!force&&privateApiCache.has(PRIVATE_API_BASE+"/leagues")){
+      renderMyLeagueCards(privateRows(privateApiCache.get(PRIVATE_API_BASE+"/leagues"),"leagues"));
+      privateSetState("Sesión activa · Tus ligas están cargadas.","good");
+      return;
+    }
+    privateSetState("Cargando tus ligas…");
+    const data=await privateApi(PRIVATE_API_BASE+"/leagues",force);
+    const leagues=privateRows(data,"leagues");
+    renderMyLeagueCards(leagues);
+    privateSetState(leagues.length?"Se han cargado "+leagues.length+" liga(s) de tu cuenta.":"La API respondió, pero no se encontró una lista de ligas en la respuesta.",leagues.length?"good":"");
+  }catch(error){
+    const message=error?.message||"No se pudieron cargar tus ligas.";
+    privateSetState(message,"error");
+    if(!privateAuthState.authenticated)showPrivateLogin();
+  }finally{$("myLeaguesReload").disabled=false}
+}
+function renderMyLeagueCards(leagues){
+  const host=$("myLeagueCards");
+  $("myLeagueDetail").classList.add("hidden");
+  host.replaceChildren();
+  if(!leagues.length){
+    host.innerHTML='<div class="private-empty">No aparecen ligas en la respuesta. Comprueba que la cuenta de LALIGA tenga ligas activas.</div>';
+    return;
+  }
+  leagues.forEach((league,index)=>{
+    const id=privateLeagueId(league);
+    const status=privateField(league,["status","leagueType","type","competitionType"]);
+    const count=privateField(league,["teamCount","teamsCount","membersCount","numberOfTeams","totalTeams"]);
+    const owner=privateField(league,["ownerName","managerName","creatorName"]);
+    const meta=[status!==null?privateText(status):null,count!==null?privateText(count)+" equipos":null,owner!==null?"Creador: "+privateText(owner):null].filter(Boolean).join(" · ");
+    const card=document.createElement("button");
+    card.type="button";card.className="private-league-card";
+    card.innerHTML='<span class="private-league-name">'+esc(privateLeagueName(league))+'</span><span class="private-league-meta">'+esc(meta||"Abrir clasificación y mercado")+'</span>';
+    card.addEventListener("click",()=>openPrivateLeague(league));
+    if(id===null){card.disabled=true;card.title="Esta liga no devuelve un identificador reconocible."}
+    host.appendChild(card);
+  });
+}
+async function openPrivateLeague(league){
+  selectedPrivateLeague=league;
+  selectedPrivateStanding=[];
+  selectedPrivateRosterTeam=null;
+  $("myLeagueCards").classList.add("hidden");
+  $("myLeagueDetail").classList.remove("hidden");
+  $("myLeagueName").textContent=privateLeagueName(league);
+  const id=privateLeagueId(league);
+  $("myLeagueMeta").textContent="ID de liga: "+(id||"no disponible");
+  $("myLeagueRoster").classList.add("hidden");
+  $("myLeagueRoster").replaceChildren();
+  await switchPrivateLeagueTab("standing");
+}
+function closePrivateLeague(){
+  selectedPrivateLeague=null;
+  selectedPrivateStanding=[];
+  selectedPrivateRosterTeam=null;
+  $("myLeagueDetail").classList.add("hidden");
+  $("myLeagueCards").classList.remove("hidden");
+  privateSetPanelState("");
+}
+async function switchPrivateLeagueTab(tab){
+  if(!selectedPrivateLeague)return;
+  selectedPrivateLeagueTab=tab;
+  document.querySelectorAll("[data-private-tab]").forEach(b=>b.classList.toggle("active",b.dataset.privateTab===tab));
+  const panels={standing:"myStandingPanel",teams:"myTeamsPanel",market:"myMarketPanel",activity:"myActivityPanel"};
+  Object.entries(panels).forEach(([key,id])=>$(id).classList.toggle("hidden",key!==tab));
+  privateSetPanelState("");
+  try{
+    const leagueId=privateLeagueId(selectedPrivateLeague);
+    if(!leagueId)throw Error("La liga no contiene un identificador reconocible.");
+    if(tab==="standing"){
+      privateSetPanelState("Cargando clasificación…");
+      const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/standing");
+      selectedPrivateStanding=privateRows(data,"standing");
+      renderPrivateStanding(selectedPrivateStanding);
+      privateSetPanelState(selectedPrivateStanding.length?"Clasificación cargada.":"La API no devolvió filas de clasificación.",selectedPrivateStanding.length?"good":"");
+    }else if(tab==="teams"){
+      if(!selectedPrivateStanding.length){
+        privateSetPanelState("Cargando los equipos de la liga…");
+        const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/standing");
+        selectedPrivateStanding=privateRows(data,"standing");
+      }
+      renderPrivateLeagueTeams(selectedPrivateStanding);
+      privateSetPanelState(selectedPrivateStanding.length?"Selecciona un equipo para ver su plantilla.":"No se encontraron equipos en la clasificación.",selectedPrivateStanding.length?"good":"");
+    }else if(tab==="market"){
+      privateSetPanelState("Consultando el mercado de la liga…");
+      const data=await privateApi(PRIVATE_API_BASE+"/league/"+encodeURIComponent(leagueId)+"/market");
+      renderPrivateMarket(privateRows(data,"market"));
+      privateSetPanelState("Consulta de mercado completada.","good");
+    }else if(tab==="activity"){
+      privateSetPanelState("Cargando movimientos…");
+      const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/activity/0");
+      renderPrivateActivity(privateRows(data,"activity"));
+      privateSetPanelState("Consulta de movimientos completada.","good");
+    }
+  }catch(error){
+    const msg=error?.message||"No se pudo cargar esta sección.";
+    privateSetPanelState(msg,"error");
+    const host=tab==="standing"?$("myStandingPanel"):tab==="market"?$("myMarketContent"):tab==="activity"?$("myActivityContent"):null;
+    if(host)host.innerHTML='<div class="private-empty">'+esc(msg)+'</div>';
+  }
+}
+function renderPrivateStanding(rows){
+  const host=$("myStandingPanel");
+  if(!rows.length){host.innerHTML='<div class="private-empty">No hay filas para mostrar.</div>';return}
+  const html=rows.map((row,index)=>{
+    const teamId=privateId(row,"team");
+    const rank=privateField(row,["position","rank","ranking","place","standingPosition"])??(index+1);
+    const manager=privateField(row,["managerName","teamName","name","nickname","displayName","username","manager"]);
+    const points=privateField(row,["totalPoints","points","pointsTotal","score","totalScore","standingPoints","weekPoints"]);
+    const value=privateField(row,["teamValue","value","teamWorth"]);
+    const teamLabel=privateText(manager,teamId?"Equipo "+teamId:"Equipo");
+    return '<tr><td class="numeric">'+esc(rank)+'</td><td>'+esc(teamLabel)+'</td><td class="numeric">'+esc(points===null?"—":points)+'</td><td class="numeric">'+esc(value===null?"—":privateMoney(value))+'</td><td class="numeric">'+(teamId?'<button type="button" data-roster-team="'+esc(teamId)+'" data-roster-name="'+esc(teamLabel)+'">Ver</button>':'—')+'</td></tr>';
+  }).join("");
+  host.innerHTML='<div class="private-table-wrap"><table class="private-table"><thead><tr><th>#</th><th>Manager / equipo</th><th class="numeric">Puntos</th><th class="numeric">Valor plantilla</th><th class="numeric">Plantilla</th></tr></thead><tbody>'+html+'</tbody></table></div>';
+  host.querySelectorAll("[data-roster-team]").forEach(btn=>btn.addEventListener("click",()=>{
+    switchPrivateLeagueTab("teams").then(()=>loadPrivateRoster(btn.dataset.rosterTeam,btn.dataset.rosterName));
+  }));
+}
+function renderPrivateLeagueTeams(rows){
+  const host=$("myLeagueTeamList");
+  host.replaceChildren();
+  $("myLeagueRoster").classList.add("hidden");
+  if(!rows.length){host.innerHTML='<div class="private-empty">No se encontraron equipos para esta liga.</div>';return}
+  rows.forEach((row,index)=>{
+    const teamId=privateId(row,"team");
+    const name=privateText(privateField(row,["managerName","teamName","name","nickname","displayName","username","manager"]),teamId?"Equipo "+teamId:"Equipo "+(index+1));
+    const rank=privateField(row,["position","rank","ranking","place"])??(index+1);
+    const points=privateField(row,["totalPoints","points","pointsTotal","score","totalScore","standingPoints"]);
+    const button=document.createElement("button");
+    button.type="button";button.className="private-team-card";
+    button.innerHTML='<b>'+esc(name)+'</b><span>#'+esc(rank)+' · '+esc(points===null?"—":points)+" pts</span>";
+    if(teamId)button.addEventListener("click",()=>loadPrivateRoster(teamId,name));
+    else button.disabled=true;
+    host.appendChild(button);
+  });
+}
+async function loadPrivateRoster(teamId,teamName){
+  selectedPrivateRosterTeam={id:String(teamId),name:String(teamName||"Equipo")};
+  const host=$("myLeagueRoster");
+  host.classList.remove("hidden");
+  host.innerHTML='<div class="private-loading">Cargando plantilla de '+esc(selectedPrivateRosterTeam.name)+'…</div>';
+  try{
+    const leagueId=privateLeagueId(selectedPrivateLeague);
+    const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/teams/"+encodeURIComponent(teamId));
+    const players=privateRows(data,"roster");
+    const rows=players.map((player)=>{
+      const master=player.playerMaster||player.player||player;
+      const name=privateField(master,["nickname","name","displayName","fullName","shortName"]);
+      const position=privateField(master,["positionName","position","positionId","role"]);
+      const points=privateField(player,["points","totalPoints","weekPoints","averagePoints"]);
+      const value=privateField(master,["marketValue","value"]);
+      const pt=privateField(player,["playerTeamId"]);
+      return '<div class="private-player-row"><div><div class="private-player-name">'+esc(privateText(name,"Jugador"))+'</div><div class="private-player-meta">'+esc(position===null?"":("Posición: "+position))+(pt!==null?" · Ficha: "+esc(pt):"")+(points!==null?" · Puntos: "+esc(points):"")+'</div></div><div class="private-player-value">'+esc(value===null?"":privateMoney(value))+'</div></div>';
+    }).join("");
+    host.innerHTML='<div class="private-roster-head"><h3>'+esc(selectedPrivateRosterTeam.name)+' · Plantilla</h3><button type="button" data-load-lineup="'+esc(teamId)+'">Ver once</button></div>'+
+      (players.length?'<div>'+rows+'</div>':'<div class="private-empty">La respuesta no contiene una lista de jugadores reconocible. Consulta la respuesta de API o vuelve a intentarlo.</div>')+
+      '<div id="myPrivateLineup" class="private-roster"></div>';
+    const lineupButton=host.querySelector("[data-load-lineup]");
+    lineupButton.addEventListener("click",()=>loadPrivateLineup(teamId,selectedPrivateRosterTeam.name));
+  }catch(error){
+    host.innerHTML='<div class="private-empty">'+esc(error?.message||"No se pudo cargar la plantilla.")+'</div>';
+  }
+}
+async function loadPrivateLineup(teamId,teamName){
+  const host=$("myPrivateLineup");
+  if(!host)return;
+  host.innerHTML='<div class="private-loading">Cargando once actual…</div>';
+  try{
+    const data=await privateApi(PRIVATE_API_BASE+"/teams/"+encodeURIComponent(teamId)+"/lineup");
+    const formation=privateField(data,["tacticalFormation","formation","tactical_formation"]);
+    const players=privateCollection(data,["goalkeeper","defender","midfield","striker","players","lineup","data"]);
+    host.innerHTML='<div class="private-panel-intro">Once de '+esc(teamName)+(formation?' · Formación: '+esc(Array.isArray(formation)?formation.join("-"):formation):"")+'</div><pre>'+esc(JSON.stringify(data,null,2))+'</pre>';
+  }catch(error){
+    host.innerHTML='<div class="private-empty">No se pudo cargar el once: '+esc(error?.message||"error")+'</div>';
+  }
+}
+function renderPrivateMarket(rows){
+  const host=$("myMarketContent");
+  if(!rows.length){host.innerHTML='<div class="private-empty">El mercado no devolvió listados reconocibles. Puede estar vacío o la estructura de respuesta puede haber cambiado.</div>';return}
+  host.innerHTML=rows.map(item=>{
+    const player=item.playerMaster||item.player||item;
+    const name=privateField(player,["nickname","name","displayName","fullName"]);
+    const seller=privateField(item,["managerName","sellerName","teamName","sellerTeam","manager"]);
+    const price=privateField(item,["salePrice","price","marketValue","money"]);
+    const expiry=privateField(item,["expirationDate","expiresAt","expiration","endDate"]);
+    const bids=privateField(item,["numberOfBids","bidsCount","bidCount"]);
+    const offers=privateField(item,["numberOfOffers","offersCount","offerCount"]);
+    const meta=["Vendedor: "+privateText(seller),expiry!==null?"Caduca: "+privateDate(expiry):null,bids!==null?"Pujas: "+bids:null,offers!==null?"Ofertas: "+offers:null].filter(Boolean).join(" · ");
+    return '<div class="private-market-row"><div><div class="private-market-name">'+esc(privateText(name,"Jugador en mercado"))+'</div><div class="private-market-meta">'+esc(meta)+'</div></div><div class="private-market-price">'+esc(price===null?"Precio n/d":privateMoney(price))+'</div></div>';
+  }).join("");
+}
+function renderPrivateActivity(rows){
+  const host=$("myActivityContent");
+  if(!rows.length){host.innerHTML='<div class="private-empty">No hay movimientos visibles en esta página o la respuesta no contiene una lista reconocible.</div>';return}
+  host.innerHTML=rows.map(item=>{
+    const action=privateField(item,["activityName","description","typeName","activityType","title","activityTypeId"]);
+    const manager=privateField(item,["managerName","teamName","manager","team"]);
+    const player=privateField(item,["playerName","nickname","playerMaster","player"]);
+    const money=privateField(item,["money","amount","price","offerMoney"]);
+    const date=privateField(item,["date","createdAt","activityDate","creationDate"]);
+    const meta=[privateText(manager),player!==null?"Jugador: "+privateText(player):null,date!==null?privateDate(date):null].filter(Boolean).join(" · ");
+    return '<div class="private-activity-row"><div><div class="private-market-name">'+esc(privateText(action,"Movimiento de liga"))+'</div><div class="private-activity-meta">'+esc(meta)+'</div></div><div class="private-market-price">'+esc(money===null?"":privateMoney(money))+'</div></div>';
+  }).join("");
+}
+$("myLeaguesReload").onclick=()=>loadMyLeagues(true);
+$("myLeaguesLoginButton").onclick=()=>showAuth();
+$("backMyLeagues").onclick=closePrivateLeague;
+document.querySelectorAll("[data-private-tab]").forEach(button=>button.addEventListener("click",()=>switchPrivateLeagueTab(button.dataset.privateTab)));
+
 async function checkAuth(){
   try{
-    const r=await fetch("/api/auth",{headers:{Accept:"application/json"},cache:"no-store"});
+    const r=await fetch("/api/auth",{headers:{Accept:"application/json"},credentials:"same-origin",cache:"no-store"});
     const data=await r.json();
+    privateAuthState=data;
     setAuthUi(data);
-  }catch{setAuthUi({authenticated:false})}
+  }catch{privateAuthState={authenticated:false};setAuthUi(privateAuthState)}
 }
 function setAuthUi(data){
+  privateAuthState=data||{authenticated:false};
   const logged=!!data?.authenticated;
   const b=$("authButton");b.textContent=logged?"Sesión activa":"Iniciar sesión";b.classList.toggle("logged",logged);
   $("loginPanel").style.display=logged?"none":"block";
@@ -1788,8 +2142,9 @@ $("closeAuth").onclick=()=>{$("authModal").classList.add("hidden");$("authModal"
 $("authModal").onclick=e=>{if(e.target===$("authModal"))$("closeAuth").click()};
 $("logoutButton").onclick=async()=>{
   await fetch("/api/auth",{method:"DELETE",credentials:"same-origin",cache:"no-store"}).catch(()=>{});
-  $("googleCode").value="";setAuthUi({authenticated:false});
+  $("googleCode").value="";privateAuthState={authenticated:false};privateApiCache.clear();selectedPrivateLeague=null;setAuthUi({authenticated:false});
   $("loginState").className="auth-state";$("loginState").textContent="";
+  if(!$("my-leagues").classList.contains("hidden"))showPrivateLogin();
 };
 
 document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
@@ -1800,6 +2155,7 @@ document.querySelectorAll("[data-section]").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
   $(b.dataset.section).classList.add("active");
   if(b.dataset.section==="calendar")loadCalendar();
+  if(b.dataset.section==="my-leagues")loadMyLeagues();
 });
 $("closeModal").onclick=()=>{$("modal").classList.add("hidden");$("modal").setAttribute("aria-hidden","true")};$("modal").onclick=e=>{if(e.target===$("modal"))$("closeModal").click()};document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").classList.contains("hidden"))$("closeModal").click();if(e.key==="Escape"&&!$("authModal").classList.contains("hidden"))$("closeAuth").click()});
 $("apiGrid").replaceChildren(...EPS.map(apiCard));
