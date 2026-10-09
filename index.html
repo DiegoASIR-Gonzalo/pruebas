@@ -457,6 +457,20 @@ main.wrap{padding-bottom:96px!important}
 .private-player-open:focus-visible{outline:1px solid #eee;outline-offset:-2px}
 .highlight.has-private-context{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:650px){.highlight.has-private-context{grid-template-columns:repeat(2,minmax(0,1fr))}.private-player-open{padding:9px 5px;gap:6px}.private-player-side strong{font-size:10px}.private-player-side small{font-size:8px}}
+.private-market-balance{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 12px;padding:12px;border:1px solid #38301b;background:#11100a}
+.private-market-balance-label{display:block;color:#999;font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+.private-market-balance strong{display:block;color:#f2c300;font-size:22px;font-weight:900;margin-top:3px}
+.private-market-balance-state{font-size:9px;color:#777;margin-top:3px;line-height:1.4}
+.private-market-balance button{font-size:10px;white-space:nowrap;padding:8px 10px}
+.private-market-listing{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;border-bottom:1px solid #202020;background:#090909}
+.private-market-listing .private-player-open{border-bottom:0}
+.private-market-listing .private-player-open:hover{background:#151515}
+.private-market-action{align-self:center;margin:6px 8px 6px 0;padding:9px 11px!important;background:#e50914!important;border-color:#e50914!important;color:#fff!important;font-size:10px!important;font-weight:850;white-space:nowrap}
+.private-market-action:disabled,.private-action-button:disabled{opacity:.35;cursor:not-allowed}
+.private-roster-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;border-bottom:1px solid #202020;background:#090909}
+.private-roster-entry .private-player-open{border-bottom:0}
+.private-action-button{align-self:center;margin:6px 8px 6px 0;padding:8px 10px!important;background:#e50914!important;border-color:#e50914!important;color:#fff!important;font-size:9px!important;font-weight:850;white-space:nowrap}
+@media(max-width:500px){.private-market-balance{align-items:flex-start;padding:9px;gap:6px}.private-market-balance strong{font-size:18px}.private-market-balance button{font-size:9px;padding:7px 6px}.private-market-listing,.private-roster-entry{grid-template-columns:minmax(0,1fr) auto}.private-market-action,.private-action-button{margin-right:5px;padding:7px 6px!important;font-size:8px!important}}
 .private-loading{font-size:11px;color:#a6a6a6;padding:12px 4px}
 @media(max-width:650px){
   .private-league-grid,.private-team-list{grid-template-columns:1fr}
@@ -600,7 +614,11 @@ main.wrap{padding-bottom:96px!important}
           <div id="myLeagueRoster" class="private-roster hidden"></div>
         </div>
         <div id="myMarketPanel" class="private-panel hidden">
-          <div class="private-panel-intro">Solo lectura. El endpoint de mercado está documentado por el proyecto de referencia, pero todavía necesita verificación independiente con una cuenta real.</div>
+          <div class="private-panel-intro">Consulta el mercado, realiza pujas y revisa el saldo de tu equipo. Las operaciones se envían al servidor y solo se mostrarán como realizadas cuando este las confirme.</div>
+          <div class="private-market-balance">
+            <div><span class="private-market-balance-label">Saldo de tu equipo</span><strong id="myMarketBalanceValue">Consultando…</strong><div id="myMarketBalanceState" class="private-market-balance-state" aria-live="polite"></div></div>
+            <button type="button" id="myMarketRefreshBalance">Actualizar saldo</button>
+          </div>
           <div id="myMarketContent"></div>
         </div>
         <div id="myActivityPanel" class="private-panel hidden">
@@ -1767,6 +1785,8 @@ let selectedPrivateStanding=[];
 let selectedPrivateLeagueTab="standing";
 let selectedPrivateRosterTeam=null;
 let selectedPrivateRosterPlayers=[];
+let selectedPrivateBalance=null;
+let selectedPrivateOwnTeamId=null;
 
 function privateCollection(value,keys,depth=0){
   if(Array.isArray(value))return value;
@@ -1930,6 +1950,151 @@ function privateRows(data,kind){
           :["activities","activity","movements","items","entries","results","data","content","history"];
   return privateCollection(data,keys);
 }
+function privateOwnTeamId(league=selectedPrivateLeague){
+  if(!obj(league))return null;
+  const teamCandidates=[league.team,league.myTeam,league.userTeam,league.managerTeam,league.ownTeam];
+  for(const team of teamCandidates){
+    const id=privateDirectField(team,["id","teamId","team_id","managerTeamId"]);
+    if(id!==null)return String(id);
+  }
+  const direct=privateDirectField(league,["myTeamId","userTeamId","managerTeamId","ownTeamId"]);
+  return direct===null?null:String(direct);
+}
+function privateExtractMoney(data){
+  const parse=value=>{
+    if(typeof value==="number"&&Number.isFinite(value))return value;
+    if(typeof value!=="string"||!value.trim())return null;
+    const text=value.trim().replace(/€/g,"").replace(/\s/g,"");
+    const normalized=/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(text)?text.replace(/\./g,"").replace(",","."):text.replace(/,/g,".");
+    const parsed=Number(normalized.replace(/[^\d.-]/g,""));
+    return Number.isFinite(parsed)?parsed:null;
+  };
+  const direct=parse(data);
+  if(direct!==null)return direct;
+  const keys=["money","balance","budget","cash","availableMoney","teamMoney","amount","value","saldo"];
+  const visit=(node,depth=0)=>{
+    if(!node||typeof node!=="object"||depth>6)return null;
+    if(Array.isArray(node)){for(const item of node){const found=visit(item,depth+1);if(found!==null)return found;}return null;}
+    for(const key of keys){if(Object.prototype.hasOwnProperty.call(node,key)){const value=node[key];const found=parse(obj(value)?(value.value??value.amount??value.money??value.balance):value);if(found!==null)return found;}}
+    for(const value of Object.values(node)){const found=visit(value,depth+1);if(found!==null)return found;}
+    return null;
+  };
+  return visit(data);
+}
+async function loadPrivateMarketBalance(force=false){
+  const valueEl=$("myMarketBalanceValue"),stateEl=$("myMarketBalanceState");
+  if(!valueEl)return null;
+  valueEl.textContent="Consultando…";
+  if(stateEl)stateEl.textContent="";
+  try{
+    const leagueId=privateLeagueId(selectedPrivateLeague);
+    if(!leagueId)throw Error("No se ha identificado la liga activa.");
+    let teamId=privateOwnTeamId(selectedPrivateLeague);
+    if(!teamId){
+      const leaguesData=await privateApi(PRIVATE_API_BASE+"/leagues",force);
+      const league=privateRows(leaguesData,"leagues").find(x=>String(privateLeagueId(x))===String(leagueId));
+      teamId=privateOwnTeamId(league);
+      if(teamId)selectedPrivateOwnTeamId=String(teamId);
+    }else selectedPrivateOwnTeamId=String(teamId);
+    if(!teamId)throw Error("No se pudo identificar tu equipo en esta liga.");
+    const data=await privateApi(PRIVATE_API_BASE+"/teams/"+encodeURIComponent(teamId)+"/money",true);
+    const money=privateExtractMoney(data);
+    if(money===null)throw Error("La API no devolvió un saldo reconocible.");
+    selectedPrivateBalance=money;
+    valueEl.textContent=privateMoney(money);
+    if(stateEl)stateEl.textContent="Saldo actualizado";
+    return money;
+  }catch(error){
+    selectedPrivateBalance=null;
+    valueEl.textContent="No disponible";
+    if(stateEl)stateEl.textContent=error?.message||"No se pudo consultar el saldo.";
+    return null;
+  }
+}
+async function privateApiWrite(path,payload,method="POST"){
+  if(!privateAuthState?.authenticated)throw Error("Inicia sesión antes de realizar una operación.");
+  const response=await fetch("/api/auth?path="+encodeURIComponent(path),{
+    method,headers:{"Content-Type":"application/json","Accept":"application/json"},
+    credentials:"same-origin",cache:"no-store",body:payload===undefined?undefined:JSON.stringify(payload)
+  });
+  const raw=await response.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}catch{data={message:raw.slice(0,500)}}
+  if(!response.ok){
+    const detail=privateErrorMessage(data,response.status);
+    if(response.status===404||response.status===405||/oauth|redirect|method not allowed|not supported/i.test(String(detail))){
+      throw Error("El servidor de esta página todavía no permite operaciones de escritura. La puja o el clausulazo no se han confirmado; hace falta habilitar POST en el proxy del servidor.");
+    }
+    throw Error(detail+". La operación no se ha confirmado; actualiza mercado y saldo antes de volver a intentarlo.");
+  }
+  // Some auth-only handlers return HTTP 200 even when they do not proxy the requested mutation.
+  if(obj(data)&&("authenticated" in data)&&!("success" in data)&&!("result" in data)&&!("transactionId" in data)){
+    throw Error("El servidor respondió al flujo de autenticación y no confirmó la operación de mercado. Hace falta habilitar escrituras en el proxy.");
+  }
+  privateApiCache.clear();
+  return data;
+}
+function privateMarketId(item){
+  let id=privateDirectField(item,["marketId","market_id","marketPlayerId","marketPlayerID","listingId","marketItemId","marketEntryId"]);
+  if(id===null)id=privateDirectField(item,["id"]);
+  if(id===null&&obj(item?.market))id=privateDirectField(item.market,["id","marketId","listingId"]);
+  return id===null?null:String(id);
+}
+function privateIntegerMoney(value){
+  if(value===null||value===undefined||value==="")return null;
+  const raw=String(value).trim().replace(/€/g,"").replace(/\s/g,"");
+  const normalized=/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(raw)?raw.replace(/\./g,"").replace(",","."):raw.replace(/,/g,".");
+  const n=typeof value==="number"?value:Number(normalized.replace(/[^\d.-]/g,""));
+  return Number.isFinite(n)&&Number.isInteger(n)&&n>0?n:null;
+}
+async function placePrivateBid(item,index,button){
+  const leagueId=privateLeagueId(selectedPrivateLeague),marketId=privateMarketId(item),info=privatePlayerInfo(item);
+  if(!leagueId||!marketId){alert("Este anuncio no incluye un ID de mercado reconocible, así que no se puede pujar desde aquí.");return}
+  const listingPrice=privateField(item,["salePrice","price","marketValue","market_value","money"])??info.price;
+  const marketValue=info.cached?.market??privateField(item,["currentMarketValue","marketValue","market_value","fantasyValue"])??listingPrice;
+  const minimum=privateIntegerMoney(marketValue);
+  if(!minimum){alert("No se pudo determinar el importe mínimo de la puja. Actualiza el mercado e inténtalo de nuevo.");return}
+  const raw=window.prompt("¿Cuánto quieres pujar por "+info.name+"?\nLa puja mínima es "+privateMoney(minimum)+". Introduce euros sin separadores.",String(minimum));
+  if(raw===null)return;
+  const amount=privateIntegerMoney(raw);
+  if(!amount){alert("Introduce una cantidad válida en euros, sin decimales ni separadores.");return}
+  if(amount<minimum){alert("La puja no puede ser inferior al valor mínimo de "+privateMoney(minimum)+".");return}
+  const overBalance=selectedPrivateBalance!==null&&amount>selectedPrivateBalance;
+  const warning=overBalance?"\n\nAviso: tu saldo actual es "+privateMoney(selectedPrivateBalance)+" y esta puja lo supera. La liga puede rechazarla por sus límites de endeudamiento.":"";
+  if(!confirm("Vas a pujar "+privateMoney(amount)+" por "+info.name+".\n\nLiga: "+privateLeagueName(selectedPrivateLeague)+"\nSaldo actual: "+(selectedPrivateBalance===null?"no disponible":privateMoney(selectedPrivateBalance))+warning+"\n\n¿Confirmas el envío de la puja?"))return;
+  if(button)button.disabled=true;
+  privateSetPanelState("Enviando puja por "+info.name+"…");
+  try{
+    await privateApiWrite(PRIVATE_API_BASE+"/league/"+encodeURIComponent(leagueId)+"/market/"+encodeURIComponent(marketId)+"/bid",{money:amount},"POST");
+    privateSetPanelState("El servidor ha aceptado la solicitud de puja. Actualizando mercado y saldo…","good");
+    await switchPrivateLeagueTab("market");
+    await loadPrivateMarketBalance(true);
+  }catch(error){
+    privateSetPanelState(error?.message||"No se pudo confirmar la puja.","error");
+  }finally{if(button)button.disabled=false}
+}
+async function payPrivateBuyout(entry,button){
+  const leagueId=privateLeagueId(selectedPrivateLeague),info=privatePlayerInfo(entry);
+  const amount=privateIntegerMoney(info.clause);
+  if(!leagueId||!info.id||!amount){alert("No hay ID público o cláusula válida disponible para este jugador.");return}
+  const ownTeamId=selectedPrivateOwnTeamId||privateOwnTeamId(selectedPrivateLeague);
+  if(ownTeamId&&selectedPrivateRosterTeam&&String(ownTeamId)===String(selectedPrivateRosterTeam.id)){
+    alert("No puedes pagar la cláusula de un jugador de tu propio equipo.");return;
+  }
+  if(!confirm("Clausulazo por "+info.name+"\n\nEquipo actual: "+(selectedPrivateRosterTeam?.name||"Rival")+"\nCláusula: "+privateMoney(amount)+"\nSaldo actual: "+(selectedPrivateBalance===null?"no disponible":privateMoney(selectedPrivateBalance))+"\n\nEsta operación compra al jugador pagando la cláusula completa. ¿Confirmas el envío?"))return;
+  if(button)button.disabled=true;
+  privateSetPanelState("Enviando clausulazo por "+info.name+"…");
+  try{
+    await privateApiWrite(PRIVATE_API_BASE+"/league/"+encodeURIComponent(leagueId)+"/buyout/"+encodeURIComponent(info.id)+"/pay",{buyoutClauseToPay:amount},"POST");
+    privateSetPanelState("El servidor ha aceptado la solicitud de clausulazo. Actualizando plantilla…","good");
+    const team=selectedPrivateRosterTeam;
+    if(team)await loadPrivateRoster(team.id,team.name);
+    await loadPrivateMarketBalance(true);
+  }catch(error){
+    privateSetPanelState(error?.message||"No se pudo confirmar el clausulazo.","error");
+  }finally{if(button)button.disabled=false}
+}
+
 function showPrivateLogin(){
   $("myLeaguesLogin").classList.remove("hidden");
   $("myLeaguesContent").classList.add("hidden");
@@ -1988,6 +2153,8 @@ function renderMyLeagueCards(leagues){
 }
 async function openPrivateLeague(league){
   selectedPrivateLeague=league;
+  selectedPrivateOwnTeamId=privateOwnTeamId(league);
+  selectedPrivateBalance=null;
   selectedPrivateStanding=[];
   selectedPrivateRosterTeam=null;
   $("myLeagueCards").classList.add("hidden");
@@ -2001,6 +2168,8 @@ async function openPrivateLeague(league){
 }
 function closePrivateLeague(){
   selectedPrivateLeague=null;
+  selectedPrivateOwnTeamId=null;
+  selectedPrivateBalance=null;
   selectedPrivateStanding=[];
   selectedPrivateRosterTeam=null;
   $("myLeagueDetail").classList.add("hidden");
@@ -2033,8 +2202,9 @@ async function switchPrivateLeagueTab(tab){
       privateSetPanelState(selectedPrivateStanding.length?"Selecciona un equipo para ver su plantilla.":"No se encontraron equipos en la clasificación.",selectedPrivateStanding.length?"good":"");
     }else if(tab==="market"){
       privateSetPanelState("Consultando el mercado de la liga…");
-      const data=await privateApi(PRIVATE_API_BASE+"/league/"+encodeURIComponent(leagueId)+"/market");
+      const data=await privateApi(PRIVATE_API_BASE+"/league/"+encodeURIComponent(leagueId)+"/market",true);
       renderPrivateMarket(privateRows(data,"market"));
+      await loadPrivateMarketBalance(true);
       privateSetPanelState("Consulta de mercado completada.","good");
     }else if(tab==="activity"){
       privateSetPanelState("Cargando movimientos…");
@@ -2094,6 +2264,8 @@ async function loadPrivateRoster(teamId,teamName){
     const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/teams/"+encodeURIComponent(teamId));
     const rosterPlayers=privateRows(data,"roster");
     selectedPrivateRosterPlayers=rosterPlayers;
+    const ownTeamId=selectedPrivateOwnTeamId||privateOwnTeamId(selectedPrivateLeague);
+    const isOwnRoster=ownTeamId!==null&&String(ownTeamId)===String(teamId);
     const rows=rosterPlayers.map((player,index)=>{
       const info=privatePlayerInfo(player);
       const position=privateField(info.master,["positionName","position","positionId","role"]);
@@ -2103,12 +2275,15 @@ async function loadPrivateRoster(teamId,teamName){
       const avatar=info.image?'<img class="private-player-avatar" src="'+esc(info.image)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'<span class="private-player-avatar-fallback" aria-hidden="true"></span>';
       const price=info.price===null?'Precio n/d':privateMoney(info.price);
       const clause=info.clause===null?'Cláusula n/d':'Cláusula '+privateMoney(info.clause);
-      return '<button type="button" class="private-player-row private-player-open" data-private-roster-index="'+index+'"><span class="private-player-main">'+avatar+'<span class="private-player-main-text"><span class="private-player-name">'+esc(info.name)+'</span><span class="private-player-meta">'+esc(meta||"Ver ficha y estadísticas")+'</span></span></span><span class="private-player-side"><strong>'+esc(price)+'</strong><small>'+esc(clause)+'</small></span></button>';
+      const canBuyout=!isOwnRoster&&!!info.id&&privateIntegerMoney(info.clause)!==null;
+      const buyoutButton=canBuyout?'<button type="button" class="private-action-button" data-private-buyout-index="'+index+'">Clausulazo</button>':'';
+      return '<div class="private-roster-entry"><button type="button" class="private-player-row private-player-open" data-private-roster-index="'+index+'"><span class="private-player-main">'+avatar+'<span class="private-player-main-text"><span class="private-player-name">'+esc(info.name)+'</span><span class="private-player-meta">'+esc(meta||"Ver ficha y estadísticas")+'</span></span></span><span class="private-player-side"><strong>'+esc(price)+'</strong><small>'+esc(clause)+'</small></span></button>'+buyoutButton+'</div>';
     }).join("");
     host.innerHTML='<div class="private-roster-head"><h3>'+esc(selectedPrivateRosterTeam.name)+' · Plantilla</h3><button type="button" data-load-lineup="'+esc(teamId)+'">Ver once</button></div>'+
       (rosterPlayers.length?'<div>'+rows+'</div>':'<div class="private-empty">La respuesta no contiene una lista de jugadores reconocible. Consulta la respuesta de API o vuelve a intentarlo.</div>')+
       '<div id="myPrivateLineup" class="private-roster"></div>';
     host.querySelectorAll("[data-private-roster-index]").forEach(button=>button.addEventListener("click",()=>openPrivatePlayer(rosterPlayers[Number(button.dataset.privateRosterIndex)])));
+    host.querySelectorAll("[data-private-buyout-index]").forEach(button=>button.addEventListener("click",()=>payPrivateBuyout(rosterPlayers[Number(button.dataset.privateBuyoutIndex)],button)));
     const lineupButton=host.querySelector("[data-load-lineup]");
     lineupButton.addEventListener("click",()=>loadPrivateLineup(teamId,selectedPrivateRosterTeam.name));
   }catch(error){
@@ -2155,7 +2330,7 @@ async function loadPrivateLineup(teamId,teamName){
 }
 function renderPrivateMarket(rows){
   const host=$("myMarketContent");
-  if(!rows.length){host.innerHTML='<div class="private-empty">El mercado no devolvió listados reconocibles. Puede estar vacío o la estructura de respuesta puede haber cambiado.</div>';return}
+  if(!rows.length){host.innerHTML='<div class="private-empty">El mercado está vacío o la respuesta no contiene listados reconocibles.</div>';return}
   host.innerHTML=rows.map((item,index)=>{
     const info=privatePlayerInfo(item);
     const seller=privateField(item,["managerName","sellerName","teamName","sellerTeam","manager"]);
@@ -2165,10 +2340,16 @@ function renderPrivateMarket(rows){
     const meta=["Vendedor: "+privateText(seller),expiry!==null?"Caduca: "+privateDate(expiry):null,bids!==null?"Pujas: "+bids:null,offers!==null?"Ofertas: "+offers:null].filter(Boolean).join(" · ");
     const avatar=info.image?'<img class="private-player-avatar" src="'+esc(info.image)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'<span class="private-player-avatar-fallback" aria-hidden="true"></span>';
     const price=privateField(item,["salePrice","price","marketValue","money"])??info.price;
-    return '<button type="button" class="private-market-row private-player-open" data-private-market-index="'+index+'"><span class="private-player-main">'+avatar+'<span class="private-player-main-text"><span class="private-market-name">'+esc(info.name||"Jugador en mercado")+'</span><span class="private-market-meta">'+esc(meta)+'</span></span></span><span class="private-player-side"><strong>'+esc(price===null?"Precio n/d":privateMoney(price))+'</strong></span></button>';
+    const marketId=privateMarketId(item);
+    const marketValue=info.cached?.market??privateField(item,["currentMarketValue","marketValue","market_value","fantasyValue"])??price;
+    const minimum=privateIntegerMoney(marketValue);
+    const disabled=!marketId||!minimum;
+    return '<div class="private-market-listing"><button type="button" class="private-market-row private-player-open" data-private-market-index="'+index+'"><span class="private-player-main">'+avatar+'<span class="private-player-main-text"><span class="private-market-name">'+esc(info.name||"Jugador en mercado")+'</span><span class="private-market-meta">'+esc(meta)+'</span></span></span><span class="private-player-side"><strong>'+esc(price===null?"Precio n/d":privateMoney(price))+'</strong>'+(minimum!==null?'<small>Mínimo '+esc(privateMoney(minimum))+'</small>':'')+'</span></button><button type="button" class="private-market-action" data-private-bid-index="'+index+'" '+(disabled?'disabled title="No hay datos suficientes para pujar"':'')+'>Pujar</button></div>';
   }).join("");
   host.querySelectorAll("[data-private-market-index]").forEach(button=>button.addEventListener("click",()=>openPrivatePlayer(rows[Number(button.dataset.privateMarketIndex)])));
+  host.querySelectorAll("[data-private-bid-index]").forEach(button=>button.addEventListener("click",()=>placePrivateBid(rows[Number(button.dataset.privateBidIndex)],Number(button.dataset.privateBidIndex),button)));
 }
+
 function renderPrivateActivity(rows){
   const host=$("myActivityContent");
   if(!rows.length){host.innerHTML='<div class="private-empty">No hay movimientos visibles en esta página o la respuesta no contiene una lista reconocible.</div>';return}
@@ -2183,6 +2364,7 @@ function renderPrivateActivity(rows){
   }).join("");
 }
 $("myLeaguesReload").onclick=()=>loadMyLeagues(true);
+$("myMarketRefreshBalance")?.addEventListener("click",()=>loadPrivateMarketBalance(true));
 $("myLeaguesLoginButton").onclick=()=>showAuth();
 $("backMyLeagues").onclick=closePrivateLeague;
 document.querySelectorAll("[data-private-tab]").forEach(button=>button.addEventListener("click",()=>switchPrivateLeagueTab(button.dataset.privateTab)));
@@ -2199,7 +2381,7 @@ function setAuthUi(data){
   const wasLogged=!!privateAuthState?.authenticated;
   privateAuthState=data||{authenticated:false};
   const logged=!!data?.authenticated;
-  if(wasLogged&&!logged){privateApiCache.clear();selectedPrivateLeague=null;selectedPrivateRosterTeam=null;selectedPrivateRosterPlayers=[];}
+  if(wasLogged&&!logged){privateApiCache.clear();selectedPrivateLeague=null;selectedPrivateRosterTeam=null;selectedPrivateRosterPlayers=[];selectedPrivateBalance=null;selectedPrivateOwnTeamId=null;}
   const b=$("authButton");b.textContent=logged?"Sesión activa":"Iniciar sesión";b.classList.toggle("logged",logged);
   $("loginPanel").style.display=logged?"none":"block";
   $("sessionPanel").style.display=logged?"block":"none";
@@ -2240,7 +2422,7 @@ $("closeAuth").onclick=()=>{$("authModal").classList.add("hidden");$("authModal"
 $("authModal").onclick=e=>{if(e.target===$("authModal"))$("closeAuth").click()};
 $("logoutButton").onclick=async()=>{
   await fetch("/api/auth",{method:"DELETE",credentials:"same-origin",cache:"no-store"}).catch(()=>{});
-  $("googleCode").value="";privateAuthState={authenticated:false};privateApiCache.clear();selectedPrivateLeague=null;setAuthUi({authenticated:false});
+  $("googleCode").value="";privateAuthState={authenticated:false};privateApiCache.clear();selectedPrivateLeague=null;selectedPrivateBalance=null;selectedPrivateOwnTeamId=null;setAuthUi({authenticated:false});
   $("loginState").className="auth-state";$("loginState").textContent="";
   if(!$("my-leagues").classList.contains("hidden"))showPrivateLogin();
 };
