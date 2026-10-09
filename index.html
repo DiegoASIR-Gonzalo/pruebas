@@ -1748,6 +1748,7 @@ let selectedPrivateLeague=null;
 let selectedPrivateStanding=[];
 let selectedPrivateLeagueTab="standing";
 let selectedPrivateRosterTeam=null;
+let selectedPrivateRosterPlayers=[];
 
 function privateCollection(value,keys,depth=0){
   if(Array.isArray(value))return value;
@@ -1839,6 +1840,7 @@ async function privateApi(path,force=false){
   try{data=raw?JSON.parse(raw):{}}catch{data={message:raw.slice(0,350)}}
   if(response.status===401){
     privateAuthState={authenticated:false};
+    privateApiCache.clear();
     setAuthUi(privateAuthState);
     $("myLeaguesLogin").classList.remove("hidden");
     $("myLeaguesContent").classList.add("hidden");
@@ -2028,6 +2030,7 @@ async function loadPrivateRoster(teamId,teamName){
     const leagueId=privateLeagueId(selectedPrivateLeague);
     const data=await privateApi(PRIVATE_API_BASE+"/leagues/"+encodeURIComponent(leagueId)+"/teams/"+encodeURIComponent(teamId));
     const players=privateRows(data,"roster");
+    selectedPrivateRosterPlayers=players;
     const rows=players.map((player)=>{
       const master=player.playerMaster||player.player||player;
       const name=privateField(master,["nickname","name","displayName","fullName","shortName"]);
@@ -2052,9 +2055,34 @@ async function loadPrivateLineup(teamId,teamName){
   host.innerHTML='<div class="private-loading">Cargando once actual…</div>';
   try{
     const data=await privateApi(PRIVATE_API_BASE+"/teams/"+encodeURIComponent(teamId)+"/lineup");
-    const formation=privateField(data,["tacticalFormation","formation","tactical_formation"]);
-    const players=privateCollection(data,["goalkeeper","defender","midfield","striker","players","lineup","data"]);
-    host.innerHTML='<div class="private-panel-intro">Once de '+esc(teamName)+(formation?' · Formación: '+esc(Array.isArray(formation)?formation.join("-"):formation):"")+'</div><pre>'+esc(JSON.stringify(data,null,2))+'</pre>';
+    const root=data&&typeof data==="object"?(data.lineup&&typeof data.lineup==="object"?data.lineup:data):{};
+    const formation=root.tactical_formation||root.tacticalFormation||(root.formation&&root.formation.tacticalFormation)||root.formation||null;
+    const lookup=new Map();
+    selectedPrivateRosterPlayers.forEach(player=>{
+      const pId=privateField(player,["playerTeamId","id","playerId"]);
+      const pName=privateField(player.playerMaster||player.player||player,["nickname","name","displayName","fullName"]);
+      if(pId!==null&&pName!==null)lookup.set(String(pId),String(pName));
+    });
+    const entryName=entry=>{
+      if(entry===null||entry===undefined||entry==="")return "—";
+      if(typeof entry==="object"){
+        const name=privateField(entry,["nickname","name","displayName","fullName"]);
+        const id=privateField(entry,["playerTeamId","id","playerId"]);
+        return name!==null?String(name):(id!==null?(lookup.get(String(id))||("Ficha "+id)):"Jugador");
+      }
+      return lookup.get(String(entry))||("Ficha "+String(entry));
+    };
+    const groups=[
+      ["Portero",root.goalkeeper],
+      ["Defensas",root.defender||root.defenders],
+      ["Centrocampistas",root.midfield||root.midfielders],
+      ["Delanteros",root.striker||root.strikers]
+    ];
+    const cards=groups.map(([label,value])=>{
+      const entries=Array.isArray(value)?value:(value===null||value===undefined?[]:[value]);
+      return '<div class="private-player-row"><div><div class="private-player-name">'+esc(label)+'</div><div class="private-player-meta">'+esc(entries.length?entries.map(entryName).join(" · "):"Sin jugador asignado")+'</div></div><div class="private-player-value">'+entries.length+'</div></div>';
+    }).join("");
+    host.innerHTML='<div class="private-panel-intro">Once de '+esc(teamName)+(formation?' · Formación: '+esc(Array.isArray(formation)?formation.join("-"):formation):"")+'</div>'+cards+'<details style="margin-top:10px"><summary class="private-panel-intro">Ver respuesta técnica</summary><pre>'+esc(JSON.stringify(data,null,2))+'</pre></details>';
   }catch(error){
     host.innerHTML='<div class="private-empty">No se pudo cargar el once: '+esc(error?.message||"error")+'</div>';
   }
