@@ -125,7 +125,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 .team-logo{width:42px;height:42px;border-radius:0!important;background:#151515;object-fit:contain}.team-name{font-size:12px}.team-short,.team-count{font-size:9px;color:#777}
 .team-detail{padding:0 10px}
 #api .tool-grid{grid-template-columns:1fr;padding:0 10px}.api-card{border-radius:0;background:#0b0b0b;border-color:#252525}.api-head{padding:10px}.api-name{font-size:12px}.api-desc{font-size:9px}.api-body{padding:9px}.api-route{font-size:9px;background:#050505;border-color:#202020;border-radius:0}.api-row{flex-wrap:wrap}.api-row input{font-size:10px}.api-row button{font-size:10px}
-.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);height:64px;background:#050505;border-top:1px solid #252525;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav button{border:0;border-radius:0;background:transparent;color:#666;padding:7px 2px 4px;font-size:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.bottom-nav .ico{font-size:19px;line-height:1}.bottom-nav button.active{color:var(--red)}
 .modal,.dialog,.profile-img,.chip,.highlight>div,.week-btn,.week-title,.week-stat,.media-card,.google-step,.auth-state,.kv,.auth-button,.choice-secondary,.google-login{border-radius:0!important}
 .modal{background:rgba(0,0,0,.86)}.dialog{background:#090909;border-color:#292929;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -136,7 +136,7 @@ main.wrap{width:min(100%,430px);padding:0 0 78px}
 @media(max-width:699px){.app-shell{width:100%}}
 
 /* ===== Responsive desktop layout + fixed bottom navigation ===== */
-.bottom-nav{grid-template-columns:repeat(7,1fr)!important}
+.bottom-nav{grid-template-columns:repeat(8,minmax(0,1fr))!important}
 .bottom-nav{position:fixed!important;left:50%!important;bottom:0!important;transform:translateX(-50%)!important;width:min(100%,760px)!important;height:68px!important;z-index:100!important;background:#050505!important;border-top:1px solid #252525!important;box-shadow:0 -8px 24px rgba(0,0,0,.55)!important}
 main.wrap{padding-bottom:96px!important}
 @media(min-width:700px){
@@ -398,6 +398,61 @@ main.wrap{padding-bottom:96px!important}
   .compare-value{font-size:25px}
   .compare-metric{font-size:10px}
 }
+
+/* ===== Private leagues dashboard ===== */
+.private-hero{margin-top:1vh!important;text-align:left!important;padding:18px 12px 12px!important}
+.private-hero h1{font-size:clamp(25px,4vw,36px)!important}
+.private-hero p{max-width:850px;font-size:12px!important;color:#858585}
+.private-page-actions{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:0 10px 12px}
+.private-state{font-size:11px;color:#9a9a9a;line-height:1.5;min-height:20px}
+.private-state.error{color:#ff9ca5}
+.private-state.good{color:#8ae2b6}
+.private-login-prompt,.private-detail{margin:0 10px 14px;border:1px solid #292929;background:#0b0b0b;padding:13px}
+.private-empty-title{font-weight:850;font-size:15px}
+.private-login-prompt p,.private-panel-intro{font-size:11px;color:#888;line-height:1.5;margin:7px 0 11px}
+.private-league-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 10px}
+.private-league-card{width:100%;text-align:left;padding:13px;background:#0b0b0b;border:1px solid #2b2b2b;display:flex;flex-direction:column;gap:7px;min-height:100px}
+.private-league-card:hover{border-color:#a9a9a9;background:#111}
+.private-league-name{font-weight:850;font-size:14px;color:#f2f2f2}
+.private-league-meta{font-size:10px;color:#888;line-height:1.45}
+.private-detail-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.private-detail-heading{min-width:0}
+.private-detail-heading h2{font-size:18px;margin:0 0 4px}
+.private-muted{font-size:10px;color:#888}
+.private-tabs{display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid #292929;margin-bottom:12px;padding-bottom:9px}
+.private-tabs button{font-size:10px;padding:8px 10px}
+.private-tabs button.active{border-color:#a4a4a4;color:#fff;background:#202020}
+.private-panel{min-width:0}
+.private-table-wrap{overflow-x:auto;border:1px solid #292929}
+.private-table{width:100%;border-collapse:collapse;font-size:11px;min-width:460px}
+.private-table th,.private-table td{padding:9px 8px;border-bottom:1px solid #222;text-align:left;vertical-align:middle}
+.private-table th{color:#8c8c8c;font-size:9px;text-transform:uppercase;letter-spacing:.05em;background:#101010}
+.private-table tr:last-child td{border-bottom:0}
+.private-table .numeric{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.private-team-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.private-team-card{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:10px;border:1px solid #262626;background:#080808;min-width:0}
+.private-team-card:hover{background:#121212;border-color:#777}
+.private-team-card b{font-size:11px;overflow-wrap:anywhere}
+.private-team-card span{font-size:10px;color:#888;white-space:nowrap}
+.private-roster{margin-top:14px;border-top:1px solid #2a2a2a;padding-top:12px}
+.private-roster-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.private-roster-head h3{font-size:14px;margin:0}
+.private-player-row,.private-market-row,.private-activity-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 8px;border-bottom:1px solid #202020;background:#090909}
+.private-player-name,.private-market-name{font-size:11px;font-weight:800}
+.private-player-meta,.private-market-meta,.private-activity-meta{font-size:9px;color:#888;margin-top:4px;line-height:1.45}
+.private-player-value,.private-market-price{font-size:11px;font-weight:800;text-align:right;white-space:nowrap}
+.private-empty{padding:15px;border:1px dashed #333;text-align:center;font-size:11px;color:#8a8a8a;line-height:1.5}
+.private-warning{font-size:10px;line-height:1.5;color:#cdbb83;padding:8px 10px;border:1px solid #4a4025;background:#151208;margin-bottom:10px}
+.private-loading{font-size:11px;color:#a6a6a6;padding:12px 4px}
+@media(max-width:650px){
+  .private-league-grid,.private-team-list{grid-template-columns:1fr}
+  .private-detail{padding:9px}
+  .private-detail-head{align-items:flex-start;flex-direction:column;gap:9px}
+  .private-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .private-tabs button{padding:9px 5px}
+  .private-table th,.private-table td{padding:8px 6px}
+}
+
 </style>
 </head>
 <body>
@@ -408,6 +463,7 @@ main.wrap{padding-bottom:96px!important}
     <nav class="nav">
       <button class="active" data-section="home">Inicio</button>
       <button data-section="teams">Equipos</button>
+      <button data-section="my-leagues">Mis Ligas</button>
       <button data-section="calendar">Calendario</button>
       <button data-section="create-team">Crear Plantilla</button>
       <button data-section="forgotten">Olvidados</button>
@@ -491,6 +547,55 @@ main.wrap{padding-bottom:96px!important}
     </section>
   </section>
 
+
+  <section id="my-leagues" class="section" aria-labelledby="myLeaguesTitle">
+    <div class="hero private-hero">
+      <h1 id="myLeaguesTitle">Mis Ligas</h1>
+      <p>Consulta tus ligas, clasificaciones, plantillas de los managers, mercado y movimientos.</p>
+    </div>
+    <div class="private-page-actions">
+      <div id="myLeaguesState" class="private-state" aria-live="polite">Inicia sesión para cargar tus ligas.</div>
+      <button id="myLeaguesReload" type="button">Actualizar</button>
+    </div>
+    <div id="myLeaguesLogin" class="private-login-prompt">
+      <div class="private-empty-title">Tu cuenta de Fantasy</div>
+      <p>Inicia sesión con Google para consultar la información privada de tus ligas.</p>
+      <button id="myLeaguesLoginButton" type="button" class="primary">Iniciar sesión</button>
+    </div>
+    <div id="myLeaguesContent" class="hidden">
+      <div id="myLeagueCards" class="private-league-grid"></div>
+      <section id="myLeagueDetail" class="private-detail hidden">
+        <div class="private-detail-head">
+          <button type="button" id="backMyLeagues">← Todas mis ligas</button>
+          <div class="private-detail-heading">
+            <h2 id="myLeagueName">Liga</h2>
+            <div id="myLeagueMeta" class="private-muted"></div>
+          </div>
+        </div>
+        <div id="myLeagueTabs" class="private-tabs">
+          <button type="button" data-private-tab="standing" class="active">Clasificación</button>
+          <button type="button" data-private-tab="teams">Equipos y plantillas</button>
+          <button type="button" data-private-tab="market">Mercado</button>
+          <button type="button" data-private-tab="activity">Movimientos</button>
+        </div>
+        <div id="myLeaguePanelState" class="private-state" aria-live="polite"></div>
+        <div id="myStandingPanel" class="private-panel"></div>
+        <div id="myTeamsPanel" class="private-panel hidden">
+          <div class="private-panel-intro">Selecciona un manager para abrir su plantilla. El endpoint de plantillas está verificado con cuenta real según el documento técnico.</div>
+          <div id="myLeagueTeamList" class="private-team-list"></div>
+          <div id="myLeagueRoster" class="private-roster hidden"></div>
+        </div>
+        <div id="myMarketPanel" class="private-panel hidden">
+          <div class="private-panel-intro">Solo lectura. El endpoint de mercado está documentado por el proyecto de referencia, pero todavía necesita verificación independiente con una cuenta real.</div>
+          <div id="myMarketContent"></div>
+        </div>
+        <div id="myActivityPanel" class="private-panel hidden">
+          <div class="private-panel-intro">Historial de movimientos de la liga. Esta ruta también está pendiente de verificación con cuenta real.</div>
+          <div id="myActivityContent"></div>
+        </div>
+      </section>
+    </div>
+  </section>
 
   <section id="calendar" class="section" aria-labelledby="calendarTitle">
     <div class="hero" style="margin-top:1vh">
@@ -616,6 +721,7 @@ main.wrap{padding-bottom:96px!important}
 <nav class="bottom-nav" aria-label="Navegación principal">
   <button class="active" data-section="home"><span class="ico">♜</span><span>Inicio</span></button>
   <button data-section="teams"><span class="ico">▦</span><span>Equipos</span></button>
+  <button data-section="my-leagues"><span class="ico">♙</span><span>Ligas</span></button>
   <button data-section="calendar"><span class="ico">▤</span><span>Calendario</span></button>
   <button data-section="create-team"><span class="ico">⚽</span><span>Plantilla</span></button>
   <button data-section="compare"><span class="ico">VS</span><span>Comparar</span></button>
