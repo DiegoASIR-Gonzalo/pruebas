@@ -26,24 +26,24 @@ function json(res, status, body) {
 function cookie(name, value, maxAge, sameSite) {
   return name + "=" + encodeURIComponent(value) +
     "; Max-Age=" + Math.max(0, Math.floor(maxAge)) +
-    "; Path=/; HttpOnly; Secure; SameSite=" + (sameSite || "Strict") +
+    "; Path=/api/auth; HttpOnly; Secure; SameSite=" + (sameSite || "Strict") +
     "; Priority=High";
 }
 
-function clearCookie(name) {
-  return name + "=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; HttpOnly; Secure; SameSite=Strict";
+function clearCookie(name, path) {
+  return name + "=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=" + (path || "/api/auth") + "; HttpOnly; Secure; SameSite=Strict";
 }
 
 function clearOAuthCookies() {
-  return [
-    clearCookie(STATE_COOKIE),
-    clearCookie(VERIFIER_COOKIE),
-    clearCookie(NONCE_COOKIE)
-  ];
+  return [STATE_COOKIE, VERIFIER_COOKIE, NONCE_COOKIE].flatMap(function (name) {
+    return [clearCookie(name, "/api/auth"), clearCookie(name, "/")];
+  });
 }
 
 function clearSessionCookies() {
-  return [clearCookie(SESSION_COOKIE), clearCookie(REFRESH_COOKIE)];
+  return [SESSION_COOKIE, REFRESH_COOKIE].flatMap(function (name) {
+    return [clearCookie(name, "/api/auth"), clearCookie(name, "/")];
+  });
 }
 
 function parseCookies(header) {
