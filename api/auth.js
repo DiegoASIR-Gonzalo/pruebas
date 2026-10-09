@@ -360,6 +360,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "DELETE") {
+    if (!sameOrigin(req)) {
+      return json(res, 403, { error: "Origen no permitido." });
+    }
     res.setHeader("Set-Cookie", clearSessionCookies().concat(clearOAuthCookies()));
     return json(res, 200, { authenticated: false });
   }
