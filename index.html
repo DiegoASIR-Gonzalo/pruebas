@@ -2166,6 +2166,7 @@ $("completeGoogle").onclick=async()=>{
     if(!r.ok)throw Error(data.error||("HTTP "+r.status));
     state.className="auth-state show good";state.textContent="Cuenta de LALIGA verificada. Sesión iniciada correctamente.";
     $("googleCode").value="";setAuthUi(data);
+    if(!$("my-leagues").classList.contains("hidden"))loadMyLeagues(true);
   }catch(e){state.className="auth-state show error";state.textContent=e.message||"No se pudo completar el login con Google."}
   finally{btn.disabled=false}
 };
